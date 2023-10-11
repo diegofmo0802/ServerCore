@@ -11,5 +11,5 @@ export const Saml = {
 	Debug: Debug,
 	Plantilla: Plantilla
 }
-/**@type {typeof import('./Tipo').Saml.Servidor} */
+
 export default Servidor;

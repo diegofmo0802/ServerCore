@@ -6,7 +6,7 @@
 import CRYPTO from 'crypto';
 import EVENTS from 'events';
 
-export default class WebSocket extends EVENTS {
+class WebSocket extends EVENTS {
     /**@type {import('stream').Duplex} Contiene la conexión con el cliente. */
     Conexión = null;
     /**@type {string} Contiene la SS_UUID de la sesión asociada al WebSocket. */
@@ -45,7 +45,7 @@ export default class WebSocket extends EVENTS {
      * @param {boolean} Texto indica si el contenido es texto o no.
      * @returns {Buffer}
      */
-    Codificar (Datos, Texto = null) {
+    Codificar (Datos, Texto = false) {
         let Codificado = Texto ? [129] : [130];
         if (Datos.length <= 125) {
             Codificado[1] = Datos.length;
@@ -212,7 +212,8 @@ export default class WebSocket extends EVENTS {
         this.Conexión.on('error', /**@event Error */     (Error) => this.emit('Error', Error));
     }
 }
-/** Para aceptar las peticiones de conexión a WebSocket
+export default WebSocket;
+/* Para aceptar las peticiones de conexión a WebSocket
  * 
  * HTTP/1.1 101 Switching Protocols
  * Upgrade: websocket

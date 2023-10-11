@@ -2,12 +2,12 @@
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade el sistema de plantillas `.HSaml`.
  * @license Saml
- * @module Saml/Plantilla
+ * @module saml.server_core/Plantilla
  */
 
 import FS from 'fs';
 
-export default class Plantilla {
+class Plantilla {
 	static Expresiones = {
 		Variable: /(?<=\$Variable{)[^]*?(?=})/ig, //Completada
 		Array: {
@@ -23,13 +23,13 @@ export default class Plantilla {
 	 * @returns {Promise<string>}
 	 */
 	static Cargar(Ruta, Datos) {
-		return new Promise((PrREspuesta, PrError) => {
+		return new Promise((PrRespuesta, PrError) => {
 			FS.stat(Ruta, (Error, Detalles) => {
 				if (Error) return PrError(Error.message);
-				if (!(Detalles.isFile)) return PrError('La ruta no pertenece a una plantilla');
+				if (! (Detalles.isFile)) return PrError('La ruta no pertenece a una plantilla');
 				FS.readFile(Ruta, (Error, Plantilla) => {
 					if (Error) return PrError(Error.message);
-					PrREspuesta(this.Compilar(Plantilla.toString(), Datos));
+					PrRespuesta(this.Compilar(Plantilla.toString(), Datos));
 				});
 			});
 		});
@@ -40,10 +40,10 @@ export default class Plantilla {
 	 * @param {{}} Datos Los datos con los que se compilara la plantilla.
 	 * @returns {string}
 	 */
-	static Compilar(Plantilla, Datos) {
+	static Compilar(Contenido, Datos) {
 		for (let ID in Datos) {
-			if (typeof Datos[ID] !== 'object') {//@ts-ignore
-				Plantilla = Plantilla.replaceAll(`$Variable{${ID}}`, Datos[ID]);
+			if (typeof Datos[ID] !== 'object') {
+				Contenido = Contenido.replaceAll(`$Variable{${ID}}`, Datos[ID]);
 			} else {
 				/**
 				 * Compila la etiqueta <HSaml:Array>.
@@ -52,24 +52,25 @@ export default class Plantilla {
 				 * @returns {void}
 				 */
 				const CompilarOBJ = (Nombre, Datos) => {
-					let Bloques = Plantilla.match(this.Expresiones.Array.Bloque);
+					let Bloques = Contenido.match(this.Expresiones.Array.Bloque);
 					if (Bloques) for (let Bloque of Bloques) {
 						let Variable = Bloque.match(this.Expresiones.Array.Variable);
 						if (Variable) if (Nombre == Variable[0]) {
 							let Formato = Bloque.replace(this.Expresiones.Array.Formato, '');
 							let SubPlantilla = '';
-							for (let ID in Datos) {// @ts-ignore
+							for (let ID in Datos) {
 								SubPlantilla += Formato.replaceAll(
 									`$Array{Valor}`, Datos[ID]
 								).replaceAll(`$Array{ID}`, ID);
-							}// @ts-ignore
-							Plantilla = Plantilla.replaceAll(Bloque, SubPlantilla);
+							}
+							Contenido = Contenido.replaceAll(Bloque, SubPlantilla);
 						}
 					}
 				};
 				CompilarOBJ(ID, Datos[ID]);
 			}
 		}
-		return Plantilla;
+		return Contenido;
 	}
 }
+export default Plantilla;

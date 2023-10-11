@@ -1,16 +1,16 @@
-import URI from 'url';
-
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade la forma de Petición de `Saml/Server-core`.
  */
 
-export default class Petición {
+import URI from 'url';
+
+class Petición {
 	/**@type {import('http').IncomingHttpHeaders} Contiene los encabezados de la petición. */
 	Cabeceras = null;
 	/**@type {Map<string, string>} Contiene las cookies de la petición. */
 	Cookies = null;
-	/**@type {Promise<import('../Tipo').Saml.Servidor.Petición.GET>} Contiene los datos POST que se enviaron. */
+	/**@type {import('../Tipo').Saml.Servidor.Petición.GET} Contiene los datos POST que se enviaron. */
 	GET = null;
 	/**@type {string} Contiene la dirección IP de quien realizo la petición. */
 	IP = null;
@@ -35,7 +35,7 @@ export default class Petición {
 		this.IP = this.Cabeceras['x-forwarded-for']
 		? SrvPetición.headers['x-forwarded-for'].toString()
 		: SrvPetición.socket.remoteAddress;
-		this.Método = Petición.Método(SrvPetición.method);
+		this.Método = this.ObtenerMétodo(SrvPetición.method);
 		this.POST = this.Datos_Post(SrvPetición);
 		this.SrvPetición = SrvPetición;
 		this.Url = SrvPetición.url.split('?')[0];
@@ -134,24 +134,25 @@ export default class Petición {
 		});
 	}
 	/**
-	 * Define que método se uso para realizar la petición.
-	 * @param {string} Método El método con el que se realizo la petición.
-	 * @returns {import('../Tipo').Saml.Servidor.Petición.Método}
-	 */
-	static Método(Método) {
-		return Método == 'POST'
-		? 'POST'
-		: Método == 'PUT' ? 'PUT'
-			: Método == 'DELETE' ? 'DELETE'
-			: 'GET';
-	}
-	/**
 	 * Obtiene los datos enviados por medio de URL QUERY.
 	 * @param {string} Url La url recibida de la petición http.
 	 * @returns {Map<string,string>}
 	 */
 	Variables_Get(Url) {
 		let Ob_Url = new URI.URL(`http://x.x${Url}`);
-		return Ob_Url.searchParams;
+		return new Map(Ob_Url.searchParams);
+	}
+	/**
+	 * Define que método se uso para realizar la petición.
+	 * @param {string} Método El método con el que se realizo la petición.
+	 * @returns {import('../Tipo').Saml.Servidor.Petición.Método}
+	 */
+	ObtenerMétodo(Método) {
+		return Método == 'POST'
+		? 'POST'
+		: Método == 'PUT' ? 'PUT'
+			: Método == 'DELETE' ? 'DELETE'
+			: 'GET';
 	}
 }
+export default Petición;
