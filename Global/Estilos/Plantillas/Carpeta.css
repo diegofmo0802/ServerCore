@@ -1,0 +1,77 @@
+#Carpeta {
+    --Color_Fondo: rgb(255,180,220);
+    --Color_Fondo_Contenido: rgba(255,0,0,0.1);
+    --Color_Fondo_Atrás: rgba(180,220,255,0.5);
+    --Color_Fondo_Atrás_Acción: rgba(180,220,255,0.75);
+    --Color_Fondo_Búsqueda: rgba(255,180,220,0.5);
+    --Color_Fondo_Búsqueda_Acción: rgba(255,180,220,0.75);
+    --Color_Fondo_Elemento: rgba(220,255,180,0.25);
+    --Color_Fondo_Elemento_Acción: rgba(220,255,180,0.5);
+    --Color_Borde_Búsqueda_Acción: rgb(180,220,255);
+}
+#Carpeta {
+    align-items: center;
+    background: var(--Color_Fondo);
+    height: 100%;
+    overflow: visible scroll;
+    position: fixed;
+    width: 100%;
+}
+#Carpeta .Contenido {
+    background: var(--Color_Fondo_Contenido);
+    border-radius: 2em;
+    margin-top: 2em;
+    padding: 2em;
+    text-align: center;
+    width: 70%;
+}
+#Carpeta .Opciones {
+    display: flex;
+    text-align: start;
+}
+#Carpeta #Carpeta_Cambiar {
+    cursor: pointer;
+}
+#Carpeta .Atrás,
+#Carpeta #Carpeta_Ruta,
+#Carpeta #Carpeta_Cambiar {
+    background: var(--Color_Fondo_Atrás);
+    border-radius: 1em;
+    color: rgb(0,0,0);
+    display: inline-block;
+    margin: 0.5em;
+    padding: 1em;
+    text-decoration: none;
+}
+#Carpeta #Carpeta_Ruta,
+#Carpeta #Carpeta_Cambiar {
+    background: var(--Color_Fondo_Búsqueda);
+    border: none;
+}
+#Carpeta .Lista {
+    list-style: none;
+}
+#Carpeta .Elemento {
+    background: var(--Color_Fondo_Elemento);
+    border-radius: 1em;
+    color: rgb(0,0,0);
+    display: block;
+    margin: 0.25em;
+    padding: 1em;
+    text-decoration: none;
+}
+#Carpeta .Atrás:hover  {
+    background: var(--Color_Fondo_Atrás_Acción);
+}
+#Carpeta #Carpeta_Ruta:focus {
+    border: var(--Color_Borde_Búsqueda_Acción) 3px double;
+    margin: calc(0.5em - 3px);
+    outline: none;
+}
+#Carpeta #Carpeta_Ruta:focus,
+#Carpeta #Carpeta_Cambiar:hover  {
+    background: var(--Color_Fondo_Búsqueda_Acción);
+}
+#Carpeta .Elemento:hover {
+    background: var(--Color_Fondo_Elemento_Acción);
+}

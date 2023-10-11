@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Saml:Global/Estilos/Plantillas/[Plantillas].css">
+        <title>[SA-ML] - $Variable{Código}</title>
+    </head>
+    <body>
+        <div id="Error" class="Centrar">
+            <div class="Información">
+                <h1 class="Código">Error: $Variable{Código}</h1>
+                <p class="Mensaje">$Variable{Mensaje}</p>
+                <div class="Centrar">
+                    <div class="Carga">
+                        <div class="C_Fondo"></div>
+                        <div class="C_Fondo2"></div>
+                        <picture>
+                            <source srcset="/Saml:Global/Recursos/Ícono/Saml/[Ícono]%20-%20SM%20-%20960.png"/>
+                            <source srcset="/favicon.ico"/>
+                            <img class="C_Logo">
+                        </picture>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

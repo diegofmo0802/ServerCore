@@ -1,0 +1,30 @@
+#Error {
+    --Color_Fondo: rgb(255,180,220);
+    --Color_Código: rgb(255,0,0);
+    --Color_Mensaje: rgb(0,0,0);
+    --Color_Fondo_Imagen: rgba(255,0,0,0.1);
+}
+#Error {
+    background: var(--Color_Fondo);
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    overflow: visible;
+}
+#Error .Información {
+    text-align: center;
+    width: 90%;
+    overflow: visible;
+}
+#Error .Código {
+    color: var(--Color_Código);
+    font-size: 3em;
+}
+#Error .Mensaje {
+    color: var(--Color_Mensaje);
+    font-size: 1em;
+    margin-bottom: 1em;
+}
+#Error .Carga {
+    width: 30%;
+}

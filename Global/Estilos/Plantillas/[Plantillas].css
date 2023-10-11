@@ -1,0 +1,119 @@
+@import './Carpeta.css';
+@import './Error.css';
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+.Centrar {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.Carga {
+    align-items: center;
+    animation: Entrada 0.2s linear 0s 1, Fluctuar 4s linear 1s infinite;
+    background: var(--Color_Fondo);
+    border-radius: 50%;
+    box-sizing: content-box;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    padding: 2%;
+    position: relative;
+    width: 40%;
+    z-index: 0;
+}
+.Carga .C_Fondo,
+.Carga .C_Fondo2 {
+    align-items: center;
+    background: var(--Color_Fondo, rgb(0,0,0));
+    border-radius: 50%;
+    box-sizing: content-box;
+    display: flex;
+    height: 96%;
+    justify-content: center;
+    overflow: hidden;
+    position: absolute;
+    width: 96%;
+}
+.Carga .C_Fondo2 {
+    height: 92%;
+    width: 92%;
+}
+.Carga .C_Logo {
+    /*background: var(--Color_Fondo) url('/Src/Recursos/Íconos/Saml/[Ícono] - SM - 960.png');
+    background-attachment: local;
+    background-position:center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50%;
+    height: 0px;
+    padding-bottom: 100%;*/
+    animation: FluctuarImg 4s linear 0s infinite;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+}
+.Carga .C_Fondo::before,
+.Carga .C_Fondo::after,
+.Carga::before,
+.Carga::after {
+    animation: Girar 5s linear 0s infinite;
+    background: linear-gradient(90deg, rgb(100,100,0), rgb(0,100,180));
+    content: '';
+    height: 25%;
+    position: absolute;
+    width: 125%;
+    z-index: -1;
+}
+.Carga .C_Fondo::after,
+.Carga::after {
+    animation-direction: reverse;
+    animation-duration: 3s;
+    background: linear-gradient(0deg, rgb(255,0,255), rgb(0,255,0));
+    height: 125%;
+    width: 25%;
+}
+.Carga .C_Fondo::before,
+.Carga .C_Fondo::after {
+    background: linear-gradient(90deg, rgb(0,0,255), rgb(255,255,0));
+    animation-duration: 4s;
+    z-index: 0;
+}
+.Carga .C_Fondo::after {
+    background: linear-gradient(0deg, rgb(255,0,0), rgb(0,255,255));
+    animation-duration: 2s;
+    z-index: 0;
+}
+
+@keyframes Entrada {
+    0%   {opacity: 0;}
+    100% {opacity: 1;}
+}
+@keyframes Girar {
+    0%   {transform:  rotate(0deg);}
+    100% {transform:  rotate(360deg);}
+}
+@keyframes Fluctuar {
+    0%   {box-shadow: rgba(180,220,255,0) 0px 0px 0px 0px;}
+    25%  {box-shadow: rgba(180,220,255,1) 0px 0px 0px 3em;}
+    50%  {box-shadow: rgba(180,220,255,0) 0px 0px 0px 6em;}
+    75%  {box-shadow: rgba(180,220,255,0) 0px 0px 0px 0px;}
+    100% {box-shadow: rgba(180,220,255,0) 0px 0px 0px 0px;}
+}
+@keyframes FluctuarImg {
+    0%   {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0em);}
+    2%   {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0.4em);}
+    25%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0em);}
+    27%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0.4em);}
+    50%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0em);}
+    52%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0.4em);}
+    75%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0em);}
+    77%  {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0.4em);}
+    100% {filter: drop-shadow(rgba(255,0,0,1) 0px 0px 0em);}
+}

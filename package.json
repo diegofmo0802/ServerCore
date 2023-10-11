@@ -1,0 +1,20 @@
+{
+  "name": "saml-server-core",
+  "version": "1.0.0",
+  "description": "a module for http/s and ws/s servers",
+  "main": "Server-Core.js",
+  "type": "module",
+  "scripts": {
+    "csv-to-json": "node \"Herramientas/CSV-To-JSON.js\""
+  },
+  "keywords": [
+    "saml",
+    "http",
+    "https",
+    "ws",
+    "wss",
+    "server"
+  ],
+  "author": "diegofmo0802",
+  "license": "ISC"
+}

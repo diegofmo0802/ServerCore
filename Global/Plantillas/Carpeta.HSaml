@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/Saml:Global/Estilos/Plantillas/[Plantillas].css">
+        <title>[SA-ML] - Dir</title>
+    </head>
+    <body>
+        <div id="Carpeta" class="Centrar">
+            <div class="Contenido">
+                <h1 class="Ruta">Carpeta: $Variable{Url}</h1>
+                <div class="Opciones">
+                    <a class="Atrás" href="$Variable{Url}../">Atrás</a>
+                    <input id="Carpeta_Ruta" type="search" placeholder="Cambiar de ruta... $Variable{Url}" value="$Variable{Url}"/>
+                    <input id="Carpeta_Cambiar"type="button" value="Cambiar Ruta"/>
+                </div>
+                <ul class="Lista">
+                    <HSaml:Array>
+                        $HSaml:Array{Carpeta}
+                        <li>
+                            <a class="Elemento" href="$Variable{Url}$Array{Valor}">$Array{Valor}</a>
+                        </li>
+                    </HSaml:Array>
+                </ul>
+            </div>
+            <script>
+                const Carpeta_Cambiar = document.querySelector('#Carpeta_Cambiar');
+                const Carpeta_Ruta = document.querySelector('#Carpeta_Ruta');
+                Carpeta_Cambiar.addEventListener('click', () => {
+                    window.location.href = Carpeta_Ruta.value;
+                });
+                Carpeta_Ruta.addEventListener('keydown', (Evento) => {
+                    Carpeta_Ruta.value.length <= '$Variable{Url}'.length && Evento.key == 'Backspace'
+                    ? Evento.preventDefault()
+                    : false;
+                })
+            </script>
+        </div>
+    </body>
+</html>
