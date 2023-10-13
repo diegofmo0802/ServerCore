@@ -1,6 +1,0 @@
-$Variable{Titulo}
-$Variable{Descripción}
-<ul><HSaml:Array>
-    $HSaml:Array{AR}
-    <li>$Array{ID}: $Array{Valor}</li>
-</HSaml:Array></ul>

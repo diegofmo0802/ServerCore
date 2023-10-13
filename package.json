@@ -1,11 +1,11 @@
 {
-  "name": "saml.server-core",
+  "name": "servercore",
   "version": "2.0.0",
   "description": "a module for http/s and ws/s servers",
   "main": "ServerCore.js",
   "type": "module",
   "scripts": {
-    "test": "node Test/Plantilla.js && node Test/Debug.js",
+    "test": "node Test/ServerCore.js",
     "csv-to-json": "node \"Global/Herramientas/CSV-To-JSON.js\""
   },
   "keywords": [
@@ -17,5 +17,5 @@
     "server"
   ],
   "author": "diegofmo0802",
-  "license": "ISC"
+  "license": "Apache-2.0"
 }

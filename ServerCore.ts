@@ -2,9 +2,14 @@ import Debug from "./Debug/[Debug].js";
 import Plantilla from "./Plantilla/[Plantilla].js";
 import Servidor from "./Servidor/[Servidor].js";
 
-export const Saml = {
+const ServerCore = Servidor;
+const Saml = {
 	Debug: Debug,
 	Plantilla: Plantilla
 }
 
-export default Servidor;
+export default ServerCore;
+export {
+	ServerCore,
+	Saml
+};
