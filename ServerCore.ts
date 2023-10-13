@@ -13,3 +13,4 @@ export {
 	ServerCore,
 	Saml
 };
+module.exports = ServerCore;

@@ -203,8 +203,7 @@ class Servidor {
 			if (Enrutado) {
 				let Llave = Petición.Cabeceras['sec-websocket-key'].trim();
 				WebSocket.Aceptar_Conexión(Llave);
-				Regla.Tipo == 'WebSocket'
-				? Regla.Opciones.Acción(Petición, WebSocket) : false;
+				Regla.Opciones.Acción(Petición, WebSocket);
 				break;
 			};
 		}

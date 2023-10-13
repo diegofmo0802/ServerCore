@@ -40,7 +40,7 @@ export class Respuesta {
 	 * @param Dato El dato que se enviara.
 	 * @param Codificación La Codificación con la que se enviara la respuesta.
 	 */
-	public Enviar(Dato: any, Codificación: BufferEncoding): void;
+	public Enviar(Dato: any, Codificación?: BufferEncoding): void;
 	/**
 	 * Envía un Archivo como respuesta.
 	 * @param Ruta El dato que se enviara.

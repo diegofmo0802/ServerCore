@@ -55,7 +55,7 @@ export namespace Servidor {
             Tipo: 'WebSocket',
             Opciones: {
                 Cobertura: ('Parcial' | 'Completa'),
-                Acción: (Petición: Petición, WebSocket: WebSocket) => void
+                Acción: (Petición: Petición, WebSocket: M_WebSocket) => void
             }
         };
     }
