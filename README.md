@@ -16,33 +16,33 @@ o que se cree un gestor de paquetes para implementar las funcionalidades dentro 
 Actualmente tengo en local una copia del proyecto con varias de las funcionalidades<br/>
 este comenzó como un proyecto personal y con fines de práctica de pensamiento lógico<br/>
 por lo tanto no tiene las mejores prácticas ni la mejor documentación, sin embargo<br/>
-publicaré el código de esta manera e iré modificandolo para corregir esto.
+publicaré el código de esta manera e iré modificando para corregir esto.
 <br/><br/>
 
 **Futuras correcciones**
 - [ ] Documentar clases y funciones.
 - [ ] Traducir la documentación actual al inglés.
 - [ ] Cambiar los nombres de variables, funciones, clases y descripciones a inglés.
-- [ ] Buscar y corregir malas prcticas.
+- [ ] Buscar y corregir malas practicas.
 <br/><br/>
 
 Esto es todo por el momento, [diegofmo0802](https://diegofmo0802.github.io) se retira.
 <br/><br/><br/>
 
 # Documentación 
-<!-- Por el momento iré enlistando las funcionalidades agregadas para documentar todo debidamente en el futuro. -->
+<!-- Por el momento iré enlistonado las funcionalidades agregadas para documentar todo debidamente en el futuro. -->
 Para crear un servidor usando el modulo debes primero importarlo.<br/>
 > [!NOTE]
 > Por el momento **`ServerCore`** no esta en npm, por lo que debes descargar el repositorio y poner su contenido en una carpeta dentro tu proyecto.
 > ```
-> - Proyecto raiz
+> - Proyecto raíz
 > | - ServerCore/
 > | - src/
 >   | - main.js
 > | - package.json
 > ```
 <br/><br/>
-Una ves tengas ServerCore en tu proyecto debes importar el artchivo `ServerCore.js`<br/>
+Una ves tengas ServerCore en tu proyecto debes importar el archivo `ServerCore.js`<br/>
 - Si en tu package.json tienes la propiedad `"type": "module"`:
   ```js
   import ServerCore from './ServerCore/ServerCore.js';
@@ -52,25 +52,25 @@ Una ves tengas ServerCore en tu proyecto debes importar el artchivo `ServerCore.
   const ServerCore = require('./ServerCore/ServerCore.js').default;
   ```
 <br/><br/>
-## Servidot HTTP
+## Servidor HTTP
 Para crear un servidor HTTP puedes hacerlo de diferentes maneras:
 > [!NOTE]
 > Debes haber importado el modulo primero.
-- Solo pasandole el puerto
+- Solo pasando el puerto
   ```js
   const Servidor = new ServerCore(80);
   ```
-- Pasandole Puerto y Host
+- Pasando Puerto y Host
   ```js
   const Servidor = new ServerCore(80, 'MiDominio.com');
   ```
 <br/><br/>
 ## Servidor HTTPS
 > [!NOTE]
-> - Debes tener un sertificado ssl (la clave publica y privada).
+> - Debes tener un certificado ssl (la clave publica y privada).
 > - Si no quieres especificar un host usa `null`.
 > - Actualmente se inicia el servidor HTTP y HTTPS a la vez en este caso
->   esto se corregira y se pondra como caracteristica ocipnal en futuras versiones.
+>   esto se corregirá y se pondrá como característica opcional en futuras versiones.
 ```js
 const Servidor = new ServerCore(80, null, {
     Publico: 'Cert/MiDominio.pem', //El archivo con la clave publica
@@ -79,7 +79,7 @@ const Servidor = new ServerCore(80, null, {
 });
 ```
 <br/><br/>
-## Agregar enrutadores
+## Agregar enrutador
 En **`ServerCore`** existen 4 clases de enrutador:<br/>
 <table>
   <tr>
@@ -88,14 +88,14 @@ En **`ServerCore`** existen 4 clases de enrutador:<br/>
   </tr>
   <tr>
     <td><a href="#carpeta">Carpeta</a></td>
-    <td>Comparte una carpeta y sus subcarpetas</td>
+    <td>Comparte una carpeta y sus sub-carpetas</td>
   </tr>
   <tr>
     <td><a href="#archivo">Archivo</a></td>
-    <td>Comparte un unico archivo</td>
+    <td>Comparte un único archivo</td>
   </tr>
   <tr>
-    <td><a href="#accion">Acción</a></td>
+    <td><a href="#acción">Acción</a></td>
     <td>Te permite trabajar completamente con las solicitudes </td>
   </tr>
   <tr>
@@ -104,31 +104,31 @@ En **`ServerCore`** existen 4 clases de enrutador:<br/>
   </tr>
 </table>
 <br/>
-Los Mètodos aceptados actualmente son:<br/>
+Los Métodos aceptados actualmente son:<br/>
 <table>
   <tr>
-    <th>Mètodo</th>
+    <th>Método</th>
     <th>Descripción</th>
   </tr>
   <tr>
     <td>GET</td>
-    <td>El metodo de petición `GET`.</td>
+    <td>El método de petición `GET`.</td>
   </tr>
   <tr>
     <td>POST</td>
-    <td>El metodo de petición `POST`.</td>
+    <td>El método de petición `POST`.</td>
   </tr>
   <tr>
     <td>PUT</td>
-    <td>El metodo de petición `PUT`.</td>
+    <td>El método de petición `PUT`.</td>
   </tr>
   <tr>
     <td>DELETE</td>
-    <td>El metodo de petición `DELETE`.</td>
+    <td>El método de petición `DELETE`.</td>
   </tr>
   <tr>
     <td>ALL</td>
-    <td>Todos los metodos anteriormente mencionados.</td>
+    <td>Todos los métodos anteriormente mencionados.</td>
   </tr>
 </table>
 <br/>
@@ -140,26 +140,26 @@ Tipos de cobertura:<br/>
   </tr>
   <tr>
     <td>Completa</td>
-    <td>Toma todas las subrutas y no se podran usar</td>
+    <td>Toma todas las sub-rutas y no se podrán usar</td>
   </tr>
   <tr>
     <td>Parcial</td>
-    <td>Se toma solo esa ruta, las subrutas pueden ser usadas en otra cosa</td>
+    <td>Se toma solo esa ruta, las sub-rutas pueden ser usadas en otra cosa</td>
   </tr>
 </table>
 <br/><br/><br/>
 
 ### Carpeta
 
-Comparte una carpeta y todo su contenido tanto archivos como subcarpetas
+Comparte una carpeta y todo su contenido tanto archivos como sub-carpetas
 > [!WARNING]
-> - ⚠️No compartas la raiz de tu proyecto, ya que esto daria acceso a **TODO** su contenido.
+> - ⚠️No compartas la raíz de tu proyecto, ya que esto daría acceso a **TODO** su contenido.
 >   - Datos privados como las llaves privadas de tus certificados.
->   - Contraseñas a bases de datos que esten en los archivos js del lado del servidor.
+>   - Contraseñas a bases de datos que estén en los archivos js del lado del servidor.
 >   - Tokens de seguridad
 >   y en general cualquier otro dato
 > - Esto tomara la ruta que le asignes de forma completa
->   **Ejemplo**: si le asignas la ruta `/src` tomaria todas las subrutas como `/src/estilos` 
+>   **Ejemplo**: si le asignas la ruta `/src` tomaría todas las sub-rutas como `/src/estilos` 
 Para añadir este tipo de regla usa:
 ```js
 Servidor.Añadir_Reglas({
@@ -221,7 +221,7 @@ Servidor.Añadir_Reglas({
 
 ### WebSocket
 
-Esto te permite gestionar una conexion WebSocket completa:
+Esto te permite gestionar una conexión WebSocket completa:
 
 ```js
 const Conexiones = new Set();
