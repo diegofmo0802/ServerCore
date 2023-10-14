@@ -3,7 +3,7 @@
 Hola! soy [diegofmo0802](https://diegofmo0802.github.io).<br/>
 Como comente  anteriormente en mi perfil, ServerCore permitirá:
 - [x] Crear servidores HTTP y HTTPS.
-- [-] Sistema de plantillas.
+- [ ] **En proceso**Sistema de plantillas.
 - [x] Gestionar conexiones WebSocket.
 - [ ] Gestionar negociaciones de WebRTC.
 - [ ] Gestionar notificaciones WebPush.
@@ -20,8 +20,8 @@ publicaré el código de esta manera e iré modificando para corregir esto.
 <br/><br/>
 
 **Futuras correcciones**
-- [-] Documentar clases y funciones.
-- [-] Traducir la documentación actual al inglés.
+- [ ] **en proceso** Documentar clases y funciones.
+- [ ] **en proceso** Traducir la documentación actual al inglés.
 - [ ] Cambiar los nombres de variables, funciones, clases y descripciones a inglés.
 - [ ] Buscar y corregir malas practicas.
 <br/><br/>
