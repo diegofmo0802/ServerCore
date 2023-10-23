@@ -5,9 +5,8 @@
 
 import HTTP from 'http';
 
-import Servidor from './[Servidor].js';
-import Petición from './Petición.js';
-
+import Servidor from './Server.js';
+import Petición from './Request.js';
 export namespace Respuesta {
     type Extension =
         //Formatos de Texto

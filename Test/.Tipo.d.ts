@@ -5,7 +5,9 @@
  * 
  */
 
-export namespace Saml {
+import { Debug, ServerCore, Plantilla } from '../ServerCore'
+
+export namespace _Saml {
     namespace Servidor {
         namespace Petición {
             type Método = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'ALL';

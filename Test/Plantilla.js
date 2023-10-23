@@ -1,6 +1,6 @@
-import Plantilla from "../Plantilla/[Plantilla].js";
+import Plantilla from "../Template/Template.js";
 
-console.log(
+(async () => console.log(
     await Plantilla.Cargar('./Test/Plantilla.HSaml', {
         Titulo: 'Titulo de la prueba',
         Descripción: 'Descripción xD',
@@ -9,4 +9,4 @@ console.log(
             Otra: 'Otra2'
         }
     })
-);
+))();

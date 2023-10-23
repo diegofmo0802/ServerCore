@@ -42,7 +42,7 @@ class Plantilla {
 	 */
 	static Compilar(Contenido, Datos) {
 		for (let ID in Datos) {
-			if (typeof Datos[ID] !== 'object') {
+			if (typeof Datos[ID] !== 'object') {//@ts-ignore
 				Contenido = Contenido.replaceAll(`$Variable{${ID}}`, Datos[ID]);
 			} else {
 				/**
@@ -58,11 +58,11 @@ class Plantilla {
 						if (Variable) if (Nombre == Variable[0]) {
 							let Formato = Bloque.replace(this.Expresiones.Array.Formato, '');
 							let SubPlantilla = '';
-							for (let ID in Datos) {
+							for (let ID in Datos) {//@ts-ignore
 								SubPlantilla += Formato.replaceAll(
 									`$Array{Valor}`, Datos[ID]
 								).replaceAll(`$Array{ID}`, ID);
-							}
+							}//@ts-ignore
 							Contenido = Contenido.replaceAll(Bloque, SubPlantilla);
 						}
 					}

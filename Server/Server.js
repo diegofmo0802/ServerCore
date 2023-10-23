@@ -11,18 +11,16 @@ import HTTPS from 'https';
 import PATH from 'path';
 import URL from 'url';
 
-import Debug from '../Debug/[Debug].js';
-import Petición from "./Petición.js";
-import Respuesta from "./Respuesta.js";
-import Sesión from "./Sesión.js";
+import Debug from '../Debug/Debug.js';
+import Petición from "./Request.js";
+import Respuesta from "./Response.js";
+import Sesión from "./Session.js";
 import WebSocket from "./WebSocket.js";
 
 const _Peticiones = new Debug('Peticiones', '.Debug/Peticiones', false);
 const _Solicitudes = new Debug('Solicitudes', '.Debug/Solicitudes', false);
 
 class Servidor {
-	/**@type {typeof Debug} */
-	static Debug = Debug;
 	/**@type {typeof Petición} */
 	static Petición = Petición;
 	/**@type {typeof Respuesta} */

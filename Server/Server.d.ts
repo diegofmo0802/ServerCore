@@ -1,31 +1,21 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade una forma sencilla de crear servidores HTTP/S y WS/S.
- * @license Saml
+ * @license Apache-2.0
  * @module saml.server_core
  */
 
 import HTTP from 'http';
 import {Duplex} from 'stream';
 
-import Debug from '../Debug/[Debug].js';
-import Petición from "./Petición.js";
-import Respuesta from "./Respuesta.js";
-import Sesión from "./Sesión.js";
-import WebSocket from "./WebSocket.js";
-
-type M_Debug = Debug;
-type M_Petición = Petición;
-type M_Respuesta = Respuesta;
-type M_Sesión = Sesión;
-type M_WebSocket = WebSocket;
+import __Petición from "./Request.js";
+import __Respuesta from "./Response.js";
+import __Sesión from "./Session.js";
+import __WebSocket from "./WebSocket.js";
 
 export namespace Servidor {
-	//type Debug = M_Debug;
-	type Petición = M_Petición;
-	type Respuesta = M_Respuesta;
-	type Sesión = M_Sesión;
-	type WebSocket = M_WebSocket;
+	export import Petición = __Petición
+	export import Respuesta = __Respuesta
     namespace Regla {
         type Base = {
             Método: Petición.Método,
@@ -68,11 +58,10 @@ export namespace Servidor {
 	type Reglas = Array<Regla>;
 }
 export class Servidor {
-	public static Debug: typeof Debug;
-	public static Petición: typeof Petición;
-	public static Respuesta: typeof Respuesta;
-	public static Sesión: typeof Sesión;
-	public static WebSocket: typeof WebSocket;
+	public static Petición: __Petición;
+	public static Respuesta: __Respuesta;
+	public static Sesión: __Sesión;
+	public static WebSocket: __WebSocket;
 	/**Contiene el host donde el servidor recibirá peticiones. */
 	private Host: string;
 	/**Contiene el listado de plantillas de respuesta del servidor. */

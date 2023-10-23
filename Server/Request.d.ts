@@ -4,7 +4,7 @@
  */
 
 import HTTP from 'http';
-import Sesión from './Sesión.js';
+import Sesión from './Session.js';
 
 export namespace Petición {
     type Método = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'ALL';
@@ -74,5 +74,4 @@ export class Petición {
 	 * @param Url La url recibida de la petición http.
 	 */
 	private Variables_Get(Url: string): Map<string, string>
-}
-export default Petición;
+}export default Petición;

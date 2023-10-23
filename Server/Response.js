@@ -7,13 +7,13 @@ import FS from 'fs';
 import PATH from 'path';
 import URL from 'url';
 
-import {Saml} from '../ServerCore.js';
-import Servidor from '../ServerCore.js';
+import Plantilla from '../Template/Template.js';
+import Servidor from './Server.js';
 
 class Respuesta {
-	/**@type {typeof Servidor.Petición} Contiene la petición que recibió el servidor. */
+	/**@type {Servidor.Petición} Contiene la petición que recibió el servidor. */
 	Petición = null;
-	/**@type {typeof Servidor.Plantillas} Contiene el listado de plantillas de respuesta del servidor. */
+	/**@type {Servidor.Plantillas} Contiene el listado de plantillas de respuesta del servidor. */
 	Plantillas = null;
 	/**@type {import('http').ServerResponse} Contiene la respuesta que dará el servidor. */
 	SrvRespuesta = null;
@@ -119,8 +119,8 @@ class Respuesta {
 	}
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param {import('../ServerCore.js').default.Regla.Carpeta} Regla La regla de enrutamiento.
-	 * @param {import('../ServerCore.js').default.Petición} Petición La petición que recibió el servidor.
+	 * @param {import('./Server.js').Servidor.} Regla La regla de enrutamiento.
+	 * @param {import('./Request.js').default} Petición La petición que recibió el servidor.
 	 * @returns {void}
 	 */
 	EnviarCarpeta(Regla, Petición) {
@@ -146,7 +146,7 @@ class Respuesta {
 					} else {
 						// @ts-ignore
 						let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-						this.EnviarHSaml(`${Directorio}/../Global/Plantillas/Carpeta.HSaml`, {
+						this.EnviarHSaml(`${Directorio}/../Global/Template/Folder.HSaml`, {
 							Url: Petición.Url,
 							Carpeta: Carpeta
 						});
@@ -174,7 +174,7 @@ class Respuesta {
 	 * @returns {void}
 	 */
 	EnviarHSaml(Ruta, Datos) {
-		Saml.Plantilla.Cargar(Ruta, Datos).then((Plantilla) => {
+		Plantilla.Cargar(Ruta, Datos).then((Plantilla) => {
 			this.EnviarEncabezados(200, this.Encabezados('html'));
 			this.Enviar(Plantilla, 'utf-8');
 		}).catch((Error) => {
@@ -198,7 +198,7 @@ class Respuesta {
 	 */
 	Error(Código, Mensaje) {
 		if (this.Plantillas.Error) {
-			Saml.Plantilla.Cargar(this.Plantillas.Error, {
+			Plantilla.Cargar(this.Plantillas.Error, {
 				Código: Código, Mensaje: Mensaje
 			}).then((Plantilla) => {
 				this.EnviarEncabezados(Código, this.Encabezados('html'));
@@ -210,7 +210,7 @@ class Respuesta {
 		} else {
 			// @ts-ignore
 			let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-			Saml.Plantilla.Cargar(`${Directorio}/../Global/Plantillas/Error.HSaml`, {
+			Plantilla.Cargar(`${Directorio}/../Global/Template/Error.HSaml`, {
 				Código: Código, Mensaje: Mensaje
 			}).then((Plantilla) => {
 				this.EnviarEncabezados(Código, this.Encabezados('html'));

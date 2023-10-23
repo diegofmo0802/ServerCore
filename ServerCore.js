@@ -1,21 +1,15 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
- * @description Añade el espacio de nombre Saml e Inicia los módulos requeridos por `[Servidor].js`.
+ * @description Exporta lo necesario para usar ServerCore
  * @license Apache-2.0
  */
 
-import Debug from "./Debug/[Debug].js";
-import Plantilla from "./Plantilla/[Plantilla].js";
-import Servidor from "./Servidor/[Servidor].js";
+import Debug from "./Debug/Debug.js";
+import Plantilla from "./Template/Template.js";
+import ServerCore from "./Server/Server.js";
 
-const ServerCore = Servidor;
-const Saml = {
-	Debug:  Debug,
-	Plantilla: Plantilla
+export {
+	Debug, Plantilla, ServerCore
 };
 
 export default ServerCore;
-export {
-	ServerCore,
-	Saml
-};

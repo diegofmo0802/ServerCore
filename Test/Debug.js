@@ -1,4 +1,4 @@
-import Debug from "../Debug/[Debug].js";
+import Debug from "../Debug/Debug.js";
 
 Debug.Log('Hola mundo');
 Debug.Log([

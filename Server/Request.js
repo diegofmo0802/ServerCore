@@ -10,15 +10,15 @@ class Petición {
 	Cabeceras = null;
 	/**@type {Map<string, string>} Contiene las cookies de la petición. */
 	Cookies = null;
-	/**@type {import('../Tipo').Saml.Servidor.Petición.GET} Contiene los datos POST que se enviaron. */
+	/**@type {import('./Request').Petición.GET} Contiene los datos POST que se enviaron. */
 	GET = null;
 	/**@type {string} Contiene la dirección IP de quien realizo la petición. */
 	IP = null;
-	/**@type {import('../Tipo').Saml.Servidor.Petición.Método} Contiene el método de la petición. */
+	/**@type {import('./Request').Petición.Método} Contiene el método de la petición. */
 	Método = null;
-	/**@type {Promise<import('../Tipo').Saml.Servidor.Petición.POST>} Contiene los datos POST que se enviaron. */
+	/**@type {Promise<import('./Request').Petición.POST>} Contiene los datos POST que se enviaron. */
 	POST = null;
-	/**@type {import('../Tipo').Saml.Servidor.Sesión} */
+	/**@type {import('./Session').Sesión} */
 	Sesión = null;
 	/**@type {import('http').IncomingMessage} Contiene la petición que recibió el servidor. */
 	SrvPetición = null;
@@ -59,13 +59,13 @@ class Petición {
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
 	 * @param {import('http').IncomingMessage} SrvPetición La petición que recibió el servidor.
-	 * @returns {Promise<import('../Tipo').Saml.Servidor.Petición.POST>}
+	 * @returns {Promise<import('./Request').Petición.POST>}
 	 */
 	Datos_Post(SrvPetición) {
 		return new Promise((PrRespuesta, PrError) => {
 			let Datos = Buffer.from([]);
 			let Partes = [];
-			/**@type {import('../Tipo').Saml.Servidor.Petición.POST} */
+			/**@type {import('./Request').Petición.POST} */
 			let POST = {
 				Archivos: new Map,
 				Formato: 'Desconocido',
@@ -145,7 +145,7 @@ class Petición {
 	/**
 	 * Define que método se uso para realizar la petición.
 	 * @param {string} Método El método con el que se realizo la petición.
-	 * @returns {import('../Tipo').Saml.Servidor.Petición.Método}
+	 * @returns {import('./Request').Petición.Método}
 	 */
 	ObtenerMétodo(Método) {
 		return Método == 'POST'

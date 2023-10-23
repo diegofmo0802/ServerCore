@@ -1,6 +1,6 @@
 import FS from 'fs';
 
-import CUI from './CUI/[CUI].js';
+import CUI from '../../ConsoleUI/ConsoleUI.js';
 
 const RX_Line = /[^\r\n]+(?:\r?\n|$)/g;
 const RX_Item = /(?:"(?:[^"]|"")*"|[^,\r\n]*)(?:,|$)/g;
@@ -20,7 +20,7 @@ function Convertir(Ruta) {
                 let Items = Linea.match(RX_Item);
                 if (Posición == 0) {
                     Items.forEach((Item, Posición2) => {
-                        Cabeceras[Posición2] = Item == ',' | Item == ''
+                        Cabeceras[Posición2] = Item == ',' || Item == ''
                         ? `Columna-${Posición2}`
                         : Item.endsWith(',')
                             ? Item.slice(0, -1)

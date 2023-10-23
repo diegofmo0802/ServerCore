@@ -6,7 +6,7 @@
  */
 
 import FS from 'fs';
-import CUI from '../CUI/[CUI].js';
+import ConsoleUI from '../ConsoleUI/ConsoleUI.js';
 
 class Debug {
 	/**@type {Map<string,Debug>} Contiene las instancias de Debug. */
@@ -19,7 +19,7 @@ class Debug {
 	Carpeta = null;
 	/**@type {boolean} Contiene el indicador `Mostrar en consola`. */
 	EnConsola = null;
-	/**@private @type {import('./[Debug].js').Debug.Fecha} Contiene la fecha en la que inicio el Debug. */
+	/**@private @type {import('./Debug.js').Debug.Fecha} Contiene la fecha en la que inicio el Debug. */
 	Fecha = null;
 	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
 	Ruta = null;
@@ -65,17 +65,17 @@ class Debug {
 		if (! (this.Stream.destroyed)) this.Stream.write(`${Prefijo} -> ${JSON.stringify((() => {
 			let Resultado = [];
 			Datos.forEach((Dato) => {
-				if (typeof Dato === 'string') Resultado.push(CUI.Color_limpiar(Dato));
+				if (typeof Dato === 'string') Resultado.push(ConsoleUI.Color_limpiar(Dato));
 				else Resultado.push(Dato);
 			});
 			return Resultado;
 		})())}\n`);
 		if (this.EnConsola || Debug.MostrarTodo) console.log(
-			CUI.Color(`&B(255,0,0)&C(255,255,0)${Prefijo}&R`),
+			ConsoleUI.Color(`&B(255,0,0)&C(255,255,0)${Prefijo}&R`),
 			...(() => {
 				let Resultado = [];
 				Datos.forEach((Dato) => {
-					if (typeof Dato === 'string') Resultado.push(CUI.Color(Dato));
+					if (typeof Dato === 'string') Resultado.push(ConsoleUI.Color(Dato));
 					else Resultado.push(Dato);
 				});
 				return Resultado;
@@ -93,7 +93,7 @@ class Debug {
 	}
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm
-	 * @returns {import('./[Debug].js').Debug.Fecha}
+	 * @returns {import('./Debug.js').Debug.Fecha}
 	 */
 	static Fecha() {
 		let Fecha = new Date;
