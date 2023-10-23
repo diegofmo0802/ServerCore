@@ -78,10 +78,10 @@ class CUI {
         return new Promise((Respuesta, Error) => {
             /**
              * Da respuesta a la promesa enviada.
-             * @param {Buffer} Mensaje la respuesta del usuario.
+             * @param {Buffer} Datos la respuesta del usuario.
              */
-            function Responder(Mensaje) {
-                Mensaje = Mensaje.toString().replace(/[\n\r]+/g, '');
+            function Responder(Datos) {
+                let Mensaje = Datos.toString().replace(/[\n\r]+/g, '');
                 Respuesta(Mensaje);
                 process.stdin.removeListener('data', Responder);
             }

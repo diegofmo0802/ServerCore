@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test</title>
+    </head>
+    <body>
+        $Variable{Des}
+        <table>
+            <tr>
+                <th>Test</th>
+                <th>Enlace</th>
+            </tr>
+            <HSaml:Array>
+                $HSaml:Array{Tests}
+                <tr>
+                    <td>$Array{ID}</td>
+                    <td><a href="$Array{Valor}">$Array{Valor}</a></td>
+                </tr>
+            </HSaml:Array>
+        </table>
+    </body>
+</html>
