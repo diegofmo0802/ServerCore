@@ -13,7 +13,7 @@ import URL from 'url';
 
 import Debug from '../Debug/Debug.js';
 import Request from "./Request.js";
-import Respuesta from "./Response.js";
+import Response from "./Response.js";
 import Sesión from "./Session.js";
 import WebSocket from "./WebSocket.js";
 

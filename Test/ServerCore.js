@@ -8,7 +8,7 @@ Servidor.Añadir_Reglas({
     Tipo: 'Acción', Opciones: {
         Cobertura: 'Parcial',
         Acción: (Petición, Respuesta) => {
-            Respuesta.EnviarHSaml('./Test/Test.HSaml', {
+            Respuesta.SendTemplate('./Test/Test.HSaml', {
                 Des: 'Una Descripción',
                 Tests: {
                     WebSocket: 'Test/Ws',

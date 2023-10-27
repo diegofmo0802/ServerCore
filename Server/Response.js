@@ -1,34 +1,35 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade la forma de Respuesta a `Saml/Server-core`.
+ * @license Apache-2.0
  */
 
 import FS from 'fs';
 import PATH from 'path';
 import URL from 'url';
 
-import Plantilla from '../Template/Template.js';
-import Servidor from './Server.js';
+import Template from '../Template/Template.js';
+import Server from './Server.js';
 
-class Respuesta {
-	/**@type {Servidor.Petición} Contiene la petición que recibió el servidor. */
-	Petición = null;
-	/**@type {Servidor.Plantillas} Contiene el listado de plantillas de respuesta del servidor. */
-	Plantillas = null;
+class Response {
+	/**@type {Server.Petición} Contiene la petición que recibió el servidor. */
+	Request = null;
+	/**@type {Server.Plantillas} Contiene el listado de plantillas de respuesta del servidor. */
+	Templates = null;
 	/**@type {import('http').ServerResponse} Contiene la respuesta que dará el servidor. */
-	SrvRespuesta = null;
+	HTTPResponse = null;
 	/**
 	 * Crea la forma de Respuesta de `Saml/Servidor`.
-	 * @param {typeof Servidor.Petición} Petición La petición que recibió el servidor.
-	 * @param {import('http').ServerResponse} SrvRespuesta La respuesta que dará el servidor.
-	 * @param {Servidor.Plantillas?} Plantillas El listado de plantillas de respuesta del servidor.
+	 * @param {typeof Server.Petición} Request La petición que recibió el servidor.
+	 * @param {import('http').ServerResponse} HTTPResponse La respuesta que dará el servidor.
+	 * @param {Server.Plantillas?} Templates El listado de plantillas de respuesta del servidor.
 	 */
-	constructor(Petición, SrvRespuesta, Plantillas = null) {
-		this.Petición = Petición;
-		this.Plantillas = Plantillas ? Plantillas : {};
-		this.SrvRespuesta = SrvRespuesta;
-		this.SrvRespuesta.setHeader('X-Powered-By', 'Saml/Servidor');
-		this.SrvRespuesta.setHeader('X-Version', '1.0');
+	constructor(Request, HTTPResponse, Templates = null) {
+		this.Request = Request;
+		this.Templates = Templates ? Templates : {};
+		this.HTTPResponse = HTTPResponse;
+		this.HTTPResponse.setHeader('X-Powered-By', 'ServerCore');
+		this.HTTPResponse.setHeader('X-Version', '2.0.0');
 	}
 	/**
 	 * Crea encabezados para los tipos de archivo admitidos.
@@ -36,192 +37,193 @@ class Respuesta {
 	 * @param {string} Extension La extension de archivo.
 	 * @returns {Object}
 	 */
-	 Encabezados(Extension) {
+	 GenerateHeaders(Extension) {
 		Extension = Extension.startsWith('.') ? Extension.slice(1) : Extension;
-		let Encabezados = {};
-		let Rangos = false;
+		let Headers = {};
+		let AcceptRanges = false;
 		switch(Extension.toUpperCase()) {
 			//Formatos de texto
-			case 'HTML': Encabezados['Content-Type'] = 'text/html';        break;
-			case 'JS':   Encabezados['Content-Type'] = 'text/javascript';  break;
-			case 'CSS':  Encabezados['Content-Type'] = 'text/css';         break;
-			case 'JSON': Encabezados['Content-Type'] = 'application/json'; break;
-			case 'XML':  Encabezados['Content-Type'] = 'application/xml';   break;
-			case 'TXT':  Encabezados['Content-Type'] = 'text/plain';       break;
+			case 'HTML': Headers['Content-Type'] = 'text/html';        break;
+			case 'JS':   Headers['Content-Type'] = 'text/javascript';  break;
+			case 'CSS':  Headers['Content-Type'] = 'text/css';         break;
+			case 'JSON': Headers['Content-Type'] = 'application/json'; break;
+			case 'XML':  Headers['Content-Type'] = 'application/xml';   break;
+			case 'TXT':  Headers['Content-Type'] = 'text/plain';       break;
 			//Formatos de multimedia
-			case 'SVG':  Encabezados['Content-Type'] = 'image/svg+xml';    Rangos = true; break;
-			case 'PNG':  Encabezados['Content-Type'] = 'image/png';        Rangos = true; break;
-			case 'JPG':  Encabezados['Content-Type'] = 'image/jpeg';       Rangos = true; break;
-			case 'JPEG': Encabezados['Content-Type'] = 'image/jpeg';       Rangos = true; break;
-			case 'MP3':  Encabezados['Content-Type'] = 'audio/mpeg';       Rangos = true; break;
-			case 'WAV':  Encabezados['Content-Type'] = 'audio/x-wav';      Rangos = true; break;
-			case 'MP4':  Encabezados['Content-Type'] = 'video/mp4';        Rangos = true; break;
+			case 'SVG':  Headers['Content-Type'] = 'image/svg+xml';    AcceptRanges = true; break;
+			case 'PNG':  Headers['Content-Type'] = 'image/png';        AcceptRanges = true; break;
+			case 'JPG':  Headers['Content-Type'] = 'image/jpeg';       AcceptRanges = true; break;
+			case 'JPEG': Headers['Content-Type'] = 'image/jpeg';       AcceptRanges = true; break;
+			case 'MP3':  Headers['Content-Type'] = 'audio/mpeg';       AcceptRanges = true; break;
+			case 'WAV':  Headers['Content-Type'] = 'audio/x-wav';      AcceptRanges = true; break;
+			case 'MP4':  Headers['Content-Type'] = 'video/mp4';        AcceptRanges = true; break;
 		}
-		if (Rangos) Encabezados['Accept-Ranges'] = 'bytes';
-		return Encabezados;
+		if (AcceptRanges) Headers['Accept-Ranges'] = 'bytes';
+		return Headers;
 	}
 	/**
 	 * Envía un dato como respuesta.
-	 * @param {any} Dato El dato que se enviara.
-	 * @param {BufferEncoding?} Codificación La Codificación con la que se enviara la respuesta.
+	 * @param {any} Datum El dato que se enviara.
+	 * @param {BufferEncoding?} Encoding La Codificación con la que se enviara la respuesta.
 	 * @returns {void}
 	 */
-	Enviar(Dato, Codificación = null) {
-		Codificación = Codificación ? Codificación : 'utf-8';
-		this.SrvRespuesta.end(Dato, Codificación);
+	Send(Datum, Encoding = null) {
+		Encoding = Encoding ? Encoding : 'utf-8';
+		this.HTTPResponse.end(Datum, Encoding);
 	}
 	/**
 	 * Envía un Archivo como respuesta.
-	 * @param {string} Ruta El dato que se enviara.
+	 * @param {string} Path El dato que se enviara.
 	 * @returns {void}
 	 */
-	EnviarArchivo(Ruta) {
-		FS.stat(Ruta, (Error, Detalles) => {
+	SendFile(Path) {
+		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
 				? this.Error(500, '[Fallo En Respuesta] - El archivo no existe.')
 				: this.Error(500, Error.message);
 			}
-			if (!(Detalles.isFile())) return this.Error(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
-			if (this.Petición.Cabeceras.range) {
-				let Información = /bytes=(\d*)?-?(\d*)?/i
-				.exec(this.Petición.Cabeceras.range);
-				if (Información) {
-					let [Inicio, Final] = Información.slice(1);
-					if (Inicio) {
+			if (!(Details.isFile())) return this.Error(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
+			if (this.Request.Headers.range) {
+				let Information = /bytes=(\d*)?-?(\d*)?/i
+				.exec(this.Request.Headers.range);
+				if (Information) {
+					let [Start, End] = Information.slice(1);
+					if (Start) {
 						let Temp = null;
-						Final = Final
-						? Final
-						: (Temp = Number(Inicio) + 1024*1000,
-							(Temp >= Detalles.size
-								? Detalles.size - 1
+						End = End
+						? End
+						: (Temp = Number(Start) + 1024*1000,
+							(Temp >= Details.size
+								? Details.size - 1
 								: Temp) + '');
-						if (Number(Inicio) <= Detalles.size && Number(Final) <= Detalles.size) {
-							let Tamaño = Final ? Number(Final) - Number(Inicio) : Detalles.size - Number(Inicio);
-							let Archivo = FS.createReadStream(Ruta, {start: Number(Inicio), end: Number(Final)});
-							this.SrvRespuesta.setHeader('Content-Length', Tamaño + 1);
-							this.SrvRespuesta.setHeader('Content-Range', `bytes ${Inicio}-${Final}/${Detalles.size}`);
-							this.EnviarEncabezados(206, this.Encabezados(PATH.extname(Ruta)));
-							Archivo.pipe(this.SrvRespuesta);
+						if (Number(Start) <= Details.size && Number(End) <= Details.size) {
+							let Size = End ? Number(End) - Number(Start) : Details.size - Number(Start);
+							let File = FS.createReadStream(Path, {start: Number(Start), end: Number(End)});
+							this.HTTPResponse.setHeader('Content-Length', Size + 1);
+							this.HTTPResponse.setHeader('Content-Range', `bytes ${Start}-${End}/${Details.size}`);
+							this.SendHeaders(206, this.GenerateHeaders(PATH.extname(Path)));
+							File.pipe(this.HTTPResponse);
 							//('Inicio:', Inicio, 'Fin:', Final, 'Frag:', Tamaño, 'Tamaño:', Detalles.size)
 						} else {
 							this.Error(416, 'El rango solicitado excede el tamaño del archivo');
 						}
-						return;
+						//return;
 					}
 				}
+			} else {
+				let File = FS.createReadStream(Path);
+				this.HTTPResponse.setHeader('Content-Length', Details.size);
+				this.SendHeaders(200, this.GenerateHeaders(PATH.extname(Path)));
+				File.pipe(this.HTTPResponse);
 			}
-			let Archivo = FS.createReadStream(Ruta);
-			this.SrvRespuesta.setHeader('Content-Length', Detalles.size);
-			this.EnviarEncabezados(200, this.Encabezados(PATH.extname(Ruta)));
-			Archivo.pipe(this.SrvRespuesta);
 		});
 	}
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param {import('./Server.js').Servidor.Regla.Carpeta} Regla La regla de enrutamiento.
-	 * @param {import('./Request.js').default} Petición La petición que recibió el servidor.
+	 * @param {import('./Server.js').Servidor.Regla.Carpeta} Rule La regla de enrutamiento.
+	 * @param {import('./Request.js').Request} Request La petición que recibió el servidor.
 	 * @returns {void}
 	 */
-	EnviarCarpeta(Regla, Petición) {
-		let Ruta = Regla.Opciones.Recurso;
-		Ruta = Ruta.endsWith('/') ? Ruta : Ruta + '/';
-		Ruta += Petición.Url.slice(Regla.Url.length);
-		Ruta = Ruta.endsWith('/') ? Ruta.slice(0, -1) : Ruta;
+	EnviarCarpeta(Rule, Request) {
+		let Path = Rule.Opciones.Recurso;
+		Path = Path.endsWith('/') ? Path : Path + '/';
+		Path += Request.Url.slice(Rule.Url.length);
+		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
 		//Saml.Debug.Log('[Enrutador - Carpeta]:', Petición.Url, Ruta);
-		FS.stat(Ruta, (Error, Detalles) => {
+		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
 				? this.Error(404, 'El archivo/Directorio no existe.')
 				: this.Error(500, Error.message);
 			}
-			if (Detalles.isDirectory()) {
-				FS.readdir(Ruta, (Error, Carpeta) => {
+			if (Details.isDirectory()) {
+				FS.readdir(Path, (Error, Folder) => {
 					if (Error) return this.Error(500, Error.message);
-					if (this.Plantillas.Carpeta) {
-						this.EnviarHSaml(this.Plantillas.Carpeta, {
-							Url: Petición.Url,
-							Carpeta: Carpeta
+					if (this.Templates.Carpeta) {
+						this.SendTemplate(this.Templates.Carpeta, {
+							Url: Request.Url,
+							Carpeta: Folder
 						});
 					} else {
 						// @ts-ignore
-						let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-						this.EnviarHSaml(`${Directorio}/../Global/Template/Folder.HSaml`, {
-							Url: Petición.Url,
-							Carpeta: Carpeta
+						let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
+						this.SendTemplate(`${ProcessDir}/../Global/Template/Folder.HSaml`, {
+							Url: Request.Url,
+							Carpeta: Folder
 						});
 						//this.EnviarJSON(Carpeta);
 					}
 				});
-			} else if (Detalles.isFile()) {
-				this.EnviarArchivo(Ruta);
+			} else if (Details.isFile()) {
+				this.SendFile(Path);
 			} else this.Error(404, 'El archivo/Directorio no existe.');
 		});
 	}
 	/**
 	 * Envía los encabezados de la respuesta.
-	 * @param {number} Código El código de la respuesta que se dará.
-	 * @param {{}} Encabezados Los encabezados que se enviaran.
+	 * @param {number} Code El código de la respuesta que se dará.
+	 * @param {{}} Headers Los encabezados que se enviaran.
 	 * @returns {void}
 	 */
-	EnviarEncabezados(Código, Encabezados) {
-		this.SrvRespuesta.writeHead(Código, Encabezados);
+	SendHeaders(Code, Headers) {
+		this.HTTPResponse.writeHead(Code, Headers);
 	}
 	/**
 	 * Envía una plantilla `.HSaml` como respuesta.
-	 * @param {string} Ruta La ruta de la plantilla.
-	 * @param {{}} Datos Los datos con los que se compilara la plantilla.
+	 * @param {string} Path La ruta de la plantilla.
+	 * @param {{}} Data Los datos con los que se compilara la plantilla.
 	 * @returns {void}
 	 */
-	EnviarHSaml(Ruta, Datos) {
-		Plantilla.Load(Ruta, Datos).then((Plantilla) => {
-			this.EnviarEncabezados(200, this.Encabezados('html'));
-			this.Enviar(Plantilla, 'utf-8');
+	SendTemplate(Path, Data) {
+		Template.Load(Path, Data).then((Template) => {
+			this.SendHeaders(200, this.GenerateHeaders('html'));
+			this.Send(Template, 'utf-8');
 		}).catch((Error) => {
 			this.Error(500, Error);
 		});
 	}
 	/**
 	 * Envía datos en formato JSON como respuesta.
-	 * @param {any} Datos El dato que se enviara.
+	 * @param {any} Data El dato que se enviara.
 	 * @returns {void}
 	 */
-	EnviarJSON(Datos) {
-		this.EnviarEncabezados(200, this.Encabezados('JSON'));
-		this.Enviar(JSON.stringify(Datos), 'utf-8');
+	SendJSON(Data) {
+		this.SendHeaders(200, this.GenerateHeaders('JSON'));
+		this.Send(JSON.stringify(Data), 'utf-8');
 	}
 	/**
 	 * Envía un error como respuesta.
-	 * @param {number} Código El código del error que se enviara.
-	 * @param {string} Mensaje El mensaje con los detalles del error.
+	 * @param {number} Code El código del error que se enviara.
+	 * @param {string} Message El mensaje con los detalles del error.
 	 * @returns {void}
 	 */
-	Error(Código, Mensaje) {
-		if (this.Plantillas.Error) {
-			Plantilla.Load(this.Plantillas.Error, {
-				Código: Código, Mensaje: Mensaje
-			}).then((Plantilla) => {
-				this.EnviarEncabezados(Código, this.Encabezados('html'));
-				this.Enviar(Plantilla);
+	Error(Code, Message) {
+		if (this.Templates.Error) {
+			Template.Load(this.Templates.Error, {
+				Código: Code, Mensaje: Message
+			}).then((Template) => {
+				this.SendHeaders(Code, this.GenerateHeaders('html'));
+				this.Send(Template);
 			}).catch((Error) => {
-				this.EnviarEncabezados(Código, this.Encabezados('txt'));
-				this.Enviar(`Error: ${Código} -> ${Mensaje}`);
+				this.SendHeaders(Code, this.GenerateHeaders('txt'));
+				this.Send(`Error: ${Code} -> ${Message}`);
 			});
 		} else {
 			// @ts-ignore
-			let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-			Plantilla.Load(`${Directorio}/../Global/Template/Error.HSaml`, {
-				Código: Código, Mensaje: Mensaje
-			}).then((Plantilla) => {
-				this.EnviarEncabezados(Código, this.Encabezados('html'));
-				this.Enviar(Plantilla);
+			let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
+			Template.Load(`${ProcessDir}/../Global/Template/Error.HSaml`, {
+				Código: Code, Mensaje: Message
+			}).then((Template) => {
+				this.SendHeaders(Code, this.GenerateHeaders('html'));
+				this.Send(Template);
 			}).catch((Error) => {
-				this.EnviarEncabezados(Código, this.Encabezados('txt'));
-				this.Enviar(`Error: ${Código} -> ${Mensaje}`);
+				this.SendHeaders(Code, this.GenerateHeaders('txt'));
+				this.Send(`Error: ${Code} -> ${Message}`);
 			});
 			//this.EnviarEncabezados(Código, this.Encabezados('txt'));
 			//this.Enviar(`Error: ${Código} -> ${Mensaje}`);
 		}
 	}
 }
-export default Respuesta;
+export default Response;

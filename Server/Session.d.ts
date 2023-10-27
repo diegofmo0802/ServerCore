@@ -5,7 +5,7 @@
 
 import EVENTS from 'events';
 import Request from './Request.js';
-import Respuesta from './Response.js';
+import Response from './Response.js';
 
 export class Sesión extends EVENTS {
     /**Contiene los datos almacenados en la sesión. */

@@ -31,7 +31,7 @@ class Sesión extends EVENTS {
             .digest('base64url');
         }
         Sesión.Sesiones.set(this.SS_UUID, this);
-        if (Respuesta) Respuesta.SrvRespuesta.setHeader('set-cookie', [
+        if (Respuesta) Respuesta.HTTPResponse.setHeader('set-cookie', [
             `SS_UUID=${this.SS_UUID}; path=/; secure; httpOnly`
         ]);
     }
