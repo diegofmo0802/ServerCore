@@ -5,11 +5,11 @@
  */
 
 import Debug from "./Debug/Debug.js";
-import Plantilla from "./Template/Template.js";
+import Template from "./Template/Template.js";
 import ServerCore from "./Server/Server.js";
 
 export {
-	Debug, Plantilla, ServerCore
+	Debug, Template, ServerCore
 };
 
 export default ServerCore;

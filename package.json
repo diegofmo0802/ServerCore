@@ -5,7 +5,7 @@
   "main": "ServerCore.js",
   "type": "module",
   "scripts": {
-    "test": "node Test/ServerCore.js",
+    "test": "node Test/Plantilla.js",
     "csv-to-json": "node \"Global/Herramientas/CSV-To-JSON.js\""
   },
   "keywords": [

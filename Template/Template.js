@@ -1,76 +1,77 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade el sistema de plantillas `.HSaml`.
- * @license Saml
- * @module saml.server_core/Plantilla
+ * @license Apache-2.0
  */
 
 import FS from 'fs';
 
-class Plantilla {
-	static Expresiones = {
+class Template {
+	static Expressions = {
 		Variable: /(?<=\$Variable{)[^]*?(?=})/ig, //Completada
 		Array: {
 			Variable: /(?<=\$HSaml:Array{)[^]*?(?=})/ig, //Completada
-			Formato: /\s*?(?:<\/?HSaml:Array(?: .*)?>|\$HSaml:Array{.*?})\s*|(?: {4}|	)(?=<)/ig, //Completada
-			Bloque: /<(HSaml:Array)(?: .*)?>[^]*?<\/\1(?: .*)?>/ig //Completada
+			Format: /\s*?(?:<\/?HSaml:Array(?: .*)?>|\$HSaml:Array{.*?})\s*|(?: {4}|	)(?=<)/ig, //Completada
+			Block: /<(HSaml:Array)(?: .*)?>[^]*?<\/\1(?: .*)?>/ig //Completada
 		}
 	};
 	/**
 	 * Carga y compila una plantilla `.HSaml`.
-	 * @param {string} Ruta La ruta de la plantilla.
-	 * @param {Object} Datos Los datos con los que se compilara la plantilla.
+	 * @param {string} Patch La ruta de la plantilla.
+	 * @param {Object} Data Los datos con los que se compilara la plantilla.
 	 * @returns {Promise<string>}
 	 */
-	static Cargar(Ruta, Datos) {
-		return new Promise((PrRespuesta, PrError) => {
-			FS.stat(Ruta, (Error, Detalles) => {
+	static Load(Patch, Data) {
+		return new Promise((PrResponse, PrError) => {
+			FS.stat(Patch, (Error, Details) => {
 				if (Error) return PrError(Error.message);
-				if (! (Detalles.isFile)) return PrError('La ruta no pertenece a una plantilla');
-				FS.readFile(Ruta, (Error, Plantilla) => {
+				if (! (Details.isFile())) return PrError('La ruta no pertenece a una plantilla');
+				FS.readFile(Patch, (Error, Template) => {
 					if (Error) return PrError(Error.message);
-					PrRespuesta(this.Compilar(Plantilla.toString(), Datos));
+					PrResponse(this.Compile(Template.toString(), Data));
 				});
 			});
 		});
 	}
 	/**
 	 * Compila una plantilla `.HSaml` a `Html`.
-	 * @param {string} Contenido El contenido de la plantilla.
-	 * @param {{}} Datos Los datos con los que se compilara la plantilla.
+	 * @param {string} Content El contenido de la plantilla.
+	 * @param {{}} Data Los datos con los que se compilara la plantilla.
 	 * @returns {string}
 	 */
-	static Compilar(Contenido, Datos) {
-		for (let ID in Datos) {
-			if (typeof Datos[ID] !== 'object') {//@ts-ignore
-				Contenido = Contenido.replaceAll(`$Variable{${ID}}`, Datos[ID]);
+	static Compile(Content, Data) {
+		for (let ID in Data) {
+			if (typeof Data[ID] !== 'object') {//@ts-ignore
+				Content = Content.replaceAll(`$Variable{${ID}}`, Data[ID]);
 			} else {
-				/**
-				 * Compila la etiqueta <HSaml:Array>.
-				 * @param {(string|number)} Nombre El ID de los Datos.
-				 * @param {Object} Datos Los datos con los que se compilara la sub plantilla.
-				 * @returns {void}
-				 */
-				const CompilarOBJ = (Nombre, Datos) => {
-					let Bloques = Contenido.match(this.Expresiones.Array.Bloque);
-					if (Bloques) for (let Bloque of Bloques) {
-						let Variable = Bloque.match(this.Expresiones.Array.Variable);
-						if (Variable) if (Nombre == Variable[0]) {
-							let Formato = Bloque.replace(this.Expresiones.Array.Formato, '');
-							let SubPlantilla = '';
-							for (let ID in Datos) {//@ts-ignore
-								SubPlantilla += Formato.replaceAll(
-									`$Array{Valor}`, Datos[ID]
-								).replaceAll(`$Array{ID}`, ID);
-							}//@ts-ignore
-							Contenido = Contenido.replaceAll(Bloque, SubPlantilla);
-						}
-					}
-				};
-				CompilarOBJ(ID, Datos[ID]);
+				Content = this.CompileOBJ(Content, ID, Data[ID]);
 			}
 		}
-		return Contenido;
+		return Content;
 	}
+	/**
+	 * Compila la etiqueta <HSaml:Array>.
+	 * @param {string} Content El Contenido del bloque.
+	 * @param {(string|number)} Name El ID de los Datos.
+	 * @param {Object} Data Los datos con los que se compilara la sub plantilla.
+	 * @returns {string}
+	 */
+	static CompileOBJ(Content, Name, Data) {
+		let Blocks = Content.match(this.Expressions.Array.Block);
+		if (Blocks) for (let Block of Blocks) {
+			let Variable = Block.match(this.Expressions.Array.Variable);
+			if (Variable) if (Name == Variable[0]) {
+				let Format = Block.replace(this.Expressions.Array.Format, '');
+				let SubTemplate = '';
+				for (let ID in Data) {//@ts-ignore
+					SubTemplate += Format.replaceAll(
+						`$Array{Valor}`, Data[ID]
+					).replaceAll(`$Array{ID}`, ID);
+				}//@ts-ignore
+				Content = Content.replaceAll(Block, SubTemplate);
+			}
+		}
+		return Content;
+	};
 }
-export default Plantilla;
+export default Template;
