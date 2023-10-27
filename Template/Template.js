@@ -17,16 +17,16 @@ class Template {
 	};
 	/**
 	 * Carga y compila una plantilla `.HSaml`.
-	 * @param {string} Patch La ruta de la plantilla.
+	 * @param {string} Path La ruta de la plantilla.
 	 * @param {Object} Data Los datos con los que se compilara la plantilla.
 	 * @returns {Promise<string>}
 	 */
-	static Load(Patch, Data) {
+	static Load(Path, Data) {
 		return new Promise((PrResponse, PrError) => {
-			FS.stat(Patch, (Error, Details) => {
+			FS.stat(Path, (Error, Details) => {
 				if (Error) return PrError(Error.message);
 				if (! (Details.isFile())) return PrError('La ruta no pertenece a una plantilla');
-				FS.readFile(Patch, (Error, Template) => {
+				FS.readFile(Path, (Error, Template) => {
 					if (Error) return PrError(Error.message);
 					PrResponse(this.Compile(Template.toString(), Data));
 				});

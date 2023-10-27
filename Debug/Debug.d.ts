@@ -1,21 +1,20 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade un sistema básico de debug.
- * @license Saml
- * @module Saml/Debug
+ * @license Apache-2.0
  */
 
-import {WriteStream} from 'fs';
+import { WriteStream } from 'fs';
 
 export namespace Debug {
-	type Fecha = {
-		Dia: string,
-		Mes: string,
-		Año: string,
-		Hora: string,
-		Minuto: string,
-		Segundo: string,
-		MiliSegundo: string,
+	type StartDate = {
+		Day: string,
+		Month: string,
+		Year: string,
+		Hour: string,
+		Minute: string,
+		Second: string,
+		MiliSecond: string,
 		DDMMYYYY: string,
 		HHMMSSmmm: string,
 		Date: Date
@@ -26,17 +25,17 @@ export class Debug {
 	/**Contiene las instancias de Debug. */
 	public static Debugs: Map<string,Debug>;
 	/**Contiene el indicador `Mostrar todo en consola`. */
-	public static MostrarTodo: boolean;
+	public static ShowAll: boolean;
 	/**Contiene el nombre del archivo `.DSaml`. */
-	private Archivo: string;
+	private File: string;
 	/**Contiene la ruta de la Carpeta de Debug. */
-	private Carpeta: string;
+	private Folder: string;
 	/**Contiene el indicador `Mostrar en consola`. */
-	private EnConsola: boolean;
+	private InConsole: boolean;
 	/**Contiene la fecha en la que inicio el Debug. */
-	private Fecha: Date;
+	private StartDate: Date;
 	/**Contiene la ruta del archivo `.DSaml`. */
-	private Ruta: string;
+	private Path: string;
 	/**Contiene el Stream del archivo `.DSaml`.*/
 	private Stream: WriteStream;
 	/**
@@ -47,23 +46,23 @@ export class Debug {
      *   esto conlleva a que el campo `"Ruta"` sera descartado.
      * - Si no proporcionas una `"Ruta"` la ruta por defecto sera `".Debug"`.
 	 * @param ID La ID de la instancia de debug.
-	 * @param Ruta La Ruta de la carpeta donde se almacenaran los Log`s.
-	 * @param EnConsola El indicador de `Mostrar en consola`.
+	 * @param Path La Ruta de la carpeta donde se almacenaran los Log`s.
+	 * @param InConsole El indicador de `Mostrar en consola`.
 	 */
-	public constructor(ID?: string, Ruta?: string, EnConsola?: boolean);
+	public constructor(ID?: string, Path?: string, InConsole?: boolean);
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
-	 * @param Datos Los datos a mostrar y almacenar.
+	 * @param Data Los datos a mostrar y almacenar.
 	 */
-	public Log(...Datos: any): void
+	public Log(...Data: any): void
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
-	 * @param Datos Los datos a mostrar y almacenar.
+	 * @param Data Los datos a mostrar y almacenar.
 	 */
-	public static Log(...Datos: any): void
+	public static Log(...Data: any): void
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm
 	 */
-	public static Fecha(): Debug.Fecha
+	public static GetDate(): Debug.StartDate
 }
 export default Debug;

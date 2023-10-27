@@ -15,11 +15,11 @@ const Y = new Debug('SEA', null, false);
 
 Y.Log('Prueba para verificar que no se muestra en consola si se inicializa con EnConsola = false');
 
-Debug.MostrarTodo = true;
+Debug.ShowAll = true;
 
 Y.Log('Prueba para verificar que al cambiar el atributo MostrarTodo a true se muestran incluso los Debug con EnConsola = false');
 
-Debug.MostrarTodo = false;
+Debug.ShowAll = false;
 
 Y.Log('Prueba para ver si vuelven a ocultarse los mensajes en consola de los EnConsola = false después de poner MostrarTodo nuevamente en false');
 

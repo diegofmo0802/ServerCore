@@ -16,10 +16,10 @@ export class Template {
 	};
 	/**
 	 * Carga y compila una plantilla `HSaml` desde un archivo.
-	 * @param Patch La ruta de la plantilla.
+	 * @param Path La ruta de la plantilla.
 	 * @param Data Los datos con los que se compilara la plantilla.
 	 */
-	public static Load(Patch: string, Data: object): Promise<string>
+	public static Load(Path: string, Data: object): Promise<string>
 	/**
 	 * Compila una plantilla `.HSaml` a `Html`.
 	 * @param {string} Content El contenido de la plantilla.
