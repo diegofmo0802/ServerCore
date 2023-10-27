@@ -31,7 +31,7 @@ class Servidor {
 	static WebSocket = WebSocket;
 	/**@type {string} Contiene el host donde el servidor recibirá peticiones. */
 	Host = null;
-	/**@type {} Contiene el listado de plantillas de respuesta del servidor. */
+	/**@type {{}} Contiene el listado de plantillas de respuesta del servidor. */
 	Plantillas = null;
 	/**@type {('HTTP'|'HTTPS'|'HTTP/S')} El protocolo en el que se esta ejecutando el servidor. */
 	Protocolo = null;

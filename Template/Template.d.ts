@@ -27,5 +27,12 @@ export class Template {
 	 * @returns {string}
 	 */
 	public static Compile(Content: string, Data: object): string;
+	/**
+	 * Compila la etiqueta <HSaml:Array>.
+	 * @param Content El Contenido del bloque.
+	 * @param Name El ID de los Datos.
+	 * @param Data Los datos con los que se compilara la sub plantilla.
+	 */
+   private static CompileOBJ(Content: string, Name: (string|number), Data: Object): string;
 }
 export default Template;

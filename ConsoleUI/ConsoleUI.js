@@ -2,37 +2,36 @@
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Contiene las funcionalidades base de las herramientas del modulo saml
  * @license Apache-2.0
- * @module saml/CUI
  */
 
-class CUI {
+class ConsoleUI {
     /**
      * Elimina los formatos de color que se usan para la función CUI.Colorear().
-     * @param {string} Texto El texto limpiar.
-     * @param {string} Prefijo El prefijo.
+     * @param {string} Text El texto limpiar.
+     * @param {string} Prefix El prefijo.
      * @returns {string}
      */
-    static Color_limpiar(Texto, Prefijo = '&') {
-        let Expresiones = {
-            Formato: new RegExp(`${Prefijo}((?:(?:[BC])[0-7])|[NSPIR])`, 'g'),
-            RGB: new RegExp(`${Prefijo}(?:([BC])\\((?:([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}))\\))`, 'g')
+    static CleanFormat(Text, Prefix = '&') {
+        let Expressions = {
+            Format: new RegExp(`${Prefix}((?:(?:[BC])[0-7])|[NSPIR])`, 'g'),
+            RGB: new RegExp(`${Prefix}(?:([BC])\\((?:([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}))\\))`, 'g')
         };
-        return Texto
-            .replace(Expresiones.Formato, (Resultado, G1) => '')
-            .replace(Expresiones.RGB, (Resultado) => '');
+        return Text
+            .replace(Expressions.Format, '')
+            .replace(Expressions.RGB, '');
     }
     /**
      * Permite colorear el texto.
-     * @param {string} Texto El texto a colorear.
-     * @param {string} Prefijo El prefijo.
+     * @param {string} Text El texto a colorear.
+     * @param {string} Prefix El prefijo.
      * @returns {string}
      */
-    static Color(Texto, Prefijo = '&') {
-        let Expresiones = {
-            Formato: new RegExp(`${Prefijo}([CB][0-7]|[NSPIR])`, 'g'),
-            RGB:     new RegExp(`${Prefijo}([CB])\\(([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2})\\)`, 'g'),
+    static Color(Text, Prefix = '&') {
+        let Expressions = {
+            Format: new RegExp(`${Prefix}([CB][0-7]|[NSPIR])`, 'g'),
+            RGB:     new RegExp(`${Prefix}([CB])\\(([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2})\\)`, 'g'),
         };
-        const Código = {
+        const Formats = {
           //Var - Código      --      Color de texto
             C0:   '\x1B[30m',         //Negro
             C1:   '\x1B[31m',         //Rojo
@@ -60,60 +59,34 @@ class CUI {
             I:    '\x1B[7m',          //Invertir
             R:    '\x1B[0m',          //Restablecer
         };
-        return `${Texto
-            .replace(Expresiones.Formato, (Resultado, G1) => Código[G1])
-            .replace(Expresiones.RGB, (Resultado, Tipo, R, G, B) => (Código[Tipo]
+        return `${Text
+            .replace(Expressions.Format, (Result, G1) => Formats[G1])
+            .replace(Expressions.RGB, (Result, Type, R, G, B) => (Formats[Type]
                 .replace('R', R)
                 .replace('G', G)
                 .replace('B', B)
             ))
-        }${Código.R}`;
-    }
-    /**
-     * Hace una pregunta al usuario.
-     * @param {string} Pregunta La pregunta que se le hará al usuario.
-     * @returns {Promise<string>}
-     */
-    static Preguntar(Pregunta) {
-        return new Promise((Respuesta, Error) => {
-            /**
-             * Da respuesta a la promesa enviada.
-             * @param {Buffer} Datos la respuesta del usuario.
-             */
-            function Responder(Datos) {
-                let Mensaje = Datos.toString().replace(/[\n\r]+/g, '');
-                Respuesta(Mensaje);
-                process.stdin.removeListener('data', Responder);
-            }
-            process.stdout.write(`${Pregunta} `, 'utf8');
-            process.stdin.addListener('data', Responder);
-        });
+        }${Formats.R}`;
     }
     /**
      * Envía un mensaje al usuario a traves de la consola.
-     * @param {string|String[]} Mensaje El/Los mensaje/s que deseas enviar al usuario.
-     * @param {boolean} Salto Si hay o no un salto de linea
+     * @param {string|String[]} Message El/Los mensaje/s que deseas enviar al usuario.
+     * @param {boolean} NewLine Si hay o no un salto de linea
      */
-    static Enviar(Mensaje, Salto = true) {
-        if (typeof Mensaje === 'string') {
-            process.stdout.write(`${Mensaje}\n\r`, 'utf8');
+    static Send(Message, NewLine = true) {
+        if (typeof Message === 'string') {
+            process.stdout.write(`${Message}${NewLine ? '\n' : ''}`, 'utf8');
         } else {
-            if (Mensaje.forEach) {
-                Mensaje.forEach((Valor) => {
-                    this.Enviar(Valor);
+            if (Message.forEach) {
+                Message.forEach((Valor) => {
+                    this.Send(Valor);
                 });
-                process.stdout.write(`\n\r`, 'utf8');
+                if (NewLine) process.stdout.write(`\n`, 'utf8');
             } else {
-                process.stdout.write('[Base] Intentaste enviar un objeto diferente a String o String[]\n\r');
+                process.stdout.write('[Base] Intentaste enviar un objeto diferente a String o String[]\n');
             }
         }
     }
-    /**
-     * Termina la ejecución del programa.
-     */
-    static Finalizar() {
-        process.exit();
-    }
 }
 
-export default CUI;
+export default ConsoleUI;

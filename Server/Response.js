@@ -119,7 +119,7 @@ class Respuesta {
 	}
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param {import('./Server.js').Servidor.} Regla La regla de enrutamiento.
+	 * @param {import('./Server.js').Servidor.Regla.Carpeta} Regla La regla de enrutamiento.
 	 * @param {import('./Request.js').default} Petición La petición que recibió el servidor.
 	 * @returns {void}
 	 */
@@ -174,7 +174,7 @@ class Respuesta {
 	 * @returns {void}
 	 */
 	EnviarHSaml(Ruta, Datos) {
-		Plantilla.Cargar(Ruta, Datos).then((Plantilla) => {
+		Plantilla.Load(Ruta, Datos).then((Plantilla) => {
 			this.EnviarEncabezados(200, this.Encabezados('html'));
 			this.Enviar(Plantilla, 'utf-8');
 		}).catch((Error) => {
@@ -198,7 +198,7 @@ class Respuesta {
 	 */
 	Error(Código, Mensaje) {
 		if (this.Plantillas.Error) {
-			Plantilla.Cargar(this.Plantillas.Error, {
+			Plantilla.Load(this.Plantillas.Error, {
 				Código: Código, Mensaje: Mensaje
 			}).then((Plantilla) => {
 				this.EnviarEncabezados(Código, this.Encabezados('html'));
@@ -210,7 +210,7 @@ class Respuesta {
 		} else {
 			// @ts-ignore
 			let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-			Plantilla.Cargar(`${Directorio}/../Global/Template/Error.HSaml`, {
+			Plantilla.Load(`${Directorio}/../Global/Template/Error.HSaml`, {
 				Código: Código, Mensaje: Mensaje
 			}).then((Plantilla) => {
 				this.EnviarEncabezados(Código, this.Encabezados('html'));

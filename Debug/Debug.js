@@ -65,17 +65,17 @@ class Debug {
 		if (! (this.Stream.destroyed)) this.Stream.write(`${Prefijo} -> ${JSON.stringify((() => {
 			let Resultado = [];
 			Datos.forEach((Dato) => {
-				if (typeof Dato === 'string') Resultado.push(ConsoleUI.Color_limpiar(Dato));
+				if (typeof Dato === 'string') Resultado.push(ConsoleUI.CleanFormat(Dato));
 				else Resultado.push(Dato);
 			});
 			return Resultado;
 		})())}\n`);
 		if (this.EnConsola || Debug.MostrarTodo) console.log(
-			ConsoleUI.Color(`&B(255,0,0)&C(255,255,0)${Prefijo}&R`),
+			ConsoleUI.GenerateFormat(`&B(255,0,0)&C(255,255,0)${Prefijo}&R`),
 			...(() => {
 				let Resultado = [];
 				Datos.forEach((Dato) => {
-					if (typeof Dato === 'string') Resultado.push(ConsoleUI.Color(Dato));
+					if (typeof Dato === 'string') Resultado.push(ConsoleUI.GenerateFormat(Dato));
 					else Resultado.push(Dato);
 				});
 				return Resultado;

@@ -5,17 +5,17 @@
  * @module saml/CUI
  */
 
-class CUI {
+class ConsoleUI {
         /**
      * Elimina los formatos de color que se usan para la función CUI.Colorear().
-     * @param Texto El texto limpiar.
-     * @param Prefijo El prefijo.
+     * @param Text El texto limpiar.
+     * @param Prefix El prefijo.
      */
-        static Color_limpiar(Texto: string, Prefijo?: string): string
+    public static CleanFormat(Text: string, Prefix?: string): string
     /**
      * Permite colorear el texto.
-     * @param Texto El texto a colorear.
-     * @param Prefijo El prefijo.
+     * @param Text El texto a colorear.
+     * @param Prefix El prefijo.
      * El prefijo por defecto es `&`
      * Colores y formatos
      * - Formatos:
@@ -42,21 +42,12 @@ class CUI {
      * - - `6`: Rojo
      * - - `7`: Amarillo
      */
-    public static Color(Texto: string, Prefijo?: string): string
-    /**
-     * Hace una pregunta al usuario.
-     * @param Pregunta La pregunta que se le hará al usuario.
-     */
-    public static Preguntar(Pregunta: string): Promise<string>
+    public static GenerateFormat(Text: string, Prefix?: string): string
     /**
      * Envía un mensaje al usuario a traves de la consola.
-     * @param Mensaje El/Los mensaje/s que deseas enviar al usuario.
-     * @param Salto Si hay o no un salto de linea
+     * @param Message El/Los mensaje/s que deseas enviar al usuario.
+     * @param NewLine Si hay o no un salto de linea
      */
-    public static Enviar(Mensaje: string|Array<string>, Salto?: boolean): void
-    /**
-     * Termina la ejecución del programa.
-     */
-    public static Finalizar(): void
+    public static Send(Message: string|Array<string>, NewLine?: boolean): void
 }
-export default CUI;
+export default ConsoleUI;
