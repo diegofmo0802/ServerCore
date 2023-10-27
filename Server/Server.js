@@ -12,7 +12,7 @@ import PATH from 'path';
 import URL from 'url';
 
 import Debug from '../Debug/Debug.js';
-import Petición from "./Request.js";
+import Request from "./Request.js";
 import Respuesta from "./Response.js";
 import Sesión from "./Session.js";
 import WebSocket from "./WebSocket.js";
@@ -21,8 +21,8 @@ const _Peticiones = new Debug('Peticiones', '.Debug/Peticiones', false);
 const _Solicitudes = new Debug('Solicitudes', '.Debug/Solicitudes', false);
 
 class Servidor {
-	/**@type {typeof Petición} */
-	static Petición = Petición;
+	/**@type {typeof Request} */
+	static Petición = Request;
 	/**@type {typeof Respuesta} */
 	static Respuesta = Respuesta;
 	/**@type {typeof Sesión} */
@@ -118,7 +118,7 @@ class Servidor {
 	}
 	/**
 	 * Enruta las peticiones hechas al servidor para que sean procesadas.
-	 * @param {Petición} Petición La petición que recibió el servidor.
+	 * @param {Request} Petición La petición que recibió el servidor.
 	 * @param {Respuesta} Respuesta La respuesta que dará el servidor.
 	 * @returns {void}
 	 */
@@ -128,7 +128,7 @@ class Servidor {
 			Regla.Url = Regla.Url.startsWith('/') ? Regla.Url : '/' + Regla.Url;
 			Regla.Url = Regla.Url.endsWith('/') ? Regla.Url : Regla.Url + '/';
 			Enrutado = Regla.Método == 'ALL'
-			|| Regla.Método == Petición.Método
+			|| Regla.Método == Petición.Method
 			? Regla.Tipo == 'Acción'
 				? Regla.Opciones.Cobertura == 'Completa'
 					? Regla.Url.length <= Petición.Url.length
@@ -174,11 +174,11 @@ class Servidor {
 				break;
 			}
 		}
-		if (!(Enrutado)) Respuesta.Error(500, `Sin enrutador para: ${Petición.Método} -> ${Petición.Url}`);
+		if (!(Enrutado)) Respuesta.Error(500, `Sin enrutador para: ${Petición.Method} -> ${Petición.Url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
-	 * @param {Petición} Petición La petición que recibió el servidor.
+	 * @param {Request} Petición La petición que recibió el servidor.
 	 * @param {WebSocket} WebSocket La conexión con el cliente.
 	 * @returns {void}
 	 */
@@ -188,7 +188,7 @@ class Servidor {
 			Regla.Url = Regla.Url.startsWith('/') ? Regla.Url : '/' + Regla.Url;
 			Regla.Url = Regla.Url.endsWith('/') ? Regla.Url : Regla.Url + '/';
 			Enrutado = Regla.Método == 'ALL'
-			|| Regla.Método == Petición.Método
+			|| Regla.Método == Petición.Method
 			? Regla.Tipo == 'WebSocket'
 				? Regla.Opciones.Cobertura == 'Completa'
 					? Regla.Url.length <= Petición.Url.length
@@ -199,7 +199,7 @@ class Servidor {
 				: false
 			: false;
 			if (Enrutado) {
-				let Llave = Petición.Cabeceras['sec-websocket-key'].trim();
+				let Llave = Petición.Headers['sec-websocket-key'].trim();
 				WebSocket.Aceptar_Conexión(Llave);
 				Regla.Opciones.Acción(Petición, WebSocket);
 				break;
@@ -215,11 +215,11 @@ class Servidor {
 	Peticiones(SrvPetición, SrvRespuesta) {
 		let Petición = new Servidor.Petición(SrvPetición);
 		let Respuesta = new Servidor.Respuesta(Petición, SrvRespuesta, this.Plantillas);
-		Petición.Sesión = new  Servidor.Sesión(Petición, Respuesta);
+		Petición.Session = new  Servidor.Sesión(Petición, Respuesta);
 		_Peticiones.Log(
 			'[Petición]:',
 			Petición.IP,
-			Petición.Método,
+			Petición.Method,
 			Petición.Url, Petición.Cookies.get('SS_UUID')
 		);
 		this.Enrutar(Petición, Respuesta);
@@ -233,12 +233,12 @@ class Servidor {
 	Solicitudes(SrvPetición, Socket) {
 		let Petición = new Servidor.Petición(SrvPetición);
 		let WebSocket = new Servidor.WebSocket(Socket);
-		Petición.Sesión = new  Servidor.Sesión(Petición);
-		if (!(Petición.Cookies.has('SS_UUID'))) WebSocket.SS_UUID = Petición.Sesión.SS_UUID;
+		Petición.Session = new  Servidor.Sesión(Petición);
+		if (!(Petición.Cookies.has('SS_UUID'))) WebSocket.SS_UUID = Petición.Session.SS_UUID;
 		_Solicitudes.Log(
 			'[WebSocket]:',
 			Petición.IP,
-			Petición.Método,
+			Petición.Method,
 			Petición.Url, Petición.Cookies.get('SS_UUID')
 		);
 		this.EnrutarWebSocket(Petición, WebSocket);

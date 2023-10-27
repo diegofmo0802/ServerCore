@@ -1,44 +1,45 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade la forma de Petición de `Saml/Server-core`.
+ * @license Apache-2.0
  */
 
 import URI from 'url';
 
-class Petición {
+class Request {
 	/**@type {import('http').IncomingHttpHeaders} Contiene los encabezados de la petición. */
-	Cabeceras = null;
+	Headers = null;
 	/**@type {Map<string, string>} Contiene las cookies de la petición. */
 	Cookies = null;
-	/**@type {import('./Request').Petición.GET} Contiene los datos POST que se enviaron. */
+	/**@type {import('./Request').Request.GET} Contiene los datos POST que se enviaron. */
 	GET = null;
 	/**@type {string} Contiene la dirección IP de quien realizo la petición. */
 	IP = null;
-	/**@type {import('./Request').Petición.Método} Contiene el método de la petición. */
-	Método = null;
-	/**@type {Promise<import('./Request').Petición.POST>} Contiene los datos POST que se enviaron. */
+	/**@type {import('./Request').Request.Method} Contiene el método de la petición. */
+	Method = null;
+	/**@type {Promise<import('./Request').Request.POST>} Contiene los datos POST que se enviaron. */
 	POST = null;
 	/**@type {import('./Session').Sesión} */
-	Sesión = null;
+	Session = null;
 	/**@type {import('http').IncomingMessage} Contiene la petición que recibió el servidor. */
-	SrvPetición = null;
+	HTTPRequest = null;
 	/**@type {string} Contiene la url de la petición. */
 	Url = null;
 	/**
 	 * Crea la forma de petición de `Saml/Servidor`.
-	 * @param {import('http').IncomingMessage} SrvPetición La petición que recibió el servidor.
+	 * @param {import('http').IncomingMessage} HTTPRequest La petición que recibió el servidor.
 	 */
-	constructor(SrvPetición) {
-		this.Cabeceras = SrvPetición.headers;
-		this.Cookies = this.Decodificar_Cookies(this.Cabeceras.cookie);
-		this.GET = this.Variables_Get(SrvPetición.url);
-		this.IP = this.Cabeceras['x-forwarded-for']
-		? SrvPetición.headers['x-forwarded-for'].toString()
-		: SrvPetición.socket.remoteAddress;
-		this.Método = this.ObtenerMétodo(SrvPetición.method);
-		this.POST = this.Datos_Post(SrvPetición);
-		this.SrvPetición = SrvPetición;
-		this.Url = SrvPetición.url.split('?')[0];
+	constructor(HTTPRequest) {
+		this.Headers = HTTPRequest.headers;
+		this.Cookies = this.GetCookies(this.Headers.cookie);
+		this.GET = this.GetData(HTTPRequest.url);
+		this.IP = this.Headers['x-forwarded-for']
+		? HTTPRequest.headers['x-forwarded-for'].toString()
+		: HTTPRequest.socket.remoteAddress;
+		this.Method = this.GetMethod(HTTPRequest.method);
+		this.POST = this.GetPostData(HTTPRequest);
+		this.HTTPRequest = HTTPRequest;
+		this.Url = HTTPRequest.url.split('?')[0];
 		this.Url = decodeURI(this.Url.endsWith('/') ? this.Url : this.Url + '/');
 	}
 	/**
@@ -46,88 +47,87 @@ class Petición {
 	 * @param {string} Cookie El texto de la cabecera `cookie`.
 	 * @returns {Map<string,string>}
 	 */
-	Decodificar_Cookies(Cookie) {
+	GetCookies(Cookie) {
 		if (!(Cookie)) return new Map();
-		let División = Cookie.split(';');
+		let Division = Cookie.split(';');
 		let Cookies = new Map();
-		for (let Parte of División) {
-			let [Nombre, ...Valor] = Parte.split('=');
-			Cookies.set(Nombre,Valor.join('='));
+		for (let Part of Division) {
+			let [Name, ...Value] = Part.split('=');
+			Cookies.set(Name, Value.join('='));
 		}
 		return Cookies;
 	};
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
-	 * @param {import('http').IncomingMessage} SrvPetición La petición que recibió el servidor.
-	 * @returns {Promise<import('./Request').Petición.POST>}
+	 * @param {import('http').IncomingMessage} HTTPRequest La petición que recibió el servidor.
+	 * @returns {Promise<import('./Request').Request.POST>}
 	 */
-	Datos_Post(SrvPetición) {
-		return new Promise((PrRespuesta, PrError) => {
-			let Datos = Buffer.from([]);
-			let Partes = [];
-			/**@type {import('./Request').Petición.POST} */
+	GetPostData(HTTPRequest) {
+		return new Promise((PrResponse, PrError) => {
+			let Data = Buffer.from([]);
+			let Parts = [];
+			/**@type {import('./Request').Request.POST} */
 			let POST = {
-				Archivos: new Map,
-				Formato: 'Desconocido',
+				Files: new Map,
+				MimeType: 'Unknown',
 				Variables: new Map
 			};
-			SrvPetición.on('data', (Parte) => {
-				if(Datos.length > 1e+8) {
-					Datos = null;
-					SrvPetición.destroy();
+			HTTPRequest.on('data', (Part) => {
+				if(Data.length > 1e+8) {
+					Data = null;
+					HTTPRequest.destroy();
 				}
-				//Datos = Buffer.concat([Datos, Parte]);
-				Partes.push(Parte);
+				Parts.push(Part);
 			});
-			SrvPetición.on('end', () => {
-				Datos = Buffer.concat(Partes);
-				if (this.Cabeceras['content-type']) {
-					let [Formato, ...Opciones] = this.Cabeceras['content-type'].trim().split(';');
-					switch(Formato.toLowerCase()) {
+			HTTPRequest.on('end', () => {
+				Data = Buffer.concat(Parts);
+				if (this.Headers['content-type']) {
+					let [Format, ...Options] = this.Headers['content-type'].trim().split(';');
+					switch(Format.toLowerCase()) {
 						case 'multipart/form-data': {
-							POST.Formato = 'multipart/form-data';
-							let Separador = '--' + Opciones.join(';').replace(/.*boundary=(.*)/gi, (Resultado, Separador) => Separador);
-							let Variables = Datos.toString('latin1').trim().split(Separador);
+							POST.MimeType = 'multipart/form-data';
+							let Separator = '--' + Options.join(';').replace(/.*boundary=(.*)/gi, (Result, Separator) => Separator);
+							let Variables = Data.toString('latin1').trim().split(Separator);
 							Variables.forEach((Variable) => {
-								let Información  =
+								let Information  =
 								/Content-Disposition: ?form-data;? ?name="(.*?)?";? ?(?:filename="(.*?)?")?(?:\s*)?(?:Content-Type: ?(.*)?)?([^]*)/i
 								.exec(Variable);
-								if (Información) {
-									let [Nombre, Archivo, Tipo, Contenido] = Información.splice(1);
-									if (Archivo) {
+								if (Information) {
+									let [Name, File, Type, Content] = Information.splice(1);
+									if (File) {
 										try {
 											//let Carpeta = `.Guardado/${this.Sesión.SS_UUID || UUID()}`;
 											//let Ruta = `${Carpeta}/${Date.now()}_${UUID()}__${Archivo}`;
 											//if (!FS.existsSync('.Guardado_Temp')) FS.mkdirSync('.Guardado_Temp');
 											//if (!FS.existsSync(Carpeta)) FS.mkdirSync(Carpeta);
-											let Datos = Buffer.from(Contenido.trim(), 'binary');
+											let Data = Buffer.from(Content.trim(), 'binary');
 											//let Stream = FS.createWriteStream(Ruta);
 											//Stream.write(Contenido.trim(), 'binary');
-											POST.Archivos.set(Buffer.from(Nombre, 'binary').toString(), {
-												Archivo: Datos,
-												Nombre: Buffer.from(Archivo, 'binary').toString(),
+											POST.Files.set(Buffer.from(Name, 'binary').toString(), {
+												File: Data,
+												Name: Buffer.from(File, 'binary').toString(),
 												//Ruta: Ruta,
-												Peso: Datos.byteLength,
-												Tipo: Buffer.from(Tipo, 'binary').toString()
+												Size: Data.byteLength,
+												Type: Buffer.from(Type, 'binary').toString()
 											});
 										} catch(Error) {
 											console.log('Error');
 											PrError(Error);
 										}
-									} else POST.Variables.set(Buffer.from(Nombre, 'binary').toString(), Contenido ? Buffer.from(Contenido, 'binary').toString().trim() : null);
+									} else POST.Variables.set(Buffer.from(Name, 'binary').toString(), Content ? Buffer.from(Content, 'binary').toString().trim() : null);
 								}
 							});
 							break;
 						}
 						default: {
-							POST.Formato = 'Desconocido';
-							POST.Desconocido = Datos;
+							POST.MimeType = 'Unknown';
+							POST.Unknown = Data;
 						}
 					}
 				}
-				PrRespuesta(POST);
+				PrResponse(POST);
 			});
-			SrvPetición.on('error', (Error) => {
+			HTTPRequest.on('error', (Error) => {
 				console.log(Error);
 				PrError(Error);
 			});
@@ -138,21 +138,21 @@ class Petición {
 	 * @param {string} Url La url recibida de la petición http.
 	 * @returns {Map<string,string>}
 	 */
-	Variables_Get(Url) {
-		let Ob_Url = new URI.URL(`http://x.x${Url}`);
-		return new Map(Ob_Url.searchParams);
+	GetData(Url) {
+		let UrlObject = new URI.URL(`http://x.x${Url}`);
+		return new Map(UrlObject.searchParams);
 	}
 	/**
 	 * Define que método se uso para realizar la petición.
-	 * @param {string} Método El método con el que se realizo la petición.
-	 * @returns {import('./Request').Petición.Método}
+	 * @param {string} Method El método con el que se realizo la petición.
+	 * @returns {import('./Request').Request.Method}
 	 */
-	ObtenerMétodo(Método) {
-		return Método == 'POST'
+	GetMethod(Method) {
+		return Method == 'POST'
 		? 'POST'
-		: Método == 'PUT' ? 'PUT'
-			: Método == 'DELETE' ? 'DELETE'
+		: Method == 'PUT' ? 'PUT'
+			: Method == 'DELETE' ? 'DELETE'
 			: 'GET';
 	}
 }
-export default Petición;
+export default Request;

@@ -18,7 +18,7 @@ export namespace Servidor {
 	export import Respuesta = __Respuesta
     namespace Regla {
         type Base = {
-            Método: Petición.Método,
+            Método: Petición.Method,
             Url: string
         };
         type Acción = Base & {

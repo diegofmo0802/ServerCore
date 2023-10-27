@@ -6,7 +6,7 @@
 import HTTP from 'http';
 
 import Servidor from './Server.js';
-import Petición from './Request.js';
+import Request from './Request.js';
 export namespace Respuesta {
     type Extension =
         //Formatos de Texto
@@ -16,7 +16,7 @@ export namespace Respuesta {
 }
 export class Respuesta {
 	/**Contiene la petición que recibió el servidor. */
-	public Petición: Petición;
+	public Petición: Request;
 	/**Contiene el listado de plantillas de respuesta del servidor. */
 	private Plantillas: Servidor.Plantillas;
 	/**Contiene la respuesta que dará el servidor. */
@@ -27,7 +27,7 @@ export class Respuesta {
 	 * @param SrvRespuesta La respuesta que dará el servidor.
 	 * @param Plantillas El listado de plantillas de respuesta del servidor.
 	 */
-	public constructor(Petición: Petición, SrvRespuesta: HTTP.ServerResponse, Plantillas: Servidor.Plantillas);
+	public constructor(Petición: Request, SrvRespuesta: HTTP.ServerResponse, Plantillas: Servidor.Plantillas);
 	/**
 	 * Crea encabezados para los tipos de archivo admitidos.
 	 * - Se añadirán mas tipos permitidos con el tiempo.
@@ -50,7 +50,7 @@ export class Respuesta {
 	 * @param Regla La regla de enrutamiento.
 	 * @param Petición La petición que recibió el servidor.
 	 */
-	public EnviarCarpeta(Regla: Servidor.Regla.Carpeta, Petición: Petición): void;
+	public EnviarCarpeta(Regla: Servidor.Regla.Carpeta, Petición: Request): void;
 	/**
 	 * Envía los encabezados de la respuesta.
 	 * @param Código El código de la respuesta que se dará.

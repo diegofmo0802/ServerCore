@@ -4,7 +4,7 @@
 */
 
 import EVENTS from 'events';
-import Petición from './Request.js';
+import Request from './Request.js';
 import Respuesta from './Response.js';
 
 export class Sesión extends EVENTS {
@@ -20,7 +20,7 @@ export class Sesión extends EVENTS {
      * @param Petición La petición que recibió el servidor.
 	 * @param Respuesta La respuesta que dará el servidor.
     */
-    public constructor(Petición: Petición, Respuesta?: Respuesta);
+    public constructor(Petición: Request, Respuesta?: Respuesta);
     /**Emite el evento `Iniciar`.*/
     Iniciar(): void;
     /**Emite el evento `Cerrar`.*/
