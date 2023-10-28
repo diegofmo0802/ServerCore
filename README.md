@@ -3,7 +3,7 @@
 Hola! soy [diegofmo0802](https://diegofmo0802.github.io).<br/>
 Como comente  anteriormente en mi perfil, ServerCore permitirá:
 - [x] Crear servidores HTTP y HTTPS.
-- [ ] **En proceso**Sistema de plantillas.
+- [ ] **En proceso** Sistema de plantillas.
 - [x] Gestionar conexiones WebSocket.
 - [ ] Gestionar negociaciones de WebRTC.
 - [ ] Gestionar notificaciones WebPush.
@@ -20,10 +20,10 @@ publicaré el código de esta manera e iré modificando para corregir esto.
 <br/><br/>
 
 **Futuras correcciones**
-- [ ] **en proceso** Documentar clases y funciones.
-- [ ] **en proceso** Traducir la documentación actual al inglés.
-- [ ] Cambiar los nombres de variables, funciones, clases y descripciones a inglés.
-- [ ] Buscar y corregir malas practicas.
+- [x] Documentar clases y funciones para intellisense.
+- [x] Cambiar los nombres de variables, funciones, clases y descripciones a inglés.
+- [ ] **en proceso** Crear documentación para enseñar a usar el módulo.
+- [ ] **en proceso** Buscar y corregir malas practicas.
 <br/><br/>
 
 Esto es todo por el momento, [diegofmo0802](https://diegofmo0802.github.io) se retira.
@@ -49,7 +49,7 @@ Una ves tengas ServerCore en tu proyecto debes importar el archivo `ServerCore.j
   ```
 - Si no tienes esta propiedad usa:
   ```js
-  const ServerCore = require('./ServerCore/ServerCore.js').default;
+  //Actualmente no esta soportado, en futuras versiones se ampliara su compatibilidad
   ```
 <br/><br/>
 ## Servidor HTTP
@@ -72,10 +72,10 @@ Para crear un servidor HTTP puedes hacerlo de diferentes maneras:
 > - Actualmente se inicia el servidor HTTP y HTTPS a la vez en este caso
 >   esto se corregirá y se pondrá como característica opcional en futuras versiones.
 ```js
-const Servidor = new ServerCore(80, null, {
-    Publico: 'Cert/MiDominio.pem', //El archivo con la clave publica
-    Llave: 'Cert/MiDominio.key',   //El archivo con la  clave privada
-    Puerto: 443         //(Opcional) El puerto donde se abrirá el servidor 
+const Server = new ServerCore(80, null, {
+  Public: 'Cert/MiDominio.pem',    //El archivo con la clave publica       (Obligatorio)
+  Private: 'Cert/MiDominio.key',   //El archivo con la  clave privada      (Obligatorio)
+  Port: 443                        //El puerto donde se abrirá el servidor (Opcional)
 });
 ```
 <br/><br/>
@@ -162,18 +162,18 @@ Comparte una carpeta y todo su contenido tanto archivos como sub-carpetas
 >   **Ejemplo**: si le asignas la ruta `/src` tomaría todas las sub-rutas como `/src/estilos` 
 Para añadir este tipo de regla usa:
 ```js
-Servidor.Añadir_Reglas({
-    Método: 'ALL', Url: '/',
-    Tipo: 'Carpeta', Opciones: {
-        Recurso: './src'
-    }
+Server.AddRules({
+  Method: 'ALL', Url: '/',
+  Type: 'Folder', Options: {
+    Source: './src'
+  }
 });
 
-Servidor.Añadir_Reglas({
-    Método: 'ALL', Url: '/',
-    Tipo: 'Carpeta', Opciones: {
-        Recurso: './global'
-    }
+Server.AddRules({
+  Method: 'ALL', Url: '/',
+  Type: 'Folder', Options: {
+    Source: './global'
+  }
 });
 ```
 <br/><br/><br/>
@@ -182,19 +182,20 @@ Servidor.Añadir_Reglas({
 
 Comparte un archivo especifico
 ```js
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/',
-    Tipo: 'Archivo', Opciones: {
-        Cobertura: 'Completa',
-        Recurso: './'
-    }
+Server.AddRules({
+  Method: 'GET', Url: '/',
+  Type: 'File', Options: {
+    Coverage: 'Complete',
+    Source: './'
+  }
 });
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/',
-    Tipo: 'Archivo', Opciones: {
-        Cobertura: 'Parcial',
-        Recurso: './'
-    }
+
+Server.AddRules({
+  Method: 'GET', Url: '/',
+  Type: 'File', Options: {
+    Coverage: 'Partial',
+    Source: './'
+  }
 });
 ```
 
@@ -202,18 +203,18 @@ Servidor.Añadir_Reglas({
 
 Te permite tener total control sobre esas peticiones:
 ```js
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/',
-    Tipo: 'Acción', Opciones: {
-        Cobertura: 'Parcial',
-        Acción: (Petición, Respuesta) => {
-            if (Petición.Cookies.has('User_ID')) {
-                Respuesta.Enviar("El User_ID que estas usando es:" + Petición.Cookies.get('User_ID'));
-            } else {
-                Respuesta.EnviarArchivo('./ErrorUsuario.html');
-            }
-        }
+Server.AddRules({
+  Method: 'GET', Url: '/',
+  Type: 'Action', Options: {
+    Coverage: 'Partial',
+    Action: (Petición, Respuesta) => {
+      if (Petición.Cookies.has('User_ID')) {
+        Respuesta.Enviar("El User_ID que estas usando es:" + Petición.Cookies.get('User_ID'));
+      } else {
+        Respuesta.EnviarArchivo('./ErrorUsuario.html');
+      }
     }
+  }
 });
 ```
 
@@ -226,26 +227,28 @@ Esto te permite gestionar una conexión WebSocket completa:
 ```js
 const Conexiones = new Set();
 
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/ws-chat',
-    Tipo: 'WebSocket', Opciones: {
-        Cobertura: 'Parcial',
-        Acción: (Petición, WebSocket) => {
-            Conexiones.forEach((Usuario) => Usuario.Enviar("Un usuario se conecto"));
-            Conexiones.add(WebSocket);
-            WebSocket.on('Finalizar', () => Conexiones.delete(WebSocket));
-            WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
-            WebSocket.on('Recibir', (Info, Datos) => {
-                console.log(Info.OPCode);
-                if (Info.OPCode == 1) {
-                    Conexiones.forEach((Usuario) => {
-                        if (Usuario !== WebSocket) Usuario.Enviar(Datos.toString());
-                    });
-                } else if (Info.OPCode == 8) {
-                    Conexiones.forEach((Usuario) => Usuario.Enviar("Un usuario se desconecto"));
-                }
-            })
+Server.AddRules({
+  Method: 'GET', Url: '/Test/WS-Chat',
+  Type: 'WebSocket', Options: {
+    Coverage: 'Partial',
+    Action: (Petición, WebSocket) => {
+      console.log('[WS] CM: Conexión nueva')
+      Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
+      Conexiones.add(WebSocket);
+      WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
+      WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
+      WebSocket.on('Message', (Info, Datos) => {
+        //console.log(Info.OPCode);
+        if (Info.OPCode == 1) {
+          console.log('[WS] MSS:', Datos.toString());
+          Conexiones.forEach((Usuario) => {
+            if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
+          });
+        } else if (Info.OPCode == 8) {
+          Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
         }
+      });
     }
+  }
 });
 ```
