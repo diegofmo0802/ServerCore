@@ -1,8 +1,8 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade una forma sencilla de crear servidores HTTP/S y WS/S.
- * @license Saml
- * @module saml.server_core
+ * @license Apache-2.0
+ * @module Saml.ServerCore
  */
 
 import FS from 'fs';
@@ -17,253 +17,238 @@ import Response from "./Response.js";
 import Session from "./Session.js";
 import WebSocket from "./WebSocket.js";
 
-const _Peticiones = new Debug('Peticiones', '.Debug/Peticiones', false);
-const _Solicitudes = new Debug('Solicitudes', '.Debug/Solicitudes', false);
+const D_Requests = new Debug('Srv.Requests', '.Debug/Requests', false);
+const D_UpgradesRequests = new Debug('Srv.UpgradeRequests', '.Debug/UpgradeRequests', false);
 
-class Servidor {
+class Server {
 	/**@type {typeof Request} */
-	static Petición = Request;
-	/**@type {typeof Respuesta} */
-	static Respuesta = Respuesta;
+	static Request = Request;
+	/**@type {typeof Response} */
+	static Response = Response;
 	/**@type {typeof Session} */
-	static Sesión = Session;
+	static Session = Session;
 	/**@type {typeof WebSocket} */
 	static WebSocket = WebSocket;
 	/**@type {string} Contiene el host donde el servidor recibirá peticiones. */
 	Host = null;
 	/**@type {{}} Contiene el listado de plantillas de respuesta del servidor. */
-	Plantillas = null;
+	Templates = null;
 	/**@type {('HTTP'|'HTTPS'|'HTTP/S')} El protocolo en el que se esta ejecutando el servidor. */
-	Protocolo = null;
+	Protocol = null;
 	/**@type {number} Contiene el puerto donde el servidor recibirá peticiones HTTP. */
-	PuertoHTTP = null;
+	HttpPort = null;
 	/**@type {number} Contiene el puerto donde el servidor recibirá peticiones HTTPS. */
-	PuertoHTTPS = null;
+	HttpsPort = null;
 	/**@type {HTTP.Server} Contiene el servidor HTTP/S. */
-	ServidorHTTP = null;
+	HttpServer = null;
 	/**@type {HTTPS.Server} Contiene el servidor HTTP/S. */
-	ServidorHTTPS = null;
-	/**@type {any} Contiene las reglas de enrutamiento del servidor. */
-	Reglas = null;
+	HttpsServer = null;
+	/**@type {import('./Server.js').Server.Rules} Contiene las reglas de enrutamiento del servidor. */
+	Rules = null;
 	/**
 	 * Crea un servidor HTTP/S.
-	 * @param {number?} Puerto El puerto donde el servidor recibirá peticiones.
+	 * @param {number?} Port El puerto donde el servidor recibirá peticiones.
 	 * @param {string?} Host El host donde el servidor recibirá peticiones.
-	 * @param {{Publico: string, Llave: string, Puerto?: number}} SSL La configuración SSL.
+	 * @param {{Public: string, Private: string, Port?: number}} SSL La configuración SSL.
 	 */
-	constructor(Puerto = null, Host = null, SSL = null) {
-		let Usar_HTTPS = SSL && SSL.Publico && SSL.Llave ? true : false;
+	constructor(Port = null, Host = null, SSL = null) {
+		let UseHttps = SSL && SSL.Public && SSL.Private ? true : false;
 		this.Host = Host ? Host : null;
-		this.Plantillas = {};
-		this.PuertoHTTP = Puerto ? Puerto : 80;
-		this.PuertoHTTPS = SSL && SSL.Puerto ? SSL.Puerto : 443;
-		this.Reglas = [];
+		this.Templates = {};
+		this.HttpPort = Port ? Port : 80;
+		this.HttpsPort = SSL && SSL.Port ? SSL.Port : 443;
+		this.Rules = [];
 		Debug.Log('&B(255,180,220)&C0---------------------------------');
 		Debug.Log('&B(255,180,220)&C0- Saml/Servidor by diegofmo0802 -');
 		Debug.Log('&B(255,180,220)&C0-       Servidor Iniciado       -');
 		Debug.Log('&B(255,180,220)&C0---------------------------------');
-		let [I_HTTP, I_HTTPS] = [false, false];
-		this.ServidorHTTP = HTTP.createServer((Petición, Respuesta) => {
-			this.Peticiones(Petición, Respuesta);
-		}).on('upgrade', (Petición, Socket) => {
-			this.Solicitudes(Petición, Socket);
-		}).listen(this.PuertoHTTP, Host, () => {
-			this.Protocolo = this.Protocolo == 'HTTPS' ? 'HTTP/S' : 'HTTP';
+		let [HttpStarted, HttpsStarted] = [false, false];
+		this.HttpServer = HTTP.createServer((Request, Response) => {
+			this.Requests(Request, Response);
+		}).on('upgrade', (Request, Socket) => {
+			this.UpgradeRequests(Request, Socket);
+		}).listen(this.HttpPort, Host, () => {
+			this.Protocol = this.Protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
 			Debug.Log('&B(255,180,220)&C0-&R Host', this.Host ? this.Host : 'localhost');
-			Debug.Log('&B(255,180,220)&C0-&R Puerto HTTP', this.PuertoHTTP);
-			if ((! Usar_HTTPS) || I_HTTPS) Debug.Log('&B(255,180,220)&C0---------------------------------');
+			Debug.Log('&B(255,180,220)&C0-&R Puerto HTTP', this.HttpPort);
+			if ((! UseHttps) || HttpsStarted) Debug.Log('&B(255,180,220)&C0---------------------------------');
 		});
-		if (Usar_HTTPS) {
-			Servidor.Certificados(SSL.Publico, SSL.Llave).then((Certificados) => {
-				this.ServidorHTTPS = HTTPS.createServer(Certificados, (Petición, Respuesta) => {
-					this.Peticiones(Petición, Respuesta);
-				}).on('upgrade', (Petición, Socket) => {
-					this.Solicitudes(Petición, Socket);
-				}).listen(this.PuertoHTTPS, Host, () => {
-					this.Protocolo = this.Protocolo == 'HTTP' ? 'HTTP/S' : 'HTTPS';
-					Debug.Log('&B(255,180,220)&C0-&R Puerto HTTPS', this.PuertoHTTPS);
-					if (I_HTTP) Debug.Log('&B(255,180,220)&C0---------------------------------');
+		if (UseHttps) {
+			Server.LoadCertificates(SSL.Public, SSL.Private).then((Certificates) => {
+				this.HttpsServer = HTTPS.createServer(Certificates, (Request, Response) => {
+					this.Requests(Request, Response);
+				}).on('upgrade', (Request, Socket) => {
+					this.UpgradeRequests(Request, Socket);
+				}).listen(this.HttpsPort, Host, () => {
+					this.Protocol = this.Protocol == 'HTTP' ? 'HTTP/S' : 'HTTPS';
+					Debug.Log('&B(255,180,220)&C0-&R Puerto HTTPS', this.HttpsPort);
+					if (HttpStarted) Debug.Log('&B(255,180,220)&C0---------------------------------');
 				});
 			}).catch((Error) => {
 				Debug.Log('&C(255,0,0)[Server - Core]: Error con los certificados: ', Error);
-				if (I_HTTP) Debug.Log('&B(255,180,220)&C0---------------------------------');
+				if (HttpStarted) Debug.Log('&B(255,180,220)&C0---------------------------------');
 			});
 		}
 		// @ts-ignore
-		let Directorio = PATH.dirname(URL.fileURLToPath(import.meta.url));
-		this.Reglas.push({
-			Método: 'GET', Tipo: 'Carpeta', Url: '/Saml:Global', Opciones: {
-				Recurso: `${Directorio}/../Global`
+		let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
+		this.Rules.push({
+			Method: 'ALL', Type: 'Folder', Url: '/Saml:Global', Options: {
+				Source: `${ProcessDir}/../Global`
 			}
 		});
 	}
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.
-	 * @param {Array} Reglas La regla/s que desea añadir.
-	 * @returns {Servidor}
+	 * @param {import('./Server.js').Server.Rules} Rules La regla/s que desea añadir.
+	 * @returns {Server}
 	 */
-	Añadir_Reglas(...Reglas) {
-		this.Reglas = this.Reglas.concat(Reglas);
+	AddRules(...Rules) {
+		this.Rules = this.Rules.concat(Rules);
 		return this;
 	}
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
-	 * @param {any} Nombre El nombre de la plantilla.
-	 * @param {string} Ruta La ruta de la plantilla `.HSaml`.
-	 * @returns {Servidor}
+	 * @param {keyof import('./Server.js').Server.Templates} Name El nombre de la plantilla.
+	 * @param {string} Path La ruta de la plantilla `.HSaml`.
+	 * @returns {Server}
 	 */
-	Definir_Plantillas(Nombre, Ruta) {
-		this.Plantillas[Nombre] = Ruta;
+	SetTemplate(Name, Path) {
+		this.Templates[Name] = Path;
 		return this;
 	}
 	/**
 	 * Enruta las peticiones hechas al servidor para que sean procesadas.
-	 * @param {Request} Petición La petición que recibió el servidor.
-	 * @param {Respuesta} Respuesta La respuesta que dará el servidor.
+	 * @param {Request} Request La petición que recibió el servidor.
+	 * @param {Response} Response La respuesta que dará el servidor.
 	 * @returns {void}
 	 */
-	Enrutar(Petición, Respuesta) {
-		let Enrutado = false;
-		for (let Regla of this.Reglas) {
-			Regla.Url = Regla.Url.startsWith('/') ? Regla.Url : '/' + Regla.Url;
-			Regla.Url = Regla.Url.endsWith('/') ? Regla.Url : Regla.Url + '/';
-			Enrutado = Regla.Método == 'ALL'
-			|| Regla.Método == Petición.Method
-			? Regla.Tipo == 'Acción'
-				? Regla.Opciones.Cobertura == 'Completa'
-					? Regla.Url.length <= Petición.Url.length
-					&& Regla.Url == Petición.Url.slice(0, Regla.Url.length)
+	Route(Request, Response) {
+		let Routed = false;
+		for (let Rule of this.Rules) {
+			Rule.Url = Rule.Url.startsWith('/') ? Rule.Url : '/' + Rule.Url;
+			Rule.Url = Rule.Url.endsWith('/') ? Rule.Url : Rule.Url + '/';
+			Routed = Rule.Method == 'ALL'
+			|| Rule.Method == Request.Method
+			? Rule.Type == 'Action'
+				? Rule.Options.Coverage == 'Complete'
+					? Rule.Url.length <= Request.Url.length
+					&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
 					? true : false
-					: Regla.Url == Petición.Url
+					: Rule.Url == Request.Url
 					? true : false
-				: Regla.Tipo == 'Archivo'
-					? Regla.Opciones.Cobertura == 'Completa'
-					? Regla.Url.length <= Petición.Url.length
-						&& Regla.Url == Petición.Url.slice(0, Regla.Url.length)
+				: Rule.Type == 'File'
+					? Rule.Options.Coverage == 'Complete'
+					? Rule.Url.length <= Request.Url.length
+						&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
 						? true : false
-					: Regla.Url == Petición.Url
+					: Rule.Url == Request.Url
 						? true : false
-					: Regla.Tipo == 'Carpeta'
-					? Regla.Url.length <= Petición.Url.length
-						&& Regla.Url == Petición.Url.slice(0, Regla.Url.length)
+					: Rule.Type == 'Folder'
+					? Rule.Url.length <= Request.Url.length
+						&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
 						? true : false
 					: false
 			: false;
-			/**
-			 * Tener en cuenta para simplificar
-			Enrutado = (Regla.Método == 'ALL' || Regla.Método == Petición.Método)
-           	&& (
-           	  	(Regla.Tipo == 'Acción' && (
-           	  	  	(Regla.Opciones.Cobertura == 'Completa' && Regla.Url.length <= Petición.Url.length && Regla.Url == Petición.Url.slice(0, Regla.Url.length)) ||
-           	  	  	(Regla.Url == Petición.Url)
-           	  	)) ||
-           	  	(Regla.Tipo == 'Archivo' && (
-           	  	  	(Regla.Opciones.Cobertura == 'Completa' && Regla.Url.length <= Petición.Url.length && Regla.Url == Petición.Url.slice(0, Regla.Url.length)) ||
-           	  	  	(Regla.Url == Petición.Url)
-           	  	)) ||
-           	  	(Regla.Tipo == 'Carpeta' && Regla.Url.length <= Petición.Url.length && Regla.Url == Petición.Url.slice(0, Regla.Url.length))
-           	);
-			*/
 
-			if (Enrutado) {
-				switch(Regla.Tipo) {
-					case 'Acción': Regla.Opciones.Acción(Petición, Respuesta); break;
-					case 'Archivo': Respuesta.EnviarArchivo(Regla.Opciones.Recurso); break;
-					case 'Carpeta': Respuesta.EnviarCarpeta(Regla, Petición); break;
+			if (Routed) {
+				switch(Rule.Type) {
+					case 'Action': Rule.Options.Action(Request, Response); break;
+					case 'File': Response.SendFile(Rule.Options.Source); break;
+					case 'Folder': Response.SendFolder(Rule, Request); break;
 				}
 				break;
 			}
 		}
-		if (!(Enrutado)) Respuesta.Error(500, `Sin enrutador para: ${Petición.Method} -> ${Petición.Url}`);
+		if (!(Routed)) Response.SendError(500, `Sin enrutador para: ${Request.Method} -> ${Request.Url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
-	 * @param {Request} Petición La petición que recibió el servidor.
+	 * @param {Request} Request La petición que recibió el servidor.
 	 * @param {WebSocket} WebSocket La conexión con el cliente.
 	 * @returns {void}
 	 */
-	EnrutarWebSocket(Petición, WebSocket) {
-		let Enrutado = false;
-		for (let Regla of this.Reglas) {
-			Regla.Url = Regla.Url.startsWith('/') ? Regla.Url : '/' + Regla.Url;
-			Regla.Url = Regla.Url.endsWith('/') ? Regla.Url : Regla.Url + '/';
-			Enrutado = Regla.Método == 'ALL'
-			|| Regla.Método == Petición.Method
-			? Regla.Tipo == 'WebSocket'
-				? Regla.Opciones.Cobertura == 'Completa'
-					? Regla.Url.length <= Petición.Url.length
-					&& Regla.Url == Petición.Url.slice(0, Regla.Url.length)
+	RouteWebSocket(Request, WebSocket) {
+		let Routed = false;
+		for (let Rule of this.Rules) {
+			Rule.Url = Rule.Url.startsWith('/') ? Rule.Url : '/' + Rule.Url;
+			Rule.Url = Rule.Url.endsWith('/') ? Rule.Url : Rule.Url + '/';
+			Routed = Rule.Method == 'ALL'
+			|| Rule.Method == Request.Method
+			? Rule.Type == 'WebSocket'
+				? Rule.Options.Coverage == 'Complete'
+					? Rule.Url.length <= Request.Url.length
+					&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
 						? true : false
-					: Regla.Url == Petición.Url
+					: Rule.Url == Request.Url
 						? true : false
 				: false
 			: false;
-			if (Enrutado) {
-				let Llave = Petición.Headers['sec-websocket-key'].trim();
-				WebSocket.Aceptar_Conexión(Llave);
-				Regla.Opciones.Acción(Petición, WebSocket);
+			if (Routed && Rule.Type == 'WebSocket') {
+				let AcceptKey = Request.Headers['sec-websocket-key'].trim();
+				WebSocket.Aceptar_Conexión(AcceptKey);
+				Rule.Options.Action(Request, WebSocket);
 				break;
 			};
 		}
 	}
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
-	 * @param {HTTP.IncomingMessage} SrvPetición La petición que recibió el servidor.
-	 * @param {HTTP.ServerResponse} SrvRespuesta La conexión con el cliente.
+	 * @param {HTTP.IncomingMessage} HttpRequest La petición que recibió el servidor.
+	 * @param {HTTP.ServerResponse} HttpResponse La conexión con el cliente.
 	 * @returns {void}
 	 */
-	Peticiones(SrvPetición, SrvRespuesta) {
-		let Petición = new Servidor.Petición(SrvPetición);
-		let Respuesta = new Servidor.Respuesta(Petición, SrvRespuesta, this.Plantillas);
-		Petición.Session = new  Servidor.Sesión(Petición, Respuesta);
-		_Peticiones.Log(
+	Requests(HttpRequest, HttpResponse) {
+		let Request = new Server.Request(HttpRequest);
+		let Response = new Server.Response(Request, HttpResponse, this.Templates);
+		Request.Session = new  Server.Session(Request, Response);
+		D_Requests.Log(
 			'[Petición]:',
-			Petición.IP,
-			Petición.Method,
-			Petición.Url, Petición.Cookies.get('SS_UUID')
+			Request.IP,
+			Request.Method,
+			Request.Url, Request.Cookies.get('SS_UUID')
 		);
-		this.Enrutar(Petición, Respuesta);
+		this.Route(Request, Response);
 	};
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
-	 * @param {HTTP.IncomingMessage} SrvPetición La petición que recibió el servidor.
+	 * @param {HTTP.IncomingMessage} HttpRequest La petición que recibió el servidor.
 	 * @param {import('stream').Duplex} Socket La respuesta que dará el servidor.
 	 * @returns {void}
 	 */
-	Solicitudes(SrvPetición, Socket) {
-		let Petición = new Servidor.Petición(SrvPetición);
-		let WebSocket = new Servidor.WebSocket(Socket);
-		Petición.Session = new  Servidor.Sesión(Petición);
-		if (!(Petición.Cookies.has('SS_UUID'))) WebSocket.SS_UUID = Petición.Session.SS_UUID;
-		_Solicitudes.Log(
+	UpgradeRequests(HttpRequest, Socket) {
+		let Request = new Server.Request(HttpRequest);
+		let WebSocket = new Server.WebSocket(Socket);
+		Request.Session = new  Server.Session(Request);
+		if (!(Request.Cookies.has('SS_UUID'))) WebSocket.SS_UUID = Request.Session.SS_UUID;
+		D_UpgradesRequests.Log(
 			'[WebSocket]:',
-			Petición.IP,
-			Petición.Method,
-			Petición.Url, Petición.Cookies.get('SS_UUID')
+			Request.IP,
+			Request.Method,
+			Request.Url, Request.Cookies.get('SS_UUID')
 		);
-		this.EnrutarWebSocket(Petición, WebSocket);
+		this.RouteWebSocket(Request, WebSocket);
 	};
 	/**
 	 * Carga la llave y certificado SSL y devuelve su contenido en strings
-	 * @param {string} RutaCer La ruta de el certificado SSL.
-	 * @param {string} RutaKey La ruta de la llave SSL.
+	 * @param {string} PathCert La ruta de el certificado SSL.
+	 * @param {string} PathKey La ruta de la llave SSL.
 	 * @returns {Promise<{cert: (Buffer|string), key: (Buffer|string)}>}
 	 */
-	static Certificados(RutaCer, RutaKey) {
-	  	return new Promise((PrRespuesta, PrError) => {
-		  	FS.stat(RutaCer, (Error, Detalles) => {
+	static LoadCertificates(PathCert, PathKey) {
+	  	return new Promise((PrResponse, PrError) => {
+		  	FS.stat(PathCert, (Error, Details) => {
 			  	if (Error) return PrError(Error.message);
-			  	if (!(Detalles.isFile())) return PrError('La ruta del Certificado no pertenece a un archivo');
-			  	FS.readFile(RutaCer, (Error, Certificado) => {
+			  	if (!(Details.isFile())) return PrError('La ruta del Certificado no pertenece a un archivo');
+			  	FS.readFile(PathCert, (Error, Certificate) => {
 				  	if (Error) return PrError(Error.message);
-				  	FS.stat(RutaKey, (Error, Detalles) => {
+				  	FS.stat(PathKey, (Error, Details) => {
 					  	if (Error) return PrError(Error.message);
-					  	if (!(Detalles.isFile())) return PrError('La ruta de la llave no pertenece a un archivo');
-					  	FS.readFile(RutaKey, (Error, Llave) => {
+					  	if (!(Details.isFile())) return PrError('La ruta de la llave no pertenece a un archivo');
+					  	FS.readFile(PathKey, (Error, Key) => {
 						  	if (Error) return PrError(Error.message);
-						  	PrRespuesta({
-								cert: Certificado,
-								key: Llave
+						  	PrResponse({
+								cert: Certificate,
+								key: Key
 						  	});
 					  	});
 				  	});
@@ -272,4 +257,4 @@ class Servidor {
 	  	});
 	}
 }
-export default Servidor;
+export default Server;

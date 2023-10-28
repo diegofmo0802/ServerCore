@@ -3,11 +3,11 @@ import ServerCore from "../ServerCore.js";
 const Servidor = new ServerCore(80);
 
 //Test De Acción y carga de plantillas
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/Test',
-    Tipo: 'Acción', Opciones: {
-        Cobertura: 'Parcial',
-        Acción: (Petición, Respuesta) => {
+Servidor.AddRules({
+    Method: 'GET', Url: '/Test',
+    Type: 'Acción', Options: {
+        Coverage: 'Parcial',
+        Action: (Petición, Respuesta) => {
             Respuesta.SendTemplate('./Test/Test.HSaml', {
                 Des: 'Una Descripción',
                 Tests: {
@@ -20,26 +20,26 @@ Servidor.Añadir_Reglas({
     }
 });
 //Test De Carpeta
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/Test/Dir',
-    Tipo: 'Carpeta', Opciones: {
-        Recurso: './'
+Servidor.AddRules({
+    Method: 'GET', Url: '/Test/Dir',
+    Type: 'Carpeta', Options: {
+        Source: './'
     }
 });
 //Test De Archivo
-Servidor.Añadir_Reglas({
-    Método: 'GET', Url: '/Test/File',
-    Tipo: 'Archivo', Opciones: {
+Servidor.AddRules({
+    Method: 'GET', Url: '/Test/File',
+    Type: 'Archivo', Opciones: {
         Cobertura: 'Completa',
         Recurso: 'README.md'
     }
 });
 //Test de regla de WebSocket
-Servidor.Añadir_Reglas((() => {
+Servidor.AddRules((() => {
     const Conexiones = new Set();
     return {
-        Método: 'GET', Url: '/Test/WS-Chat',
-        Tipo: 'WebSocket', Opciones: {
+        Method: 'GET', Url: '/Test/WS-Chat',
+        Tipo: 'WebSocket', Options: {
             Cobertura: 'Parcial',
             Acción: (Petición, WebSocket) => {
                 Conexiones.forEach((Usuario) => Usuario.Enviar("Un usuario se conecto"));

@@ -20,7 +20,7 @@ export class Response {
 	/**Contiene la petición que recibió el servidor. */
 	public Request: Request;
 	/**Contiene el listado de plantillas de respuesta del servidor. */
-	private Templates: Server.Plantillas;
+	private Templates: Server.Templates;
 	/**Contiene la respuesta que dará el servidor. */
 	public HTTPResponse: HTTP.ServerResponse;
 	/**
@@ -29,7 +29,7 @@ export class Response {
 	 * @param HTTPResponse La respuesta que dará el servidor.
 	 * @param Templates El listado de plantillas de respuesta del servidor.
 	 */
-	public constructor(Request: Request, HTTPResponse: HTTP.ServerResponse, Templates: Server.Plantillas);
+	public constructor(Request: Request, HTTPResponse: HTTP.ServerResponse, Templates: Server.Templates);
 	/**
 	 * Crea encabezados para los tipos de archivo admitidos.
 	 * - Se añadirán mas tipos permitidos con el tiempo.
@@ -52,7 +52,7 @@ export class Response {
 	 * @param Rule La regla de enrutamiento.
 	 * @param Request La petición que recibió el servidor.
 	 */
-	public EnviarCarpeta(Rule: Server.Regla.Carpeta, Request: Request): void;
+	public SendFolder(Rule: Server.Rule.Folder, Request: Request): void;
 	/**
 	 * Envía los encabezados de la respuesta.
 	 * @param Code El código de la respuesta que se dará.

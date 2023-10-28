@@ -12,17 +12,17 @@ import Template from '../Template/Template.js';
 import Server from './Server.js';
 
 class Response {
-	/**@type {Server.Petición} Contiene la petición que recibió el servidor. */
+	/**@type {Server.Request} Contiene la petición que recibió el servidor. */
 	Request = null;
-	/**@type {Server.Plantillas} Contiene el listado de plantillas de respuesta del servidor. */
+	/**@type {Server.Templates} Contiene el listado de plantillas de respuesta del servidor. */
 	Templates = null;
 	/**@type {import('http').ServerResponse} Contiene la respuesta que dará el servidor. */
 	HTTPResponse = null;
 	/**
 	 * Crea la forma de Respuesta de `Saml/Servidor`.
-	 * @param {typeof Server.Petición} Request La petición que recibió el servidor.
+	 * @param {typeof Server.Request} Request La petición que recibió el servidor.
 	 * @param {import('http').ServerResponse} HTTPResponse La respuesta que dará el servidor.
-	 * @param {Server.Plantillas?} Templates El listado de plantillas de respuesta del servidor.
+	 * @param {Server.Templates?} Templates El listado de plantillas de respuesta del servidor.
 	 */
 	constructor(Request, HTTPResponse, Templates = null) {
 		this.Request = Request;
@@ -121,12 +121,12 @@ class Response {
 	}
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param {import('./Server.js').Servidor.Regla.Carpeta} Rule La regla de enrutamiento.
+	 * @param {import('./Server.js').Server.Rule.Folder} Rule La regla de enrutamiento.
 	 * @param {import('./Request.js').Request} Request La petición que recibió el servidor.
 	 * @returns {void}
 	 */
-	EnviarCarpeta(Rule, Request) {
-		let Path = Rule.Opciones.Recurso;
+	SendFolder(Rule, Request) {
+		let Path = Rule.Options.Source;
 		Path = Path.endsWith('/') ? Path : Path + '/';
 		Path += Request.Url.slice(Rule.Url.length);
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
@@ -140,8 +140,8 @@ class Response {
 			if (Details.isDirectory()) {
 				FS.readdir(Path, (Error, Folder) => {
 					if (Error) return this.Error(500, Error.message);
-					if (this.Templates.Carpeta) {
-						this.SendTemplate(this.Templates.Carpeta, {
+					if (this.Templates.Folder) {
+						this.SendTemplate(this.Templates.Folder, {
 							Url: Request.Url,
 							Carpeta: Folder
 						});
