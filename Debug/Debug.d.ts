@@ -7,7 +7,7 @@
 import { WriteStream } from 'fs';
 
 export namespace Debug {
-	type StartDate = {
+	type ActDate = {
 		Day: string,
 		Month: string,
 		Year: string,
@@ -33,7 +33,7 @@ export class Debug {
 	/**Contiene el indicador `Mostrar en consola`. */
 	private InConsole: boolean;
 	/**Contiene la fecha en la que inicio el Debug. */
-	private StartDate: Date;
+	private StartDate: Debug.Date;
 	/**Contiene la ruta del archivo `.DSaml`. */
 	private Path: string;
 	/**Contiene el Stream del archivo `.DSaml`.*/
@@ -63,6 +63,6 @@ export class Debug {
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm
 	 */
-	public static GetDate(): Debug.StartDate
+	private static GetDate(): Debug.ActDate
 }
 export default Debug;

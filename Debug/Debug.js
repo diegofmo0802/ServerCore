@@ -18,7 +18,7 @@ class Debug {
 	Folder = null;
 	/**@type {boolean} Contiene el indicador `Mostrar en consola`. */
 	InConsole = null;
-	/**@private @type {import('./Debug.js').Debug.StartDate} Contiene la fecha en la que inicio el Debug. */
+	/**@private @type {import('./Debug.js').Debug.ActDate} Contiene la fecha en la que inicio el Debug. */
 	StartDate = null;
 	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
 	Path = null;
@@ -89,7 +89,7 @@ class Debug {
 	}
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm
-	 * @returns {import('./Debug.js').Debug.StartDate}
+	 * @returns {import('./Debug.js').Debug.ActDate}
 	 */
 	static GetDate() {
 		let ActDate = new Date;

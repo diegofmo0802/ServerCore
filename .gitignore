@@ -1,5 +1,6 @@
 \[Act\]/
 \[Versiones\]/
-.Debug
+.Debug/
+StartAgent.sh
 jsconfig.json
 debug.log
