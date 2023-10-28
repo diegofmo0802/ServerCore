@@ -58,11 +58,11 @@ Para crear un servidor HTTP puedes hacerlo de diferentes maneras:
 > Debes haber importado el modulo primero.
 - Solo pasando el puerto
   ```js
-  const Servidor = new ServerCore(80);
+  const Server = new ServerCore(80);
   ```
 - Pasando Puerto y Host
   ```js
-  const Servidor = new ServerCore(80, 'MiDominio.com');
+  const Server = new ServerCore(80, 'MiDominio.com');
   ```
 <br/><br/>
 ## Servidor HTTPS
