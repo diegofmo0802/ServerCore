@@ -87,15 +87,15 @@ En **`ServerCore`** existen 4 clases de enrutador:<br/>
     <th>Descripción</th>
   </tr>
   <tr>
-    <td><a href="#carpeta">Carpeta</a></td>
+    <td><a href="#carpeta">Folder</a></td>
     <td>Comparte una carpeta y sus sub-carpetas</td>
   </tr>
   <tr>
-    <td><a href="#archivo">Archivo</a></td>
+    <td><a href="#archivo">File</a></td>
     <td>Comparte un único archivo</td>
   </tr>
   <tr>
-    <td><a href="#acción">Acción</a></td>
+    <td><a href="#acción">Action</a></td>
     <td>Te permite trabajar completamente con las solicitudes </td>
   </tr>
   <tr>
@@ -139,11 +139,11 @@ Tipos de cobertura:<br/>
     <th>Descripción</th>
   </tr>
   <tr>
-    <td>Completa</td>
+    <td>Complete</td>
     <td>Toma todas las sub-rutas y no se podrán usar</td>
   </tr>
   <tr>
-    <td>Parcial</td>
+    <td>Partial</td>
     <td>Se toma solo esa ruta, las sub-rutas pueden ser usadas en otra cosa</td>
   </tr>
 </table>
