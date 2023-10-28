@@ -185,7 +185,7 @@ class Server {
 			: false;
 			if (Routed && Rule.Type == 'WebSocket') {
 				let AcceptKey = Request.Headers['sec-websocket-key'].trim();
-				WebSocket.Aceptar_Conexión(AcceptKey);
+				WebSocket.AcceptConnection(AcceptKey);
 				Rule.Options.Action(Request, WebSocket);
 				break;
 			};

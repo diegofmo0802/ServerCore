@@ -1,6 +1,7 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade la forma de WebSockets a `Saml/Server-core`.
+ * @license Apache-2.0
  */
 
 import EVENTS from 'events';
@@ -8,47 +9,47 @@ import {Duplex} from 'stream';
 
 export class WebSocket extends EVENTS {
     /**Contiene la conexión con el cliente. */
-    private Conexión: Duplex;
+    private Connection: Duplex;
     /**Contiene la SS_UUID de la sesión asociada al WebSocket. */
     public SS_UUID: string;
     /**
      * Crea una conexión WebSocket.
-     * @param Cliente La conexión Duplex con el cliente.
+     * @param Client La conexión Duplex con el cliente.
      */
-    public constructor(Cliente: Duplex);
+    public constructor(Client: Duplex);
     /**
      * Acepta la conexión del cliente.
-	 * @param Llave La llave de conexión `sec-websocket-key`.
+	 * @param AcceptKey La llave de conexión `sec-websocket-key`.
      */
-    public Aceptar_Conexión(Llave: string): void;
+    public AcceptConnection(AcceptKey: string): void;
     /**
 	 * Envía un dato como respuesta.
-	 * @param Dato El dato que se enviara.
+	 * @param Datum El dato que se enviara.
      */
-    public Enviar(Dato: String | Buffer): void;
+    public Send(Datum: String | Buffer): void;
     /**
 	 * Envía un JSON como respuesta.
-	 * @param Datos los datos que enviaras como JSON.
+	 * @param Data los datos que enviaras como JSON.
      */
-    public EnviarJson(Datos: Array<any> | Object): void;
+    public SendJSON(Data: Array<any> | Object): void;
     /**
      * Codifica los datos para enviar por el WebSocket.
-     * @param Datos Los datos que se van a codificar.
-     * @param Texto indica si el contenido es texto o no.
+     * @param Data Los datos que se van a codificar.
+     * @param Text indica si el contenido es texto o no.
      * @returns {Buffer}
      */
-    private Codificar (Datos: Buffer, Texto: boolean): Buffer;
+    private Encode(Data: Buffer, Text: boolean): Buffer;
     /**
      * Convierte un string en un Buffer.
-     * @param Mensaje El string a transformar.
+     * @param Message El string a transformar.
      * @returns {Buffer}
      */
-    private String_Buffer(Mensaje: string): Buffer;
+    private StringToBuffer(Message: string): Buffer;
     /**Añade los disparadores de evento.*/
-    private Iniciar_Eventos(): void;
-    on(Evento: 'Cerrar',    Acción: () => void): this;
-    on(Evento: 'Error',     Acción: (Error: Error) => void): this;
-    on(Evento: 'Finalizar', Acción: () => void): this;
-    on(Evento: 'Recibir',   Acción: (Información: {OPCode: number}, Datos: Buffer) => void): this;
+    private StartEvents(): void;
+    on(Evento: 'Close',   Acción: () => void): this;
+    on(Evento: 'Error',   Acción: (Error: Error) => void): this;
+    on(Evento: 'Finish',  Acción: () => void): this;
+    on(Evento: 'Message', Acción: (Information: {OPCode: number}, Datos: Buffer) => void): this;
 }
 export default WebSocket;
