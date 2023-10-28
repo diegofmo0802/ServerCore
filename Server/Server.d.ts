@@ -16,6 +16,7 @@ import __WebSocket from "./WebSocket.js";
 export namespace Server {
 	export import Request = __Request
 	export import Response = __Response
+	export import Session = __Session
 	export import WebSocket = __WebSocket
     namespace Rule {
         type Base = {
@@ -59,10 +60,10 @@ export namespace Server {
 	type Rules = Array<Rule>;
 }
 export class Server {
-	public static Request: __Request;
-	public static Response: __Response;
-	public static Session: __Session;
-	public static WebSocket: __WebSocket;
+	public static Request: Server.Request;
+	public static Response: Server.Response;
+	public static Session: Server.Session;
+	public static WebSocket: Server.WebSocket;
 	/**Contiene el host donde el servidor recibirá peticiones. */
 	private Host: string;
 	/**Contiene el listado de plantillas de respuesta del servidor. */

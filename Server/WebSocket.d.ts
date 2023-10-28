@@ -7,7 +7,9 @@
 import EVENTS from 'events';
 import {Duplex} from 'stream';
 
-export class WebSocket extends EVENTS {
+export namespace WebSocket { }
+
+export class WebSocket /* extends EVENTS */ {
     /**Contiene la conexión con el cliente. */
     private Connection: Duplex;
     /**Contiene la SS_UUID de la sesión asociada al WebSocket. */
@@ -47,9 +49,13 @@ export class WebSocket extends EVENTS {
     private StringToBuffer(Message: string): Buffer;
     /**Añade los disparadores de evento.*/
     private StartEvents(): void;
-    on(Evento: 'Close',   Acción: () => void): this;
-    on(Evento: 'Error',   Acción: (Error: Error) => void): this;
-    on(Evento: 'Finish',  Acción: () => void): this;
-    on(Evento: 'Message', Acción: (Information: {OPCode: number}, Datos: Buffer) => void): this;
+    on(Evento: 'Close',    Acción: () => void): this;
+    on(Evento: 'Error',    Acción: (Error: Error) => void): this;
+    on(Evento: 'Finish',   Acción: () => void): this;
+    on(Evento: 'Message',  Acción: (Information: {OPCode: number}, Datos: Buffer) => void): this;
+    off(Evento: 'Close',   Acción: () => void): this;
+    off(Evento: 'Error',   Acción: (Error: Error) => void): this;
+    off(Evento: 'Finish',  Acción: () => void): this;
+    off(Evento: 'Message', Acción: (Information: {OPCode: number}, Datos: Buffer) => void): this;
 }
 export default WebSocket;

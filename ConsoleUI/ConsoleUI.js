@@ -26,7 +26,7 @@ class ConsoleUI {
      * @param {string} Prefix El prefijo.
      * @returns {string}
      */
-    static Color(Text, Prefix = '&') {
+    static GenerateFormat(Text, Prefix = '&') {
         let Expressions = {
             Format: new RegExp(`${Prefix}([CB][0-7]|[NSPIR])`, 'g'),
             RGB:     new RegExp(`${Prefix}([CB])\\(([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2})\\)`, 'g'),

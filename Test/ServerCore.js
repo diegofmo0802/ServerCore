@@ -1,14 +1,16 @@
-import ServerCore from "../ServerCore.js";
+import ServerCore, { Debug } from "../ServerCore.js";
 
 const Servidor = new ServerCore(80);
+Debug.ShowAll = true;
 
 //Test De Acción y carga de plantillas
 Servidor.AddRules({
     Method: 'GET', Url: '/Test',
-    Type: 'Acción', Options: {
-        Coverage: 'Parcial',
+    Type: 'Action', Options: {
+        Coverage: 'Partial',
         Action: (Petición, Respuesta) => {
-            Respuesta.SendTemplate('./Test/Test.HSaml', {
+            Respuesta.SendTemplate('./Test/Plantilla.HSaml', {
+                Titulo: 'Tests',
                 Des: 'Una Descripción',
                 Tests: {
                     WebSocket: 'Test/Ws',
@@ -22,16 +24,16 @@ Servidor.AddRules({
 //Test De Carpeta
 Servidor.AddRules({
     Method: 'GET', Url: '/Test/Dir',
-    Type: 'Carpeta', Options: {
+    Type: 'Folder', Options: {
         Source: './'
     }
 });
 //Test De Archivo
 Servidor.AddRules({
     Method: 'GET', Url: '/Test/File',
-    Type: 'Archivo', Opciones: {
-        Cobertura: 'Completa',
-        Recurso: 'README.md'
+    Type: 'File', Options: {
+        Coverage: 'Complete',
+        Source: 'README.md'
     }
 });
 //Test de regla de WebSocket
@@ -39,21 +41,23 @@ Servidor.AddRules((() => {
     const Conexiones = new Set();
     return {
         Method: 'GET', Url: '/Test/WS-Chat',
-        Tipo: 'WebSocket', Options: {
-            Cobertura: 'Parcial',
-            Acción: (Petición, WebSocket) => {
-                Conexiones.forEach((Usuario) => Usuario.Enviar("Un usuario se conecto"));
+        Type: 'WebSocket', Options: {
+            Coverage: 'Partial',
+            Action: (Petición, WebSocket) => {
+                console.log('[WS] CM: Conexión nueva')
+                Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
                 Conexiones.add(WebSocket);
-                WebSocket.on('Finalizar', () => Conexiones.delete(WebSocket));
+                WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
                 WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
-                WebSocket.on('Recibir', (Info, Datos) => {
-                    console.log(Info.OPCode);
+                WebSocket.on('Message', (Info, Datos) => {
+                    //console.log(Info.OPCode);
                     if (Info.OPCode == 1) {
+                        console.log('[WS] MSS:', Datos.toString());
                         Conexiones.forEach((Usuario) => {
-                            if (Usuario !== WebSocket) Usuario.Enviar(Datos.toString());
+                            if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
                         });
                     } else if (Info.OPCode == 8) {
-                        Conexiones.forEach((Usuario) => Usuario.Enviar("Un usuario se desconecto"));
+                        Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
                     }
                 })
             }

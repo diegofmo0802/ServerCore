@@ -1,11 +1,11 @@
 {
   "name": "servercore",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "a module for http/s and ws/s servers",
   "main": "ServerCore.js",
   "type": "module",
   "scripts": {
-    "test": "node Test/Plantilla.js",
+    "test": "node Test/ServerCore.js",
     "csv-to-json": "node \"Global/Herramientas/CSV-To-JSON.js\""
   },
   "keywords": [

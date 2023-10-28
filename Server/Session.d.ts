@@ -8,6 +8,8 @@ import EVENTS from 'events';
 import Request from './Request.js';
 import Response from './Response.js';
 
+export namespace Session { }
+
 export class Session extends EVENTS {
     /**Contiene los datos almacenados en la sesión. */
     public Data: Map<string, any>;
@@ -26,8 +28,10 @@ export class Session extends EVENTS {
     Start(): void;
     /**Emite el evento `Cerrar`.*/
     Close(): void;
-    on(Evento: 'Start',   Acción: () => void) : this;
-    on(Evento: 'Close',    Acción: () => void) : this;
+    on(Evento: 'Start',  Acción: () => void) : this;
+    on(Evento: 'Close',  Acción: () => void) : this;
+    off(Evento: 'Start', Acción: () => void) : this;
+    off(Evento: 'Close', Acción: () => void) : this;
 }
 
 export default Session;

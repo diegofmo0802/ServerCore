@@ -80,10 +80,10 @@ class Response {
 		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
-				? this.Error(500, '[Fallo En Respuesta] - El archivo no existe.')
-				: this.Error(500, Error.message);
+				? this.SendError(500, '[Fallo En Respuesta] - El archivo no existe.')
+				: this.SendError(500, Error.message);
 			}
-			if (!(Details.isFile())) return this.Error(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
+			if (!(Details.isFile())) return this.SendError(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
 			if (this.Request.Headers.range) {
 				let Information = /bytes=(\d*)?-?(\d*)?/i
 				.exec(this.Request.Headers.range);
@@ -106,7 +106,7 @@ class Response {
 							File.pipe(this.HTTPResponse);
 							//('Inicio:', Inicio, 'Fin:', Final, 'Frag:', Tamaño, 'Tamaño:', Detalles.size)
 						} else {
-							this.Error(416, 'El rango solicitado excede el tamaño del archivo');
+							this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
 						}
 						//return;
 					}
@@ -134,12 +134,12 @@ class Response {
 		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
-				? this.Error(404, 'El archivo/Directorio no existe.')
-				: this.Error(500, Error.message);
+				? this.SendError(404, 'El archivo/Directorio no existe.')
+				: this.SendError(500, Error.message);
 			}
 			if (Details.isDirectory()) {
 				FS.readdir(Path, (Error, Folder) => {
-					if (Error) return this.Error(500, Error.message);
+					if (Error) return this.SendError(500, Error.message);
 					if (this.Templates.Folder) {
 						this.SendTemplate(this.Templates.Folder, {
 							Url: Request.Url,
@@ -157,7 +157,7 @@ class Response {
 				});
 			} else if (Details.isFile()) {
 				this.SendFile(Path);
-			} else this.Error(404, 'El archivo/Directorio no existe.');
+			} else this.SendError(404, 'El archivo/Directorio no existe.');
 		});
 	}
 	/**
@@ -180,7 +180,7 @@ class Response {
 			this.SendHeaders(200, this.GenerateHeaders('html'));
 			this.Send(Template, 'utf-8');
 		}).catch((Error) => {
-			this.Error(500, Error);
+			this.SendError(500, Error);
 		});
 	}
 	/**
@@ -198,7 +198,7 @@ class Response {
 	 * @param {string} Message El mensaje con los detalles del error.
 	 * @returns {void}
 	 */
-	Error(Code, Message) {
+	SendError(Code, Message) {
 		if (this.Templates.Error) {
 			Template.Load(this.Templates.Error, {
 				Código: Code, Mensaje: Message

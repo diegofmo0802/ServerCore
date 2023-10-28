@@ -13,7 +13,7 @@
                 <th>Enlace</th>
             </tr>
             <HSaml:Array>
-                $HSaml:Array{AR}
+                $HSaml:Array{Tests}
                 <tr>
                     <td>$Array{ID}</td>
                     <td><a href="$Array{Valor}">$Array{Valor}</a></td>
