@@ -7,6 +7,7 @@
 import { WriteStream } from 'fs';
 
 export namespace Debug {
+	type Debugs = Map<string, Debug>;
 	type ActDate = {
 		Day: string,
 		Month: string,
@@ -23,7 +24,7 @@ export namespace Debug {
 
 export class Debug {
 	/**Contiene las instancias de Debug. */
-	public static Debugs: Map<string,Debug>;
+	public static Debugs: Debug.Debugs;
 	/**Contiene el indicador `Mostrar todo en consola`. */
 	public static ShowAll: boolean;
 	/**Contiene el nombre del archivo `.DSaml`. */
