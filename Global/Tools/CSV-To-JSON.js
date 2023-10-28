@@ -1,3 +1,9 @@
+/**
+ * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @description Convierte un archivo .csv a uno json
+ * @license Apache-2.0
+ */
+
 import FS from 'fs';
 
 import CUI from '../../ConsoleUI/ConsoleUI.js';

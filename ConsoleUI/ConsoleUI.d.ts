@@ -2,7 +2,6 @@
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Contiene las funcionalidades base de las herramientas del modulo saml
  * @license Apache-2.0
- * @module saml/CUI
  */
 
 class ConsoleUI {
