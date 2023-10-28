@@ -19,7 +19,7 @@ class Request {
 	Method = null;
 	/**@type {Promise<import('./Request').Request.POST>} Contiene los datos POST que se enviaron. */
 	POST = null;
-	/**@type {import('./Session').Sesión} */
+	/**@type {import('./Session').Session} */
 	Session = null;
 	/**@type {import('http').IncomingMessage} Contiene la petición que recibió el servidor. */
 	HTTPRequest = null;

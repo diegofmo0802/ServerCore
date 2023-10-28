@@ -1,31 +1,33 @@
 /**
-* @author diegofmo0802 <diegofmo0802@gmail.com>.
-* @description Añade un sistema de sesiones a `Saml/Server-core`.
-*/
+ * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @description Añade un sistema de sesiones a `Saml/Server-core`.
+ * @license Apache-2.0
+ */
 
 import EVENTS from 'events';
 import Request from './Request.js';
 import Response from './Response.js';
 
-export class Sesión extends EVENTS {
+export class Session extends EVENTS {
     /**Contiene los datos almacenados en la sesión. */
-    public Datos: Map<string, any>;
+    public Data: Map<string, any>;
     /**Contiene las instancias de session. */
-    public static Sesiones: Map<string, Sesión>;
+    public static Sessions: Map<string, Session>;
     /**Contiene la SS_UUID de la sesión. */
     public SS_UUID: string;
     /**
      * Crea/Recupera una instancia de sesión.
      * - si no se pasa el parámetro `Respuesta` No se establecerá la cookie `SS_UUID` y deberás hacerlo manualmente.
-     * @param Petición La petición que recibió el servidor.
-	 * @param Respuesta La respuesta que dará el servidor.
+     * @param Request La petición que recibió el servidor.
+	 * @param Response La respuesta que dará el servidor.
     */
-    public constructor(Petición: Request, Respuesta?: Respuesta);
+    public constructor(Request: Request, Response?: Respuesta);
     /**Emite el evento `Iniciar`.*/
-    Iniciar(): void;
+    Start(): void;
     /**Emite el evento `Cerrar`.*/
-    Cerrar(): void;
-    on(Evento: 'Iniciar',   Acción: () => void) : this;
-    on(Evento: 'Cerrar',    Acción: () => void) : this;
+    Close(): void;
+    on(Evento: 'Start',   Acción: () => void) : this;
+    on(Evento: 'Close',    Acción: () => void) : this;
 }
-export default Sesión;
+
+export default Session;

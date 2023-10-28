@@ -14,7 +14,7 @@ import URL from 'url';
 import Debug from '../Debug/Debug.js';
 import Request from "./Request.js";
 import Response from "./Response.js";
-import Sesión from "./Session.js";
+import Session from "./Session.js";
 import WebSocket from "./WebSocket.js";
 
 const _Peticiones = new Debug('Peticiones', '.Debug/Peticiones', false);
@@ -25,8 +25,8 @@ class Servidor {
 	static Petición = Request;
 	/**@type {typeof Respuesta} */
 	static Respuesta = Respuesta;
-	/**@type {typeof Sesión} */
-	static Sesión = Sesión;
+	/**@type {typeof Session} */
+	static Sesión = Session;
 	/**@type {typeof WebSocket} */
 	static WebSocket = WebSocket;
 	/**@type {string} Contiene el host donde el servidor recibirá peticiones. */
