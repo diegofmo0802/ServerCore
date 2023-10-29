@@ -26,7 +26,7 @@ export class Template {
 	 * @param {{}} Data Los datos con los que se compilara la plantilla.
 	 * @returns {string}
 	 */
-	public static Compile(Content: string, Data: object): string;
+	private static Compile(Content: string, Data: object): string;
 	/**
 	 * Compila la etiqueta <HSaml:Array>.
 	 * @param Content El Contenido del bloque.

@@ -26,7 +26,11 @@
 
 ## constructor
 
-El método constructor acepta 3 parámetros (ID, path, InConsole)
+El método constructor acepta 3 parámetros (ID, path, InConsole) y devuelve una instancia de Debug
+
+```ts
+constructor(ID: string, Path: string, InConsole: boolean): Debug
+```
 
 |Parámetro|Nulo|Tipo   |Default |Descripción                                                              |
 |--------:|---:|------:|-------:|:------------------------------------------------------------------------|
@@ -48,6 +52,10 @@ const _Completed = new Debug('Completed', 'DebManager', false)
 ## Log
 
 El método constructor acepta 3 parámetros (...Data)
+
+```ts
+Log(...Data: Array<any>): void;
+```
 
 > [!WARNING]
 > Si envías un objeto como parámetro, no puede tener redundancia.
