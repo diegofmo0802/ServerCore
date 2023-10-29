@@ -19,6 +19,10 @@ este comenzó como un proyecto personal y con fines de práctica de pensamiento 
 por lo tanto no tiene las mejores prácticas ni la mejor documentación, sin embargo<br/>
 publicaré el código de esta manera e iré modificando para corregir esto.
 
+```console
+mpm install saml.servercore
+```
+
 **Futuras correcciones**
 
 - [x] Documentar clases y funciones para intellisense.
@@ -30,24 +34,26 @@ Esto es todo por el momento, [diegofmo0802](https://diegofmo0802.github.io) se r
 
 # Documentación 
 
-<!-- Por el momento iré enlistonado las funcionalidades agregadas para documentar todo debidamente en el futuro. -->
-Para crear un servidor usando el modulo debes primero importarlo.<br/>
+Primero debemos instalar el modulo usando
 
-> [!NOTE]
-> Por el momento **`ServerCore`** no esta en npm, por lo que debes descargar el repositorio y poner su contenido en una carpeta dentro tu proyecto.
-> ```
-> - Proyecto raíz
-> | - ServerCore/
-> | - src/
->   | - main.js
-> | - package.json
-> ```
+```console
+mpm install saml.servercore
+```
 
-Una ves tengas ServerCore en tu proyecto debes importar el archivo `ServerCore.js`<br/>
+También es necesario que en tu package.json este el proyecto como type: module
+```json
+{
+  "name": "my-project",
+  "main": "index.js",
+  "type": "module"
+}
+```
 
+Una ves tengas ServerCore en tu proyecto y lo hayas configurado como modulo debes importarlo<br/>
+-->
 - Si en tu package.json tienes la propiedad `"type": "module"`:
   ```js
-  import ServerCore from './ServerCore/ServerCore.js';
+  import ServerCore from 'saml.servercore';
   ```
 - Si no tienes esta propiedad usa:
   ```js
