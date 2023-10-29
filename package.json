@@ -2,20 +2,42 @@
   "name": "servercore",
   "version": "3.0.0",
   "description": "a module for http/s and ws/s servers",
-  "main": "ServerCore.js",
   "type": "module",
+  "main": "ServerCore.js",
   "scripts": {
     "test": "node Test/ServerCore.js",
     "csv-to-json": "node \"Global/Herramientas/CSV-To-JSON.js\""
   },
+  "author": {
+    "name": "diegofmo0802",
+    "email": "diegofmo0802@gmail.com",
+    "url": "https://diegofmo0802.github.io"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/diegofmo0802/ServerCore"
+  },
+  "files": [
+    "README.me",
+    "LICENSE",
+    "ServerCore.js",
+    "ServerCore.d.ts",
+    "ConsoleUI/",
+    "Debug/",
+    "Global/",
+    "Server/",
+    "Template/"
+  ],
   "keywords": [
-    "Saml",
+    "servercore",
+    "core",
+    "framework",
+    "web",
     "http",
     "https",
     "ws",
     "wss",
     "server"
-  ],
-  "author": "diegofmo0802",
-  "license": "Apache-2.0"
+  ]
 }
