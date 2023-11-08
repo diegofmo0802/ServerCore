@@ -10,17 +10,17 @@
     <body>
         <div id="Carpeta" class="Centrar">
             <div class="Contenido">
-                <h1 class="Ruta">Carpeta: $Variable{Url}</h1>
+                <h1 class="Ruta">Carpeta: ${Url}</h1>
                 <div class="Opciones">
-                    <a class="Atrás" href="$Variable{Url}../">Atrás</a>
-                    <input id="Carpeta_Ruta" type="search" placeholder="Cambiar de ruta... $Variable{Url}" value="$Variable{Url}"/>
+                    <a class="Atrás" href="${Url}../">Atrás</a>
+                    <input id="Carpeta_Ruta" type="search" placeholder="Cambiar de ruta... ${Url}" value="${Url}"/>
                     <input id="Carpeta_Cambiar"type="button" value="Cambiar Ruta"/>
                 </div>
                 <ul class="Lista">
                     <HSaml:Array>
                         $HSaml:Array{Carpeta}
                         <li>
-                            <a class="Elemento" href="$Variable{Url}$Array{Valor}">$Array{Valor}</a>
+                            <a class="Elemento" href="${Url}$Array{Valor}">$Array{Valor}</a>
                         </li>
                     </HSaml:Array>
                 </ul>
@@ -32,7 +32,7 @@
                     window.location.href = Carpeta_Ruta.value;
                 });
                 Carpeta_Ruta.addEventListener('keydown', (Evento) => {
-                    Carpeta_Ruta.value.length <= '$Variable{Url}'.length && Evento.key == 'Backspace'
+                    Carpeta_Ruta.value.length <= '${Url}'.length && Evento.key == 'Backspace'
                     ? Evento.preventDefault()
                     : false;
                 })

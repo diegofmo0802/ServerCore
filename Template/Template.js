@@ -8,7 +8,7 @@ import FS from 'fs';
 
 class Template {
 	static Expressions = {
-		Variable: /(?<=\$Variable{)[^]*?(?=})/ig, //Completada
+		Variable: /\$\{(.+?)\}/ig, //Completada
 		Array: {
 			Variable: /(?<=\$HSaml:Array{)[^]*?(?=})/ig, //Completada
 			Format: /\s*?(?:<\/?HSaml:Array(?: .*)?>|\$HSaml:Array{.*?})\s*|(?: {4}|	)(?=<)/ig, //Completada
@@ -40,10 +40,12 @@ class Template {
 	 * @returns {string}
 	 */
 	static Compile(Content, Data) {
+		Content = Content.replace(this.Expressions.Variable, (Text, G1) => {
+			if (G1 && G1 !== '' && G1 in Data) return Data[G1];
+			else return Text;
+		});
 		for (let ID in Data) {
-			if (typeof Data[ID] !== 'object') {//@ts-ignore
-				Content = Content.replaceAll(`$Variable{${ID}}`, Data[ID]);
-			} else {
+			if (typeof Data[ID] == 'object')  {
 				Content = this.CompileOBJ(Content, ID, Data[ID]);
 			}
 		}
