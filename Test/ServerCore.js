@@ -5,6 +5,20 @@ Debug.ShowAll = true;
 
 //Test De Acción y carga de plantillas
 Server.AddRules({
+    Method: 'ALL', Url: '/', Type: 'Action', Options: {
+        Coverage: 'Partial', Action: function(RQ, RS) {
+            let RQC = RQ.Session.Data.get('Request_Count') ?? 0;
+            RQ.Session.Data.set('Request_Count', RQC + 1);
+            let Contents = {};
+            RQ.Session.Data.forEach((Value, Key) => Contents[Key] = Value);
+            RS.SendJSON({
+                SS_UUID: RQ.Session.SS_UUID,
+                SS_Data: Contents,
+                Cookies: RQ.Cookies
+            });
+        }
+    }},
+    {
     Method: 'GET', Url: '/Test',
     Type: 'Action', Options: {
         Coverage: 'Partial',

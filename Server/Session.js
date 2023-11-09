@@ -6,10 +6,13 @@
 
 import CRYPTO from 'crypto';
 import EVENTS from 'events';
+import { Debug } from '../ServerCore.js';
+
+const SessionLog = new Debug('SS_Debug');
 
 class Session extends EVENTS {
     /**@type {Map<string, any>} Contiene los datos almacenados en la sesión. */
-    Data = null;
+    Data = new Map();
     /**@type {Map<string, Session>} Contiene las instancias de session. */
     static Sessions = new Map();
     /**@type {string} Contiene la SS_UUID de la sesión. */
@@ -23,19 +26,20 @@ class Session extends EVENTS {
     constructor(Request, Response = null) { super();
         if (Request.Cookies.has('SS_UUID')) {
             let SS_UUID = Request.Cookies.get('SS_UUID');
-            if (Session.Sessions.has(SS_UUID)) return Session.Sessions.get(SS_UUID);
-            this.Data = new Map();
-            this.SS_UUID = SS_UUID;
+            if (Session.Sessions.has(SS_UUID)) {
+                return Session.Sessions.get(SS_UUID);
+            } else {
+                this.SS_UUID = SS_UUID;
+            }
         } else {
-            this.Data = new Map();
-            this.SS_UUID = CRYPTO.createHash('SHA512')
-            .update(CRYPTO.randomUUID())
-            .digest('base64url');
+            this.SS_UUID = CRYPTO.randomUUID();
         }
         Session.Sessions.set(this.SS_UUID, this);
-        if (Response) Response.HTTPResponse.setHeader('set-cookie', [
-            `SS_UUID=${this.SS_UUID}; path=/; secure; httpOnly`
-        ]);
+        if (Response) {
+            Response.HTTPResponse.setHeader('set-cookie', [
+                `SS_UUID=${this.SS_UUID}; secure; httpOnly`
+            ]);
+        }
     }
     /**
      * Emite el evento `Iniciar`.
