@@ -6,9 +6,6 @@
 
 import CRYPTO from 'crypto';
 import EVENTS from 'events';
-import { Debug } from '../ServerCore.js';
-
-const SessionLog = new Debug('SS_Debug');
 
 class Session extends EVENTS {
     /**@type {Map<string, any>} Contiene los datos almacenados en la sesión. */
@@ -41,17 +38,43 @@ class Session extends EVENTS {
             ]);
         }
     }
+    
     /**
-     * Emite el evento `Iniciar`.
-     */
-    Start() {
-        this.emit('Start');
-    }
+     * Devuelve el SS_UUID de la sesión.
+    */
+    getID() { return this.SS_UUID; };
     /**
-     * Emite el evento `Cerrar`.
+     * Comprueba si un dato existe en la sesión.
+     * @param {string} Name El nombre (key) del dato que desea buscar.
      */
-    Close() {
-        this.emit('Close');
-    }
+    Has(Name) { return this.Data.has(Name); }
+    /**
+     * Recupera un dato de la sesión si este existe.
+     * @param {string} Name El nombre (key) del dato que desea buscar.
+     */
+    Get(Name) { return this.Data.get(Name) ?? null; }
+    /**
+     * Devuelve un objeto con todos los datos de la session.
+     * - Este objeto no esta vinculado, cualquier cambio en el
+     *   No se vera reflejado en la sesión.
+     */
+    GetAll() { 
+        let Data = {};
+        this.Data.forEach((Value, Key) => {
+            Data[Key] = Value;
+        });
+        return Data;
+     }
+    /**
+     * Establece/Reemplaza un dato de la sesión.
+     * @param {string} Name El nombre (key) del dato que desea buscar.
+     * @param {any} Value El valor que se asignara.
+     */
+    Set(Name, Value) { this.Data.set(Name, Value); }
+    /**
+     * Elimina un dato de la sesión si este existe.
+     * @param {string} Name El nombre (key) del dato que desea buscar.
+     */
+    Del(Name) { this.Data.delete(Name); }
 }
 export default Session;
