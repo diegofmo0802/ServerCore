@@ -12,7 +12,7 @@ Server.AddRules({
             if (RQ.Session.Get('Request_Count') > 0) RQ.Cookies.Del(`Cookie-${RQ.Session.Get('Request_Count')-1}`);
             RQ.Cookies.Set(`Cookie-${RQ.Session.Get('Request_Count')}`, 'Prueba');
             RS.SendJSON({
-                SS_UUID: RQ.Session.getID(),
+                SS_UUID: RQ.Session.GetID(),
                 SS_Data: RQ.Session.GetAll(),
                 Cookies: RQ.Cookies.GetAll(),
                 Setters: RQ.Cookies.GetSetters()
