@@ -32,11 +32,13 @@ class Session extends EVENTS {
             this.SS_UUID = CRYPTO.randomUUID();
         }
         Session.Sessions.set(this.SS_UUID, this);
-        if (Response) {
-            Response.HTTPResponse.setHeader('set-cookie', [
-                `SS_UUID=${this.SS_UUID}; secure; httpOnly`
-            ]);
-        }
+        Request.Cookies.Set('SS_UUID', this.SS_UUID, {
+            Secure: true, HttpOnly: true, Expires: (() => {
+                let Fecha = new Date();
+                Fecha.setFullYear(Fecha.getFullYear() + 1);
+                return Fecha;
+            })()
+        });
     }
     
     /**
