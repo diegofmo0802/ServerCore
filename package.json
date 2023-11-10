@@ -1,6 +1,6 @@
 {
   "name": "saml.servercore",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "a module for http/s and ws/s servers",
   "type": "module",
   "main": "ServerCore.js",
