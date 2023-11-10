@@ -8,10 +8,9 @@ export class Template {
     /**Contiene las expresiones regulares que ayudan al tratamiento de las plantillas */
 	private static Expresiones: {
 		Variable: RegExp,
-		Array: {
-			Variable: RegExp,
-			Format: RegExp,
+		Object: {
 			Block: RegExp,
+			Replaces: RegExp
 		}
 	};
 	/**
@@ -27,12 +26,5 @@ export class Template {
 	 * @returns {string}
 	 */
 	private static Compile(Content: string, Data: object): string;
-	/**
-	 * Compila la etiqueta <HSaml:Array>.
-	 * @param Content El Contenido del bloque.
-	 * @param Name El ID de los Datos.
-	 * @param Data Los datos con los que se compilara la sub plantilla.
-	 */
-   private static CompileOBJ(Content: string, Name: (string|number), Data: Object): string;
 }
 export default Template;

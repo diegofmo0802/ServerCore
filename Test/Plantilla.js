@@ -4,9 +4,6 @@ import Plantilla from "../Template/Template.js";
     await Plantilla.Load('./Test/Plantilla.HSaml', {
         Titulo: 'Titulo de la prueba',
         Des: 'Descripción xD',
-        AR: {
-            Algo: 'Algo 1',
-            Otra: 'Otra2'
-        }
+        Tests: ["algo", "algo2"]
     })
 ))();

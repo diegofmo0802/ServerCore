@@ -8,11 +8,11 @@
         <title>[SV-C] - ${Código}</title>
     </head>
     <body>
-        <div id="Error" class="Centrar">
+        <div id="Error" class="Centrar-X Centrar-Y">
             <div class="Información">
                 <h1 class="Código">Error: ${Código}</h1>
                 <p class="Mensaje">${Mensaje}</p>
-                <div class="Centrar">
+                <div class="Centrar-X Centrar-Y">
                     <div class="Carga">
                         <div class="C_Fondo"></div>
                         <div class="C_Fondo2"></div>

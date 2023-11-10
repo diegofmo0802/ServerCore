@@ -12,13 +12,12 @@
                 <th>Test</th>
                 <th>Enlace</th>
             </tr>
-            <HSaml:Array>
-                $HSaml:Array{Tests}
+            $(Tests) {
                 <tr>
-                    <td>$Array{ID}</td>
-                    <td><a href="$Array{Valor}">$Array{Valor}</a></td>
+                    <td>$Key</td>
+                    <td><a href="$Value">$Value</a></td>
                 </tr>
-            </HSaml:Array>
+            }
         </table>
     </body>
 </html>

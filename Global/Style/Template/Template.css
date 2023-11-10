@@ -5,8 +5,17 @@
     padding: 0px;
     margin: 0px;
 }
-.Centrar {
+.Centrar-X {
     align-items: center;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.Centrar-Y {
+    /* align-items: center; */
     display: flex;
     flex-direction: column;
     justify-content: center;

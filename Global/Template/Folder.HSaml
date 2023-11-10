@@ -8,7 +8,7 @@
         <title>[SA-ML] - Dir</title>
     </head>
     <body>
-        <div id="Carpeta" class="Centrar">
+        <div id="Carpeta" class="Centrar-X">
             <div class="Contenido">
                 <h1 class="Ruta">Carpeta: ${Url}</h1>
                 <div class="Opciones">
@@ -17,12 +17,11 @@
                     <input id="Carpeta_Cambiar"type="button" value="Cambiar Ruta"/>
                 </div>
                 <ul class="Lista">
-                    <HSaml:Array>
-                        $HSaml:Array{Carpeta}
+                    $(Carpeta) {
                         <li>
-                            <a class="Elemento" href="${Url}$Array{Valor}">$Array{Valor}</a>
+                            <a class="Elemento" href="${Url}$Value">$Value</a>
                         </li>
-                    </HSaml:Array>
+                    }
                 </ul>
             </div>
             <script>
