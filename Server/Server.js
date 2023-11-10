@@ -219,7 +219,7 @@ class Server {
 		let Request = new Server.Request(HttpRequest);
 		let WebSocket = new Server.WebSocket(Socket);
 		Request.Session = new  Server.Session(Request);
-		if (!(Request.Cookies.has('SS_UUID'))) WebSocket.SS_UUID = Request.Session.SS_UUID;
+		if (!(Request.Cookies.Has('SS_UUID'))) WebSocket.SS_UUID = Request.Session.GetID();
 		D_UpgradesRequests.Log(
 			'[WebSocket]:',
 			Request.IP,
