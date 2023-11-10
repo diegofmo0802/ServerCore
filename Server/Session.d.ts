@@ -34,7 +34,7 @@ export class Session {
     /**
      * Devuelve el SS_UUID de la sesión.
     */
-   public getID(): string;
+   public GetID(): string;
     /**
      * Comprueba si un dato existe en la sesión.
      * @param Name El nombre (key) del dato que desea buscar.
@@ -50,7 +50,7 @@ export class Session {
      * - Este objeto no esta vinculado, cualquier cambio en el
      *   No se vera reflejado en la sesión.
      */
-    GetAll(): object;
+    public GetAll(): object;
     /**
      * Establece/Reemplaza un dato de la sesión.
      * @param Name El nombre (key) del dato que desea buscar.

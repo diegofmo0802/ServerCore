@@ -42,7 +42,7 @@ class Session extends EVENTS {
     /**
      * Devuelve el SS_UUID de la sesión.
     */
-    getID() { return this.SS_UUID; };
+    GetID() { return this.SS_UUID; };
     /**
      * Comprueba si un dato existe en la sesión.
      * @param {string} Name El nombre (key) del dato que desea buscar.
