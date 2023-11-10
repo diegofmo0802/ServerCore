@@ -163,10 +163,12 @@ class Response {
 	/**
 	 * Envía los encabezados de la respuesta.
 	 * @param {number} Code El código de la respuesta que se dará.
-	 * @param {{}} Headers Los encabezados que se enviaran.
+	 * @param {Object} Headers Los encabezados que se enviaran.
 	 * @returns {void}
 	 */
 	SendHeaders(Code, Headers) {
+		let CookieSetters = this.Request.Cookies.GetSetters();
+		if (CookieSetters.length > 0) Headers['set-cookie'] = CookieSetters;
 		this.HTTPResponse.writeHead(Code, Headers);
 	}
 	/**

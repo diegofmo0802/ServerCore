@@ -205,7 +205,7 @@ class Server {
 			'[Petición]:',
 			Request.IP,
 			Request.Method,
-			Request.Url, Request.Cookies.get('SS_UUID')
+			Request.Url, Request.Cookies.Get('SS_UUID')
 		);
 		this.Route(Request, Response);
 	};
@@ -224,7 +224,7 @@ class Server {
 			'[WebSocket]:',
 			Request.IP,
 			Request.Method,
-			Request.Url, Request.Cookies.get('SS_UUID')
+			Request.Url, Request.Cookies.Get('SS_UUID')
 		);
 		this.RouteWebSocket(Request, WebSocket);
 	};

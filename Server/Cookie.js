@@ -18,7 +18,7 @@ class Cookie {
             let Division = Cookie.split(';');
             for (let Part of Division) {
                 let [Name, ...Value] = Part.split('=');
-                this.Data.set(Name, Value.join('='));
+                this.Data.set(Name.trim(), Value.join('='));
             }
         }
     }
@@ -45,12 +45,30 @@ class Cookie {
         return Data;
      }
     /**
+     * Devuelve un array con los valores de los encabezados "Set-Cookie".
+     */
+    GetSetters() {
+        let Setters = [];
+        this.SetNow.forEach((Value, Name) => {
+            if (Value.Delete == true) {
+                Setters.push(`${Name}=None;Expires=${(new Date).toUTCString()}`);
+            } else {
+                let Setter = `${Name}=${Value.Value}`;
+                Setter += Value.Expires  ? `;Expires=${Value.Expires.toUTCString()}` : '';
+                Setter += Value.HttpOnly ? ';HttpOnly' : '';
+                Setter += Value.Secure   ? ';Secure' : '';
+                Setters.push(Setter);
+            }
+        });
+        return Setters;
+    }
+    /**
      * Establece/Reemplaza una cookie
      * @param {string} Name El nombre de la cookie que desea establecer.
      * @param {any} Value El valor que se le asignara.
      * @param {import('./Cookie').default.SetOptions} Options Las opciones de la cookie.
      */
-    Set(Name, Value, Options) {
+    Set(Name, Value, Options = {}) {
         this.SetNow.set(Name, {
             Delete: false,
             Expires:  Options.Expires  ?? null,

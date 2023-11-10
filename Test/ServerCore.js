@@ -7,14 +7,15 @@ Debug.ShowAll = true;
 Server.AddRules({
     Method: 'ALL', Url: '/', Type: 'Action', Options: {
         Coverage: 'Partial', Action: function(RQ, RS) {
-            let RQC = RQ.Session.Data.get('Request_Count') ?? 0;
-            RQ.Session.Data.set('Request_Count', RQC + 1);
-            let Contents = {};
-            RQ.Session.Data.forEach((Value, Key) => Contents[Key] = Value);
+            let RQC = RQ.Session.Get('Request_Count') ?? 0;
+            RQ.Session.Set('Request_Count', RQC + 1);
+            if (RQ.Session.Get('Request_Count') > 0) RQ.Cookies.Del(`Cookie-${RQ.Session.Get('Request_Count')-1}`);
+            RQ.Cookies.Set(`Cookie-${RQ.Session.Get('Request_Count')}`, 'Prueba');
             RS.SendJSON({
-                SS_UUID: RQ.Session.SS_UUID,
-                SS_Data: Contents,
-                Cookies: RQ.Cookies
+                SS_UUID: RQ.Session.getID(),
+                SS_Data: RQ.Session.GetAll(),
+                Cookies: RQ.Cookies.GetAll(),
+                Setters: RQ.Cookies.GetSetters()
             });
         }
     }},

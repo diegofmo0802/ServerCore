@@ -5,6 +5,7 @@
  */
 
 import HTTP from 'http';
+import Cookie from './Cookie.js';
 import Session from './Session.js';
 
 export namespace Request {
@@ -35,7 +36,7 @@ export class Request {
 	/**Contiene los encabezados de la petición. */
 	public Headers: HTTP.IncomingHttpHeaders;
 	/**Contiene las cookies de la petición. */
-	public Cookies: Map<string, string>;
+	public Cookies: Cookie;
 	/**Contiene los datos POST que se enviaron. */
 	public GET: Request.GET;
 	/**Contiene la dirección IP de quien realizo la petición. */
@@ -55,11 +56,6 @@ export class Request {
 	 * @param HTTPRequest La petición que recibió el servidor.
 	 */
 	public constructor(HTTPRequest: HTTP.IncomingMessage);
-	/**
-	 * Convierte una cadena cookie en un objeto js.
-	 * @param Cookie El texto de la cabecera `cookie`.
-	 */
-	private GetCookies(Cookie: string): Map<string, string>;
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
 	 * @param HTTPRequest La petición que recibió el servidor.

@@ -35,7 +35,7 @@ class WebSocket extends EVENTS {
             + 'Connection: Upgrade\r\n'
             + `Sec-WebSocket-Accept: ${Pass}\r\n`
             + (this.SS_UUID
-            ? `Set-Cookie: SS_UUID=${this.SS_UUID}; path=/; secure; httpOnly;\r\n`
+            ? `Set-Cookie: SS_UUID=${this.SS_UUID}; secure; httpOnly;\r\n`
             : '')
             + '\r\n'
         );

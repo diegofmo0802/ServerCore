@@ -5,11 +5,12 @@
  */
 
 import URI from 'url';
+import Cookie from './Cookie.js';
 
 class Request {
 	/**@type {import('http').IncomingHttpHeaders} Contiene los encabezados de la petición. */
 	Headers = null;
-	/**@type {Map<string, string>} Contiene las cookies de la petición. */
+	/**@type {Cookie} Contiene las cookies de la petición. */
 	Cookies = null;
 	/**@type {import('./Request').Request.GET} Contiene los datos POST que se enviaron. */
 	GET = null;
@@ -31,7 +32,7 @@ class Request {
 	 */
 	constructor(HTTPRequest) {
 		this.Headers = HTTPRequest.headers;
-		this.Cookies = this.GetCookies(this.Headers.cookie);
+		this.Cookies = new Cookie(this.Headers.cookie);
 		this.GET = this.GetData(HTTPRequest.url);
 		this.IP = this.Headers['x-forwarded-for']
 		? HTTPRequest.headers['x-forwarded-for'].toString()
@@ -42,21 +43,6 @@ class Request {
 		this.Url = HTTPRequest.url.split('?')[0];
 		this.Url = decodeURI(this.Url.endsWith('/') ? this.Url : this.Url + '/');
 	}
-	/**
-	 * Convierte una cadena cookie en un objeto js.
-	 * @param {string} Cookie El texto de la cabecera `cookie`.
-	 * @returns {Map<string,string>}
-	 */
-	GetCookies(Cookie) {
-		if (!(Cookie)) return new Map();
-		let Division = Cookie.split(';');
-		let Cookies = new Map();
-		for (let Part of Division) {
-			let [Name, ...Value] = Part.split('=');
-			Cookies.set(Name, Value.join('='));
-		}
-		return Cookies;
-	};
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
 	 * @param {import('http').IncomingMessage} HTTPRequest La petición que recibió el servidor.

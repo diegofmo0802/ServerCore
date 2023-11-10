@@ -21,8 +21,8 @@ class Session extends EVENTS {
      * - si no se pasa el parámetro `Respuesta` No se establecerá la cookie `SS_UUID` y deberás hacerlo manualmente.
     */
     constructor(Request, Response = null) { super();
-        if (Request.Cookies.has('SS_UUID')) {
-            let SS_UUID = Request.Cookies.get('SS_UUID');
+        if (Request.Cookies.Has('SS_UUID')) {
+            let SS_UUID = Request.Cookies.Get('SS_UUID');
             if (Session.Sessions.has(SS_UUID)) {
                 return Session.Sessions.get(SS_UUID);
             } else {

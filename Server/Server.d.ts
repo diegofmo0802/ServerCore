@@ -11,9 +11,11 @@ import { Duplex } from 'stream';
 import __Request from "./Request.js";
 import __Response from "./Response.js";
 import __Session from "./Session.js";
+import __Cookie from "./Cookie.js";
 import __WebSocket from "./WebSocket.js";
 
 export namespace Server {
+	export import Cookie = __Cookie
 	export import Request = __Request
 	export import Response = __Response
 	export import Session = __Session
@@ -60,6 +62,7 @@ export namespace Server {
 	type Rules = Array<Rule>;
 }
 export class Server {
+	public static Cookie: Server.Cookie;
 	public static Request: Server.Request;
 	public static Response: Server.Response;
 	public static Session: Server.Session;

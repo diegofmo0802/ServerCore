@@ -45,6 +45,10 @@ declare class Cookie {
      *   No se vera reflejado en las cookies.
      */
     public GetAll(): object;
+    /** 
+     * Devuelve un array con los valores de los encabezados "Set-Cookie".
+     */
+    public GetSetters(): Array<string>;
     /**
      * Establece/Reemplaza una cookie
      * @param Name El nombre de la cookie que desea establecer.
