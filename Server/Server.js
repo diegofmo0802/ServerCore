@@ -107,6 +107,66 @@ class Server {
 		return this;
 	}
 	/**
+	 * Añade una regla de enrutamiento de acción.
+	 * @param {Request.Method} Method El Método HTTP al que deseas que se responda.
+	 * @param {string} Url La url donde escuchara la acción.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param {import('./Server').Server.Rule.Action.Exec} Action La acción que se ejecutara.
+	 * @returns {Server}
+	 */
+	AddAction(Method, Url, AllRoutes, Action) {
+		this.AddRules({
+			Method, Url, Type: 'Action', Options: {
+				Coverage: AllRoutes ? 'Complete' : 'Partial',
+				Action
+			}
+		});
+		return this;
+	}
+	/**
+	 * Añade una regla de enrutamiento de archivo.
+	 * @param {string} Url La url donde escuchara la acción.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param {string} Source La Ruta del archivo que desea enviar.
+	 */
+	AddFile(Url, AllRoutes, Source) {
+		this.AddRules({
+			Method: 'GET', Url, Type: 'File', Options: {
+				Coverage: AllRoutes ? 'Complete' : 'Partial',
+				Source
+			}
+		});
+		return this;
+	}
+	/**
+	 * Añade una regla de enrutamiento de carpeta.
+	 * @param {string} Url La url donde escuchara la acción.
+	 * @param {string} Source La Ruta del directorio que desea enviar.
+	 */
+	AddFolder(Url, Source) {
+		this.AddRules({
+			Method: 'GET', Url, Type: 'Folder', Options: {
+				Source
+			}
+		});
+		return this;
+	}
+	/**
+	 * Añade una regla de enrutamiento de WebSocket.
+	 * @param {string} Url La url donde escuchara la petición de conexión.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param {import('./Server').Server.Rule.WebSocket.Exec} Action La acción que se ejecutara.
+	 */
+	AddWebSocket(Url, AllRoutes, Action) {
+		this.AddRules({
+			Method: 'ALL', Url, Type: 'WebSocket', Options: {
+				Coverage: AllRoutes ? 'Complete' : 'Partial',
+				Action
+			}
+		});
+		return this;
+	}
+	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param {keyof import('./Server.js').Server.Templates} Name El nombre de la plantilla.
 	 * @param {string} Path La ruta de la plantilla `.HSaml`.

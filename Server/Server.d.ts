@@ -21,6 +21,12 @@ export namespace Server {
 	export import Session = __Session
 	export import WebSocket = __WebSocket
     namespace Rule {
+		namespace Action {
+			type Exec = (Request: Request, Response: Response) => void;
+		}
+		namespace WebSocket {
+			type Exec = (Request: Request, WebSocket: Server.WebSocket) => void;
+		}
         type Base = {
             Method: Request.Method,
             Url: string
@@ -29,7 +35,7 @@ export namespace Server {
             Type: 'Action',
             Options: {
                 Coverage: ('Partial' | 'Complete'),
-                Action: (Request: Request, Response: Response) => void
+                Action: Action.Exec
             }
         };
         type File = Base & {
@@ -49,7 +55,7 @@ export namespace Server {
             Type: 'WebSocket',
             Options: {
                 Coverage: ('Partial' | 'Complete'),
-                Action: (Request: Request, WebSocket: Server.WebSocket) => void
+                Action: WebSocket.Exec
             }
         };
     }
@@ -97,6 +103,34 @@ export class Server {
 	 * @param Rules La regla/s que desea añadir.
 	 */
 	public AddRules(...Rules: Array<Server.Rule>): Server;
+	/**
+	 * Añade una regla de enrutamiento de acción.
+	 * @param Method El Método HTTP al que deseas que se responda.
+	 * @param Url La url donde escuchara la acción.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Action La acción que se ejecutara.
+	 */
+	public AddAction(Method: Server.Request.Method, Url: string, AllRoutes: boolean, Action: Server.Rule.Action.Exec): Server;
+	/**
+	 * Añade una regla de enrutamiento de archivo.
+	 * @param Url La url donde escuchara la acción.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Source La Ruta del archivo que desea enviar.
+	 */
+	public AddFile(Url: string, AllRoutes: boolean, Source: string): Server;
+	/**
+	 * Añade una regla de enrutamiento de carpeta.
+	 * @param Url La url donde escuchara la acción.
+	 * @param Source La Ruta del directorio que desea enviar.
+	 */
+	public AddFolder(Url: string, Source: string): Server;
+	/**
+	 * Añade una regla de enrutamiento de WebSocket.
+	 * @param Url La url donde escuchara la petición de conexión.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Action La acción que se ejecutara.
+	 */
+	public AddWebSocket(Url: string, AllRoutes: boolean, Action: Server.Rule.WebSocket.Exec): Server;
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param Template El nombre de la plantilla.
