@@ -21,11 +21,13 @@
   "files": [
     "README.me",
     "LICENSE",
+    "changes.md",
     "ServerCore.js",
     "ServerCore.d.ts",
     "ConsoleUI/",
     "Debug/",
     "Global/",
+    "JsonWT",
     "Server/",
     "Template/"
   ],
