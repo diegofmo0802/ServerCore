@@ -35,7 +35,7 @@ class JsonWT {
             case 'HMAC': {//@ts-ignore
                 this.Secret = Options.Secret;
                 if (!this.Secret || this.Secret.length < 6) {
-                    throw 'Para alg: HS256, HS384 y HS512 debes usar una palabra secreta mayor a 6 caracteres';
+                    throw new Error('Para alg: HS256, HS384 y HS512 debes usar una palabra secreta mayor a 6 caracteres')
                 }
                 break;
             }
@@ -47,7 +47,7 @@ class JsonWT {
                 if (
                     PrivateKey.asymmetricKeyType !== 'rsa' ||
                     PublicKey.asymmetricKeyType !== 'rsa'
-                ) { throw 'Debes usar claves RSA para el alg: RS256, RS384 y RS512' }
+                ) { throw new Error('Debes usar claves RSA para el alg: RS256, RS384 y RS512') }
                 break;
             }
             case 'RSA-PSS': {//@ts-ignore
@@ -58,7 +58,7 @@ class JsonWT {
                 if (
                     PrivateKey.asymmetricKeyType !== 'rsa-pss' ||
                     PublicKey.asymmetricKeyType !== 'rsa-pss'
-                ) { throw 'Debes usar claves RSA-PSS para el alg: PSS256, PSS384 y PSS512' }
+                ) { throw new Error('Debes usar claves RSA-PSS para el alg: PSS256, PSS384 y PSS512') }
                 break;
             }
             case 'ECDSA': {//@ts-ignore
@@ -69,10 +69,10 @@ class JsonWT {
                 if (
                     PrivateKey.asymmetricKeyType !== 'ec' ||
                     PublicKey.asymmetricKeyType !== 'ec'
-                ) { throw 'Debes usar claves RSA-PSS para el alg: PSS256, PSS384 y PSS512' }
+                ) { throw new Error('Debes usar claves RSA-PSS para el alg: PSS256, PSS384 y PSS512') }
                 break;
             }
-            default: throw 'Se especifico un algoritmo invalido o no soportado';
+            default: throw new Error('Se especifico un algoritmo invalido o no soportado')
         }
     }
     /**
@@ -135,7 +135,7 @@ class JsonWT {
                 Signature = SignatureP1.toString('base64url');
                 break;
             }
-            default: throw 'Se especifico un algoritmo invalido o no soportado';
+            default: throw new Error('Se especifico un algoritmo invalido o no soportado')
         }
         return Signature;
     }
@@ -177,7 +177,7 @@ class JsonWT {
                 }, Buffer.from(Signature, 'base64url'));
                 break;
             }
-            default: throw 'Se especifico un algoritmo invalido o no soportado';
+            default: throw new Error('Se especifico un algoritmo invalido o no soportado')
         }
         return Verify;
     }

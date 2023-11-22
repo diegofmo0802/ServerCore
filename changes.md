@@ -1,12 +1,16 @@
-# 3.3.0 - Inicio de changes.me
-A partir de ahora se documentaran los cambios realizados
+# 3.3 Inicio de changes.me
+## 3.3.1
+  - Se corrigió el tipo de Request.POST
+    <br>Esta variable es de tipo Promise<Request.POST>
+    per intellisense la detectaba como Request.POST por un fallo en las definiciones en d.ts
 
-Se añadió:
 
-- Server.AddAction()
-- Server.AddFile() 
-- Server.AddFolder()
-- Server.AddWebSocket()
+## 3.3.0
+- A partir de ahora se documentaran los cambios realizados
+- Se agrego Server.AddAction()
+- Se agrego Server.AddFile() 
+- Se agrego Server.AddFolder()
+- Se agrego Server.AddWebSocket()
 
 se añadieron como una alternativa a Server.AddRules
 esto con el fin de simplificar la forma de añadir reglas de enrutamiento nuevas
@@ -17,15 +21,9 @@ Desarrollados sin añadir:
 
 - Capacidad de trabajo con JWT
   Crear, verificar y decodificar Json Web Tokens con los algoritmos
-  - SH256
-  - SH384
-  - SH512
-  - RS256
-  - RS384
-  - RS512
-  - PS256
-  - PS384
-  - PS512
-  - ES256
-  - ES384
-  - ES512
+  ||256|384|512|
+  |--|---|---|---|
+  |**HS**|✅|✅|✅|
+  |**RS**|✅|✅|✅|
+  |**PS**|✅|✅|✅|
+  |**ES**|✅|✅|✅|

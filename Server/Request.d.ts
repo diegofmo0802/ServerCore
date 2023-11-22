@@ -44,7 +44,7 @@ export class Request {
 	/**Contiene el método de la petición. */
 	public Method: Request.Method;
 	/**Contiene los datos POST que se enviaron. */
-	public POST: Request.POST;
+	public POST: Promise<Request.POST>;
 	/**Contiene la Sesión del dispositivo donde se realizo la petición.*/
 	public Session: Session;
 	/**Contiene la petición que recibió el servidor. */
