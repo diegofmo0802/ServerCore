@@ -1,4 +1,6 @@
 # 3.3 Inicio de changes.me
+## 3.3.2
+  -Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
 ## 3.3.1
   - Se corrigió el tipo de Request.POST
     <br>Esta variable es de tipo Promise<Request.POST>

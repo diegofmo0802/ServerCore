@@ -91,8 +91,14 @@ class JsonWT {
     GetContent(JWT) {
         let Verify = this.Verify(JWT);
         let [HeadB64, BodyB64, Signature] = JWT.split('.');
-        let Head = JSON.parse(JsonWT.Base64UrlDecode(HeadB64));
-        let Body = JSON.parse(JsonWT.Base64UrlDecode(BodyB64));
+        let Head, Body;
+        try {
+            Head = JSON.parse(JsonWT.Base64UrlDecode(HeadB64));
+            Body = JSON.parse(JsonWT.Base64UrlDecode(BodyB64));
+        } catch {
+            Head = {};
+            Body = {};
+        }
         return { Head, Body, Verify, Signature };
     }
     /**
