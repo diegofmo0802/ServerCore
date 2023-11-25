@@ -5,7 +5,7 @@
  */
 
 class ConsoleUI {
-        /**
+    /**
      * Elimina los formatos de color que se usan para la función CUI.Colorear().
      * @param Text El texto limpiar.
      * @param Prefix El prefijo.

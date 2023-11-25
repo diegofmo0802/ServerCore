@@ -7,13 +7,15 @@
 namespace Cookie {
     type SetOptions = {
         HttpOnly?: boolean,
+        Patch?: string,
         Secure?: boolean,
-        Expires?: Date,
+        Expires?: Date
     }
     type SetData = ({
         Delete: false,
         Expires: Date | null,
         HttpOnly: boolean,
+        Patch: string,
         Secure: boolean,
         Value: string
     } | {

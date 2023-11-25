@@ -74,6 +74,7 @@ class Cookie {
             Expires:  Options.Expires  ?? null,
             HttpOnly: Options.HttpOnly ?? false,
             Secure:   Options.Secure   ?? false,
+            Patch:    Options.Patch ?? '/',
             Value: Value
         });
         this.Data.set(Name, Value);

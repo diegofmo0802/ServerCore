@@ -1,6 +1,16 @@
 # 3.3 Inicio de changes.me
+## 3.3.3
+  - Se corrigieron errores en el objeto Cookie
+    - Al crearse una nueva cookie en una subRuta esta era establecida con Path en dicha subRuta
+      ahora se tomara '/' a menos que se indique otra cosa.
+  - Se corrigieron errores de tipo en Server.d.ts en cuanto a la implementación de
+    - Request
+    - Response
+    - Cookie
+    - Session
+    - WebSocket
 ## 3.3.2
-  -Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
+  - Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
 ## 3.3.1
   - Se corrigió el tipo de Request.POST
     <br>Esta variable es de tipo Promise<Request.POST>

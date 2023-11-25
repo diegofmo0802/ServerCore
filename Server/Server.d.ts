@@ -2,7 +2,6 @@
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Añade una forma sencilla de crear servidores HTTP/S y WS/S.
  * @license Apache-2.0
- * @module Saml.ServerCore
  */
 
 import HTTP from 'http';
@@ -68,11 +67,11 @@ export namespace Server {
 	type Rules = Array<Rule>;
 }
 export class Server {
-	public static Cookie: Server.Cookie;
-	public static Request: Server.Request;
-	public static Response: Server.Response;
-	public static Session: Server.Session;
-	public static WebSocket: Server.WebSocket;
+	public static Cookie = __Cookie;
+	public static Request = __Request;
+	public static Response = __Response;
+	public static Session = __Session;
+	public static WebSocket = __WebSocket;
 	/**Contiene el host donde el servidor recibirá peticiones. */
 	private Host: string;
 	/**Contiene el listado de plantillas de respuesta del servidor. */

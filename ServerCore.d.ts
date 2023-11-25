@@ -1,6 +1,7 @@
 /**
  * @author diegofmo0802 <diegofmo0802@gmail.com>.
  * @description Exporta lo necesario para usar ServerCore
+ * @module Saml.ServerCore
  * @license Apache-2.0
  */
 
