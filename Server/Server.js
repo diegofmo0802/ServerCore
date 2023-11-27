@@ -17,8 +17,10 @@ import Response from "./Response.js";
 import Session from "./Session.js";
 import WebSocket from "./WebSocket.js";
 
-const D_Requests = new Debug('Srv.Requests', '.Debug/Requests', false);
-const D_UpgradesRequests = new Debug('Srv.UpgradeRequests', '.Debug/UpgradeRequests', false);
+const Debugs = {
+	Requests: new Debug('Srv.Requests', '.Debug/Requests', false),
+	Upgrades: new Debug('Srv.UpgradeRequests', '.Debug/UpgradeRequests', false)
+};
 
 class Server {
 	/**@type {typeof Request} */
@@ -261,7 +263,7 @@ class Server {
 		let Request = new Server.Request(HttpRequest);
 		let Response = new Server.Response(Request, HttpResponse, this.Templates);
 		Request.Session = new  Server.Session(Request, Response);
-		D_Requests.Log(
+		Debugs.Requests.Log(
 			'[Petición]:',
 			Request.IP,
 			Request.Method,
@@ -280,7 +282,7 @@ class Server {
 		let WebSocket = new Server.WebSocket(Socket);
 		Request.Session = new  Server.Session(Request);
 		if (!(Request.Cookies.Has('SS_UUID'))) WebSocket.SS_UUID = Request.Session.GetID();
-		D_UpgradesRequests.Log(
+		Debugs.Upgrades.Log(
 			'[WebSocket]:',
 			Request.IP,
 			Request.Method,
