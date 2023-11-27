@@ -54,10 +54,13 @@ class Cookie {
                 Setters.push(`${Name}=None;Expires=${(new Date).toUTCString()}`);
             } else {
                 let Setter = `${Name}=${Value.Value}`;
+                Setter += Value.Domain   ? `;Domain=${Value.Domain}` : '';
+                Setter += Value.Path     ? `;Path=${Value.Path}` : '';
+                Setter += Value.SameSite ? `;SameSite=${Value.SameSite}` : '';
+                Setter += Value.MaxAge   ? `;Max-Age=${Value.MaxAge}` : '';
                 Setter += Value.Expires  ? `;Expires=${Value.Expires.toUTCString()}` : '';
                 Setter += Value.HttpOnly ? ';HttpOnly' : '';
                 Setter += Value.Secure   ? ';Secure' : '';
-                Setter += Value.Path     ? `;Path=${Value.Path}` : '';
                 Setters.push(Setter);
             }
         });

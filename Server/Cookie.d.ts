@@ -6,10 +6,13 @@
 
 namespace Cookie {
     type SetOptions = {
+        Domain?: string,
+        Expires?: Date,
         HttpOnly?: boolean,
         Path?: string,
-        Secure?: boolean,
-        Expires?: Date
+        SameSite?: 'Strict' | 'Lax' | 'None'
+        MaxAge?: number,
+        Secure?: boolean
     }
     type SetData = (SetOptions & {
         Delete: false,

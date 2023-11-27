@@ -1,9 +1,14 @@
-# 3.3 Inicio de changes.me
-## 3.3.4
+# Version 3
+## 3.4
+### 3.4.0
+  **Añadidos**
+  - Opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge
+## 3.3 << changes.md
+### 3.3.4
   **Correcciones**
   - Definición de tipos de JsonWT: de (ObjectToMar) a (ObjectToMap).
   - Definición de tipos de Cookie: de (SetOptions.Patch) a (SetOptions.Path).
-## 3.3.3
+### 3.3.3
   - Se corrigieron errores en el objeto Cookie
     - Al crearse una nueva cookie en una subRuta esta era establecida con Path en dicha subRuta
       ahora se tomara '/' a menos que se indique otra cosa.
@@ -13,15 +18,15 @@
     - Cookie
     - Session
     - WebSocket
-## 3.3.2
+### 3.3.2
   - Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
-## 3.3.1
+### 3.3.1
   - Se corrigió el tipo de Request.POST
     <br>Esta variable es de tipo Promise<Request.POST>
     per intellisense la detectaba como Request.POST por un fallo en las definiciones en d.ts
 
 
-## 3.3.0
+### 3.3.0
 - A partir de ahora se documentaran los cambios realizados
 - Se agrego Server.AddAction()
 - Se agrego Server.AddFile() 
