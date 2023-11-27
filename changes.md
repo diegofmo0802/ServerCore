@@ -2,7 +2,7 @@
 ## 3.4
 ### 3.4.0
   **Añadidos**
-  - Añadido nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge
+  - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge
 ## 3.3 << changes.md
 ### 3.3.4
   **Correcciones**
