@@ -57,7 +57,7 @@ class Cookie {
                 Setter += Value.Expires  ? `;Expires=${Value.Expires.toUTCString()}` : '';
                 Setter += Value.HttpOnly ? ';HttpOnly' : '';
                 Setter += Value.Secure   ? ';Secure' : '';
-                Setter += Value.Patch    ? `;Path=${Value.Patch}` : '';
+                Setter += Value.Path     ? `;Path=${Value.Path}` : '';
                 Setters.push(Setter);
             }
         });
@@ -75,7 +75,7 @@ class Cookie {
             Expires:  Options.Expires  ?? null,
             HttpOnly: Options.HttpOnly ?? false,
             Secure:   Options.Secure   ?? false,
-            Patch:    Options.Patch    ?? '/',
+            Path:     Options.Path    ?? '/',
             Value: Value
         });
         this.Data.set(Name, Value);
