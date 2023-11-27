@@ -1,4 +1,7 @@
 # 3.3 Inicio de changes.me
+## 3.3.4
+  **Correcciones**
+  - Definición de tipos de JsonWT de (ObjectToMar) de (ObjectToMap)
 ## 3.3.3
   - Se corrigieron errores en el objeto Cookie
     - Al crearse una nueva cookie en una subRuta esta era establecida con Path en dicha subRuta

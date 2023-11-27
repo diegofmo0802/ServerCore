@@ -89,7 +89,7 @@ export class JsonWT {
      * Convierte un objeto js a un map.
      * @param Object El objeto a convertir.
      */
-    private static ObjectToMar(Object: object): Map<string, any>;
+    private static ObjectToMap(Object: object): Map<string, any>;
     /**
      * Extrae información sobre una clave publica.
      * @param Public La clave publica.
