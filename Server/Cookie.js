@@ -54,13 +54,13 @@ class Cookie {
                 Setters.push(`${Name}=None;Expires=${(new Date).toUTCString()}`);
             } else {
                 let Setter = `${Name}=${Value.Value}`;
-                Setter += Value.Domain   ? `;Domain=${Value.Domain}` : '';
-                Setter += Value.Path     ? `;Path=${Value.Path}` : '';
-                Setter += Value.SameSite ? `;SameSite=${Value.SameSite}` : '';
-                Setter += Value.MaxAge   ? `;Max-Age=${Value.MaxAge}` : '';
+                Setter += Value.Domain   ? `;Domain=${Value.Domain}`                 : '';
                 Setter += Value.Expires  ? `;Expires=${Value.Expires.toUTCString()}` : '';
-                Setter += Value.HttpOnly ? ';HttpOnly' : '';
-                Setter += Value.Secure   ? ';Secure' : '';
+                Setter += Value.HttpOnly ? ';HttpOnly'                               : '';
+                Setter += Value.MaxAge   ? `;Max-Age=${Value.MaxAge}`                : '';
+                Setter += Value.Path     ? `;Path=${Value.Path}`                     : '';
+                Setter += Value.SameSite ? `;SameSite=${Value.SameSite}`             : '';
+                Setter += Value.Secure   ? ';Secure'                                 : '';
                 Setters.push(Setter);
             }
         });
@@ -75,10 +75,13 @@ class Cookie {
     Set(Name, Value, Options = {}) {
         this.SetNow.set(Name, {
             Delete: false,
+            Domain:   Options.Domain   ?? null,
             Expires:  Options.Expires  ?? null,
-            HttpOnly: Options.HttpOnly ?? false,
-            Secure:   Options.Secure   ?? false,
-            Path:     Options.Path    ?? '/',
+            HttpOnly: Options.HttpOnly ?? null,
+            MaxAge:   Options.MaxAge   ?? null,
+            Path:     Options.Path     ?? null,
+            SameSite: Options.SameSite ?? null,
+            Secure:   Options.Secure   ?? null,
             Value: Value
         });
         this.Data.set(Name, Value);

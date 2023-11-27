@@ -2,7 +2,9 @@
 ## 3.4
 ### 3.4.0
   **Añadidos**
-  - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge
+  - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge.
+  **Cambios**
+  - El estado por defecto de la opción Path en Cookie.Set: de (/) a (la ruta donde se envió el set-cookie).
 ## 3.3 << changes.md
 ### 3.3.4
   **Correcciones**
