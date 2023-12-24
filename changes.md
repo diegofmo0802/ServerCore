@@ -1,5 +1,11 @@
 # Version 3
+**Desarrollados sin añadir y en espera de pruebas**
+- Mail: acceso desde (saml.servercore/Mail/Mail.js)
+- JsonWT: acceso desde (saml.servercore/JsonWT/JsonWT.js)
 ## 3.4
+### 3.4.1
+**Desarrollado sin añadir**
+  - Mail: permite enviar correos electrónicos a traves de un servidor smtp/s
 ### 3.4.0
   **Añadidos**
   - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge.
@@ -29,18 +35,20 @@
 
 
 ### 3.3.0
+**Añadido**
 - A partir de ahora se documentaran los cambios realizados
 - Se agrego Server.AddAction()
 - Se agrego Server.AddFile() 
 - Se agrego Server.AddFolder()
 - Se agrego Server.AddWebSocket()
 
+**Resumen**
 se añadieron como una alternativa a Server.AddRules
 esto con el fin de simplificar la forma de añadir reglas de enrutamiento nuevas
 ya que el uso de estas funciones disminuyen la cantidad de parámetros a pasar en un objeto,
 esto debido a que cada una se especializa en añadir un tipo de regla de enrutamiento en concreto.
 
-Desarrollados sin añadir:
+**Desarrollados sin añadir**:
 
 - Capacidad de trabajo con JWT
   Crear, verificar y decodificar Json Web Tokens con los algoritmos

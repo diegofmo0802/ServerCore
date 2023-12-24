@@ -1,6 +1,6 @@
 {
   "name": "saml.servercore",
-  "version": "3.4.0-Dev",
+  "version": "3.4.1-Dev",
   "description": "a module for http/s and ws/s servers",
   "type": "module",
   "main": "ServerCore.js",
@@ -27,7 +27,8 @@
     "ConsoleUI/",
     "Debug/",
     "Global/",
-    "JsonWT",
+    "JsonWT/",
+    "Mail/",
     "Server/",
     "Template/"
   ],
