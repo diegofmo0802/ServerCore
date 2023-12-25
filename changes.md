@@ -7,6 +7,17 @@
 **Correcciones**
   - Mail: error de tipos para la función SendMail.
   - Mail: error de importación de Debug.
+**Añadido**
+  - Mail: Se añadió como exportación Beta.
+  - JsonWT: Se añadió como exportación Beta.
+**Resumen**
+para importar lo añadido como beta se puede usar
+```js
+import { Beta } from 'saml.servercore';
+const Mail = Beta.Mail;
+const JsonWT = Beta.JsonWT;
+```
+
 ### 3.4.1
 **Desarrollado sin añadir**
   - Mail: permite enviar correos electrónicos a traves de un servidor smtp/s
