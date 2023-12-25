@@ -112,11 +112,11 @@ class Server {
 	 * Añade una regla de enrutamiento de acción.
 	 * @param {Request.Method} Method El Método HTTP al que deseas que se responda.
 	 * @param {string} Url La url donde escuchara la acción.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param {import('./Server').Server.Rule.Action.Exec} Action La acción que se ejecutara.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @returns {Server}
 	 */
-	AddAction(Method, Url, AllRoutes, Action) {
+	AddAction(Method, Url, Action, AllRoutes = false) {
 		this.AddRules({
 			Method, Url, Type: 'Action', Options: {
 				Coverage: AllRoutes ? 'Complete' : 'Partial',
@@ -128,10 +128,10 @@ class Server {
 	/**
 	 * Añade una regla de enrutamiento de archivo.
 	 * @param {string} Url La url donde escuchara la acción.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param {string} Source La Ruta del archivo que desea enviar.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 */
-	AddFile(Url, AllRoutes, Source) {
+	AddFile(Url, Source, AllRoutes = false) {
 		this.AddRules({
 			Method: 'GET', Url, Type: 'File', Options: {
 				Coverage: AllRoutes ? 'Complete' : 'Partial',
@@ -156,10 +156,10 @@ class Server {
 	/**
 	 * Añade una regla de enrutamiento de WebSocket.
 	 * @param {string} Url La url donde escuchara la petición de conexión.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param {import('./Server').Server.Rule.WebSocket.Exec} Action La acción que se ejecutara.
+	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 */
-	AddWebSocket(Url, AllRoutes, Action) {
+	AddWebSocket(Url, Action, AllRoutes = false) {
 		this.AddRules({
 			Method: 'ALL', Url, Type: 'WebSocket', Options: {
 				Coverage: AllRoutes ? 'Complete' : 'Partial',

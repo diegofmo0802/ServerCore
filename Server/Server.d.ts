@@ -106,17 +106,17 @@ export class Server {
 	 * Añade una regla de enrutamiento de acción.
 	 * @param Method El Método HTTP al que deseas que se responda.
 	 * @param Url La url donde escuchara la acción.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param Action La acción que se ejecutara.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 */
-	public AddAction(Method: Server.Request.Method, Url: string, AllRoutes: boolean, Action: Server.Rule.Action.Exec): Server;
+	public AddAction(Method: Server.Request.Method, Url: string, Action: Server.Rule.Action.Exec, AllRoutes?: boolean): Server;
 	/**
 	 * Añade una regla de enrutamiento de archivo.
 	 * @param Url La url donde escuchara la acción.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param Source La Ruta del archivo que desea enviar.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 */
-	public AddFile(Url: string, AllRoutes: boolean, Source: string): Server;
+	public AddFile(Url: string, Source: string, AllRoutes?: boolean): Server;
 	/**
 	 * Añade una regla de enrutamiento de carpeta.
 	 * @param Url La url donde escuchara la acción.
@@ -126,10 +126,10 @@ export class Server {
 	/**
 	 * Añade una regla de enrutamiento de WebSocket.
 	 * @param Url La url donde escuchara la petición de conexión.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param Action La acción que se ejecutara.
+	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 */
-	public AddWebSocket(Url: string, AllRoutes: boolean, Action: Server.Rule.WebSocket.Exec): Server;
+	public AddWebSocket(Url: string, Action: Server.Rule.WebSocket.Exec, AllRoutes?: boolean): Server;
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param Template El nombre de la plantilla.

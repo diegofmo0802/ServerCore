@@ -5,7 +5,7 @@
   "type": "module",
   "main": "ServerCore.js",
   "scripts": {
-    "test": "node Test/ServerCore.js",
+    "test": "node Test/Test.js",
     "csv-to-json": "node \"Global/Herramientas/CSV-To-JSON.js\""
   },
   "author": {

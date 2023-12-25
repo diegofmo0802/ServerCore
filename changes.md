@@ -10,6 +10,8 @@
 **Añadido**
   - Mail: Se añadió como exportación Beta.
   - JsonWT: Se añadió como exportación Beta.
+**Cambios**
+  - Server: El orden de los parámetros de AddFile, AddAction y AddWebSocket.
 **Resumen**
 para importar lo añadido como beta se puede usar
 ```js

@@ -4,7 +4,7 @@ Debug.Log('Hola mundo');
 Debug.Log([
     'Prueba de envió de multiples datos',
     'Para saber el comportamiento'
-])
+]);
 
 const X = new Debug('_Debug');
 
@@ -24,3 +24,5 @@ Debug.ShowAll = false;
 Y.Log('Prueba para ver si vuelven a ocultarse los mensajes en consola de los EnConsola = false después de poner MostrarTodo nuevamente en false');
 
 Debug.Log('Fin de la prueba');
+
+export default true;

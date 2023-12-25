@@ -1,4 +1,4 @@
-import Plantilla from "../Template/Template.js";
+import Plantilla from "../../Template/Template.js";
 
 (async () => console.log(
     await Plantilla.Load('./Test/Plantilla.HSaml', {

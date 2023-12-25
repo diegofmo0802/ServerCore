@@ -1,4 +1,4 @@
-import ServerCore, { Debug } from "../ServerCore.js";
+import ServerCore, { Debug } from "../../ServerCore.js";
 
 const Server = new ServerCore(80);
 Debug.ShowAll = true;

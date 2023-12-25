@@ -1,4 +1,4 @@
-import JsonWT from "../JsonWT/JsonWT.js";
+import JsonWT from "../../JsonWT/JsonWT.js";
 import CRYPTO from 'crypto';
 import FS from 'fs';
 
