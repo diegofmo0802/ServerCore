@@ -46,7 +46,7 @@ declare class Mail {
      * @param Content El contenido del correo.
      * @param Options Indica si el contenido es HTML.
      */
-    public SendMail(Destination: string, Subject: string, Content: string, Options = {}): void
+    public SendMail(Destination: string, Subject: string, Content: string, Options: Mail.SendOptions): Promise<boolean>
 }
 
 export default Mail;

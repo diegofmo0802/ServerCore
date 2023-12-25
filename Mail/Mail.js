@@ -1,4 +1,4 @@
-import { Debug } from '../Debug/Debug.js';
+import Debug from '../Debug/Debug.js';
 
 import TLS from 'tls';
 import NET from 'net';
