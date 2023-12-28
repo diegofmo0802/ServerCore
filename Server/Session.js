@@ -21,8 +21,8 @@ class Session extends EVENTS {
      * - si no se pasa el parámetro `Respuesta` No se establecerá la cookie `SS_UUID` y deberás hacerlo manualmente.
     */
     constructor(Request, Response = null) { super();
-        if (Request.Cookies.Has('SS_UUID')) {
-            let SS_UUID = Request.Cookies.Get('SS_UUID');
+        if (Request.Cookies.Has('Session')) {
+            let SS_UUID = Request.Cookies.Get('Session');
             if (Session.Sessions.has(SS_UUID)) {
                 return Session.Sessions.get(SS_UUID);
             } else {
@@ -32,7 +32,7 @@ class Session extends EVENTS {
             this.SS_UUID = CRYPTO.randomUUID();
         }
         Session.Sessions.set(this.SS_UUID, this);
-        Request.Cookies.Set('SS_UUID', this.SS_UUID, {
+        Request.Cookies.Set('Session', this.SS_UUID, {
             Secure: true, HttpOnly: true, Path: '/', Expires: (() => {
                 let Fecha = new Date();
                 Fecha.setFullYear(Fecha.getFullYear() + 1);
