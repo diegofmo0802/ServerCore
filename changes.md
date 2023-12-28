@@ -2,7 +2,9 @@
 **Desarrollados sin añadir y en espera de pruebas**
 - Mail: acceso desde (saml.servercore/Mail/Mail.js)
 - JsonWT: acceso desde (saml.servercore/JsonWT/JsonWT.js)
+
 ## 3.4
+
 ### 3.4.2
 **Correcciones**
   - Mail: error de tipos para la función SendMail.
@@ -15,6 +17,7 @@
   - Session: El atributo `path` por defecto de la cookie SS_UUID se cambio a `/` para ajustarse al
     cambio realizado en el sub modulo cookie
   - Session: La cookie SS_UUID se renombro a Session
+  - Debug: La ruta por defecto de cambio a `.Debug/Default`
 **Resumen**
 para importar lo añadido como beta se puede usar
 ```js
@@ -26,16 +29,20 @@ const JsonWT = Beta.JsonWT;
 ### 3.4.1
 **Desarrollado sin añadir**
   - Mail: permite enviar correos electrónicos a traves de un servidor smtp/s
+
 ### 3.4.0
   **Añadidos**
   - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge.
   **Cambios**
   - El estado por defecto de la opción Path en Cookie.Set: de (/) a (la ruta donde se envió el set-cookie).
+
 ## 3.3 << changes.md
+
 ### 3.3.4
   **Correcciones**
   - Definición de tipos de JsonWT: de (ObjectToMar) a (ObjectToMap).
   - Definición de tipos de Cookie: de (SetOptions.Patch) a (SetOptions.Path).
+
 ### 3.3.3
   - Se corrigieron errores en el objeto Cookie
     - Al crearse una nueva cookie en una subRuta esta era establecida con Path en dicha subRuta
@@ -46,13 +53,14 @@ const JsonWT = Beta.JsonWT;
     - Cookie
     - Session
     - WebSocket
+
 ### 3.3.2
   - Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
+
 ### 3.3.1
   - Se corrigió el tipo de Request.POST
     <br>Esta variable es de tipo Promise<Request.POST>
     per intellisense la detectaba como Request.POST por un fallo en las definiciones en d.ts
-
 
 ### 3.3.0
 **Añadido**

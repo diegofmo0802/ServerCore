@@ -11,7 +11,7 @@ import NET from 'net';
 import FS from 'fs';
 import CRYPTO from 'crypto';
 
-const $Mail = new Debug('Mail', '.Debug/[Mail]');
+const $Mail = new Debug('Mail', '.Debug/Mail');
 
 class Mail {
     /** @type {string} */

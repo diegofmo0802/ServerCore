@@ -30,9 +30,9 @@ class Debug {
 	 * @param {string} Path La Ruta de la carpeta donde se almacenaran los Log`s.
 	 * @param {boolean?} InConsole El indicador de `Mostrar en consola`.
 	 */
-	constructor(ID = '_Debug', Path = '.Debug', InConsole = true) {
+	constructor(ID = '_Debug', Path = '.Debug/Default', InConsole = true) {
 		if (ID === null)        ID = '_Debug';
-		if (Path === null)      Path = '.Debug';
+		if (Path === null)      Path = '.Debug/Default';
 		if (InConsole === null) InConsole = false;
 		if (Debug.Debugs.has(ID)) return Debug.Debugs.get(ID);
 		Path = Path.startsWith('/') ? Path.slice(1) : Path;
@@ -48,6 +48,7 @@ class Debug {
 		this.Stream.write('/*| Saml/Debug by diegofmo0802 |*/\n');
 		this.Stream.write('/*|     Use Saml ReadDebug     |*/\n');
 		this.Stream.write('/*+----------------------------+*/\n');
+		console.log(`Debug: [${ID}] --| Guardado en |-> ${this.Path}`);
 		Debug.Debugs.set(ID, this);
 	}
 	/**
