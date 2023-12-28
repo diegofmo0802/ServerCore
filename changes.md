@@ -12,6 +12,8 @@
   - JsonWT: Se añadió como exportación Beta.
 **Cambios**
   - Server: El orden de los parámetros de AddFile, AddAction y AddWebSocket.
+  - Session: el atributo `path` por defecto de la cookie SS_UUID se cambio a `/` para ajustarse al
+    cambio realizado en el sub modulo cookie
 **Resumen**
 para importar lo añadido como beta se puede usar
 ```js

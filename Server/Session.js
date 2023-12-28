@@ -33,7 +33,7 @@ class Session extends EVENTS {
         }
         Session.Sessions.set(this.SS_UUID, this);
         Request.Cookies.Set('SS_UUID', this.SS_UUID, {
-            Secure: true, HttpOnly: true, Expires: (() => {
+            Secure: true, HttpOnly: true, Path: '/', Expires: (() => {
                 let Fecha = new Date();
                 Fecha.setFullYear(Fecha.getFullYear() + 1);
                 return Fecha;
