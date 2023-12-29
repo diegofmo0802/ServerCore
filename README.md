@@ -40,6 +40,19 @@ Primero debemos instalar el modulo usando
 mpm install saml.servercore
 ```
 
+Si deseas instalar la version en desarrollo
+> [!WARNING]
+> - Esta version puede contener errores.
+> - Esta version puede ser actualizada varias veces al dia.
+> - Esta version contiene contenido experimental.
+
+> [!NOTE]
+> El contenido de esta version esta contenido en la rama Dev
+
+```console
+npm install saml.servercore@Dev
+```
+
 También es necesario que en tu package.json este el proyecto como type: module
 ```json
 {
