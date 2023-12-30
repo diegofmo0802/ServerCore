@@ -47,12 +47,13 @@ mpm install saml.servercore@Dev
 > [!WARNING]
 > - Esta version podría contener errores.
 > - Contiene la version mas reciente del proyecto.
-> - Para acceder a las funciones en desarrollo sin añadir mencionadas en changes.md
-    ```js
-    import { Beta } from 'saml.servercore'
-    const Mail = Beta.Mail;
-    const JsonWT = Beta.JsonWT;
-    ```
+
+Para acceder a las funciones en desarrollo sin añadir mencionadas en changes.md
+```js
+import { Beta } from 'saml.servercore'
+const Mail = Beta.Mail;
+const JsonWT = Beta.JsonWT;
+```
 
 También es necesario que en tu package.json este el proyecto como type: module
 ```json
