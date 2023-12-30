@@ -99,14 +99,6 @@ class WebSocket extends EVENTS {
      * @returns {Buffer}
      */
     StringToBuffer(Message) {
-        /** Forma anterior, reemplazada el 10/08/2023 7:15am
-        let Códigos = [];
-        Mensaje = encodeURI(Mensaje);
-        for (let Posición = 0; Posición < Mensaje.length; Posición++) {
-            Códigos.push(Mensaje.charCodeAt(Posición));
-        }
-        return Buffer.from(Códigos);
-        **/
         return Buffer.from(Message, 'utf-8');
     }
     
