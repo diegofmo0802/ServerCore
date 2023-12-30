@@ -18,6 +18,7 @@
     cambio realizado en el sub modulo cookie
   - Session: La cookie SS_UUID se renombro a Session
   - Debug: La ruta por defecto de cambio a `.Debug/Default`
+  - Mail: Se eliminaron los console.log y se remitieron a Debug
 **Resumen**
 para importar lo añadido como beta se puede usar
 ```js

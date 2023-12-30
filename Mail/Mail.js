@@ -138,7 +138,7 @@ class Mail {
         let Files = [];
         if (Options.Files.length > 0) {
             Options.Files.forEach((File, I) => {
-                console.log('nuevo archivo cargado');
+                Debug.Log('nuevo archivo cargado');
                 Files[I] = FS.readFileSync(File.Path).toString('base64');
             });
         }
