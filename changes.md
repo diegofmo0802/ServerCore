@@ -12,6 +12,8 @@
 **Añadido**
   - Mail: Se añadió como exportación Beta.
   - JsonWT: Se añadió como exportación Beta.
+  - Utilities: Se creo para añadir variables o códigos útiles, tales como la ruta principal del modulo 
+    aunque esta cambie.
 **Eliminado**
   - Tools: El comando CSV-To-JSON
 **Cambios**
