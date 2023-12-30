@@ -44,7 +44,7 @@ Para instalar la version en desarrollo:
 ```console
 mpm install saml.servercore@Dev
 ```
-> [!WARN]
+> [!WARNING]
 > - Esta version podría contener errores.
 > - Contiene la version mas reciente del proyecto.
 > - Para acceder a las funciones en desarrollo sin añadir mencionadas en changes.md
