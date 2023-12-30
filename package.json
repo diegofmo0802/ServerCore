@@ -1,6 +1,6 @@
 {
   "name": "saml.servercore",
-  "version": "3.4.2-Dev.1",
+  "version": "3.4.2-Dev.3",
   "description": "a module for http/s and ws/s servers",
   "type": "module",
   "main": "ServerCore.js",
@@ -19,9 +19,10 @@
     "url": "https://github.com/diegofmo0802/ServerCore"
   },
   "files": [
-    "README.me",
+    "README.md",
     "LICENSE",
     "changes.md",
+    "Notes.md",
     "ServerCore.js",
     "ServerCore.d.ts",
     "ConsoleUI/",
