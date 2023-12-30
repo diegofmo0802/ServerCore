@@ -93,11 +93,13 @@ class Server {
 		}
 		// @ts-ignore
 		let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
+		this.AddFolder('/Saml:Global', `${ProcessDir}/../Global`);
+		/* this.AddFolder('/Saml:Global', '')
 		this.Rules.push({
 			Method: 'ALL', Type: 'Folder', Url: '/Saml:Global', Options: {
 				Source: `${ProcessDir}/../Global`
 			}
-		});
+		}); */
 	}
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.

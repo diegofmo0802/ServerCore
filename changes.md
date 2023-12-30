@@ -12,6 +12,8 @@
 **Añadido**
   - Mail: Se añadió como exportación Beta.
   - JsonWT: Se añadió como exportación Beta.
+**Eliminado**
+  - Tools: El comando CSV-To-JSON
 **Cambios**
   - Server: El orden de los parámetros de AddFile, AddAction y AddWebSocket.
   - Session: El atributo `path` por defecto de la cookie SS_UUID se cambio a `/` para ajustarse al
