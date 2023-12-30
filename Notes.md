@@ -1,2 +1,2 @@
-- Eliminar comentarios en el futuro: [Server/WebSocket.d.ts] LN(25, 26)
+- Eliminar comentarios en el futuro: [Server/Server.js]      LN(249)
 - Añadir comprobaciones para AddFile, AddFolder, AddAction, AddWebSocket: [Server/Server.js]

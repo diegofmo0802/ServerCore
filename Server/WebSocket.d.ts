@@ -21,9 +21,9 @@ export class WebSocket /* extends EVENTS */ {
     public constructor(Client: Duplex);
     /**
      * Acepta la conexión del cliente.
-    */
-    // * @param AcceptKey La llave de conexión `sec-websocket-key`.
-    public AcceptConnection(/* AcceptKey: string */): void;
+	 * @param AcceptKey La llave de conexión `sec-websocket-key`.
+     */
+    public AcceptConnection(AcceptKey: string): void;
     /**
 	 * Envía un dato como respuesta.
 	 * @param Datum El dato que se enviara.
