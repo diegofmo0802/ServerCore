@@ -40,6 +40,20 @@ Primero debemos instalar el modulo usando
 mpm install saml.servercore
 ```
 
+Para instalar la version en desarrollo:
+```console
+mpm install saml.servercore@Dev
+```
+> [!WARN]
+> - Esta version podría contener errores.
+> - Contiene la version mas reciente del proyecto.
+> - Para acceder a las funciones en desarrollo sin añadir mencionadas en changes.md
+    ```js
+    import { Beta } from 'saml.servercore'
+    const Mail = Beta.Mail;
+    const JsonWT = Beta.JsonWT;
+    ```
+
 También es necesario que en tu package.json este el proyecto como type: module
 ```json
 {
