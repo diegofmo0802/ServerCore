@@ -6,10 +6,8 @@
 
 import FS from 'fs';
 import PATH from 'path';
-import URL from 'url';
 
-import Template from '../Template/Template.js';
-import Server from './Server.js';
+import Server, { Utilities, Template } from '../ServerCore.js';
 
 class Response {
 	/**@type {Server.Request} Contiene la petición que recibió el servidor. */
@@ -20,7 +18,7 @@ class Response {
 	HTTPResponse = null;
 	/**
 	 * Crea la forma de Respuesta de `Saml/Servidor`.
-	 * @param {typeof Server.Request} Request La petición que recibió el servidor.
+	 * @param {Server.Request} Request La petición que recibió el servidor.
 	 * @param {import('http').ServerResponse} HTTPResponse La respuesta que dará el servidor.
 	 * @param {Server.Templates?} Templates El listado de plantillas de respuesta del servidor.
 	 */
@@ -146,9 +144,7 @@ class Response {
 							Carpeta: Folder
 						});
 					} else {
-						// @ts-ignore
-						let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
-						this.SendTemplate(`${ProcessDir}/../Global/Template/Folder.HSaml`, {
+						this.SendTemplate(`${Utilities.Path.ModuleDir}\\Global\\Template\\Folder.HSaml`, {
 							Url: Request.Url,
 							Carpeta: Folder
 						});
@@ -212,9 +208,7 @@ class Response {
 				this.Send(`Error: ${Code} -> ${Message}`);
 			});
 		} else {
-			// @ts-ignore
-			let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
-			Template.Load(`${ProcessDir}/../Global/Template/Error.HSaml`, {
+			Template.Load(`${Utilities.Path.ModuleDir}\\Global\\Template\\Error.HSaml`, {
 				Código: Code, Mensaje: Message
 			}).then((Template) => {
 				this.SendHeaders(Code, this.GenerateHeaders('html'));

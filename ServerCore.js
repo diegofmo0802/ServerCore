@@ -9,6 +9,7 @@
 import Debug from "./Debug/Debug.js";
 import Template from "./Template/Template.js";
 import ServerCore from "./Server/Server.js";
+import Utilities from "./Utilities/Utilities.js";
 
 // Utilidades en desarrollo y sin añadir (Beta).
 import JsonWT from "./JsonWT/JsonWT.js";
@@ -21,7 +22,7 @@ const Beta = {
 
 // Exportación de utilidades.
 export {
-	Debug, Template, ServerCore, Beta
+	Debug, Template, ServerCore, Utilities, Beta
 };
 
 // Exportación por defecto de ServerCore.

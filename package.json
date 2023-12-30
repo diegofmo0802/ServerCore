@@ -30,7 +30,8 @@
     "JsonWT/",
     "Mail/",
     "Server/",
-    "Template/"
+    "Template/",
+    "Utilities/"
   ],
   "keywords": [
     "diegofmo0802",

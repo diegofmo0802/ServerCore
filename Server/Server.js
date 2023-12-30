@@ -8,10 +8,9 @@
 import FS from 'fs';
 import HTTP from 'http';
 import HTTPS from 'https';
-import PATH from 'path';
-import URL from 'url';
 
-import Debug from '../Debug/Debug.js';
+import { Utilities, Debug } from "../ServerCore.js"
+
 import Request from "./Request.js";
 import Response from "./Response.js";
 import Session from "./Session.js";
@@ -91,9 +90,7 @@ class Server {
 				if (HttpStarted) Debug.Log('&B(255,180,220)&C0---------------------------------');
 			});
 		}
-		// @ts-ignore
-		let ProcessDir = PATH.dirname(URL.fileURLToPath(import.meta.url));
-		this.AddFolder('/Saml:Global', `${ProcessDir}/../Global`);
+		this.AddFolder('/Saml:Global', `${Utilities.Path.ModuleDir}\\Global`);
 		/* this.AddFolder('/Saml:Global', '')
 		this.Rules.push({
 			Method: 'ALL', Type: 'Folder', Url: '/Saml:Global', Options: {
