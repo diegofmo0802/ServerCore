@@ -5,6 +5,8 @@
 
 ## 3.4
 
+### 3.4.3
+
 ### 3.4.2
 **Correcciones**
   - Mail: error de tipos para la función SendMail.
