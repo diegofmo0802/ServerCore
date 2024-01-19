@@ -9,6 +9,7 @@
 **Correcciones**
   - Mail: error de tipos para la función SendMail.
   - Mail: error de importación de Debug.
+  - JsonWT: error de coincidencias entre los tipos y los return de GetContent (Head y body eran objetos y no Maps).
 **Añadido**
   - Mail: Se añadió como exportación Beta.
   - JsonWT: Se añadió como exportación Beta.

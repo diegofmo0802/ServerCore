@@ -93,11 +93,11 @@ class JsonWT {
         let [HeadB64, BodyB64, Signature] = JWT.split('.');
         let Head, Body;
         try {
-            Head = JSON.parse(JsonWT.Base64UrlDecode(HeadB64));
-            Body = JSON.parse(JsonWT.Base64UrlDecode(BodyB64));
+            Head = new Map(Object.entries(JSON.parse(JsonWT.Base64UrlDecode(HeadB64))));
+            Body = new Map(Object.entries(JSON.parse(JsonWT.Base64UrlDecode(BodyB64))));
         } catch {
-            Head = {};
-            Body = {};
+            Head = new Map();
+            Body = new Map();
         }
         return { Head, Body, Verify, Signature };
     }
