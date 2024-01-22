@@ -13,7 +13,7 @@ export class WebSocket /* extends EVENTS */ {
     /**Contiene la conexión con el cliente. */
     private Connection: Duplex;
     /**Contiene la SS_UUID de la sesión asociada al WebSocket. */
-    public SS_UUID: string;
+    public SessionID: string;
     /**
      * Crea una conexión WebSocket.
      * @param Client La conexión Duplex con el cliente.

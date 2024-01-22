@@ -266,7 +266,7 @@ class Server {
 			'[Petición]:',
 			Request.IP,
 			Request.Method,
-			Request.Url, Request.Cookies.Get('SS_UUID')
+			Request.Url, Request.Cookies.Get('Session')
 		);
 		this.Route(Request, Response);
 	};
@@ -280,12 +280,12 @@ class Server {
 		let Request = new Server.Request(HttpRequest);
 		let WebSocket = new Server.WebSocket(Socket);
 		Request.Session = new  Server.Session(Request);
-		if (!(Request.Cookies.Has('SS_UUID'))) WebSocket.SS_UUID = Request.Session.GetID();
+		if (!(Request.Cookies.Has('Session'))) WebSocket.SessionID = Request.Session.GetID();
 		Debugs.Upgrades.Log(
 			'[WebSocket]:',
 			Request.IP,
 			Request.Method,
-			Request.Url, Request.Cookies.Get('SS_UUID')
+			Request.Url, Request.Cookies.Get('Session')
 		);
 		this.RouteWebSocket(Request, WebSocket);
 	};

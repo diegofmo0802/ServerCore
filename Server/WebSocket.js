@@ -11,7 +11,7 @@ class WebSocket extends EVENTS {
     /**@type {import('stream').Duplex} Contiene la conexión con el cliente. */
     Connection = null;
     /**@type {string} Contiene la SS_UUID de la sesión asociada al WebSocket. */
-    SS_UUID = null;
+    SessionID = null;
     /**
      * Crea una conexión WebSocket.
      * @param {import('stream').Duplex} Client La conexión Duplex con el cliente.
@@ -34,8 +34,8 @@ class WebSocket extends EVENTS {
             + 'Upgrade: websocket\r\n'
             + 'Connection: Upgrade\r\n'
             + `Sec-WebSocket-Accept: ${Pass}\r\n`
-            + (this.SS_UUID
-            ? `Set-Cookie: SS_UUID=${this.SS_UUID}; secure; httpOnly;\r\n`
+            + (this.SessionID
+            ? `Set-Cookie: SS_UUID=${this.SessionID}; secure; httpOnly;\r\n`
             : '')
             + '\r\n'
         );

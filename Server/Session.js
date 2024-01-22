@@ -13,7 +13,7 @@ class Session extends EVENTS {
     /**@type {Map<string, Session>} Contiene las instancias de session. */
     static Sessions = new Map();
     /**@type {string} Contiene la SS_UUID de la sesión. */
-    SS_UUID = null;
+    SessionID = null;
     /**
      * Crea/Recupera una instancia de sesión.
      * @param {import('../ServerCore').default.Request} Request La petición que recibió el servidor.
@@ -26,13 +26,13 @@ class Session extends EVENTS {
             if (Session.Sessions.has(SS_UUID)) {
                 return Session.Sessions.get(SS_UUID);
             } else {
-                this.SS_UUID = SS_UUID;
+                this.SessionID = SS_UUID;
             }
         } else {
-            this.SS_UUID = CRYPTO.randomUUID();
+            this.SessionID = CRYPTO.randomUUID();
         }
-        Session.Sessions.set(this.SS_UUID, this);
-        Request.Cookies.Set('Session', this.SS_UUID, {
+        Session.Sessions.set(this.SessionID, this);
+        Request.Cookies.Set('Session', this.SessionID, {
             Secure: true, HttpOnly: true, Path: '/', Expires: (() => {
                 let Fecha = new Date();
                 Fecha.setFullYear(Fecha.getFullYear() + 1);
@@ -42,9 +42,9 @@ class Session extends EVENTS {
     }
     
     /**
-     * Devuelve el SS_UUID de la sesión.
+     * Devuelve el SessionID de la sesión.
     */
-    GetID() { return this.SS_UUID; };
+    GetID() { return this.SessionID; };
     /**
      * Comprueba si un dato existe en la sesión.
      * @param {string} Name El nombre (key) del dato que desea buscar.

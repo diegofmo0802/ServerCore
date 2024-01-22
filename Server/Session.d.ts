@@ -23,7 +23,7 @@ export class Session {
     /**Contiene las instancias de session. */
     private static Sessions: Map<string, Session>;
     /**Contiene la SS_UUID de la sesión. */
-    private SS_UUID: string;
+    private SessionID: string;
     /**
      * Crea/Recupera una instancia de sesión.
      * - si no se pasa el parámetro `Respuesta` No se establecerá la cookie `SS_UUID` y deberás hacerlo manualmente.
