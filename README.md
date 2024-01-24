@@ -230,6 +230,16 @@ Server.AddRules({
 ```
 
 # Version Dev
+
+## En desarrollo
+
+En el momento están en desarrollo:
+- [JsonWT]: El uso de Json Web Tokens.
+- [Mail]: El envió de E-Mails.
+- [Server]: El sistema de autenticación dinámico para las reglas de enrutamiento.
+
+## Instalación
+
 Para instalar la version en desarrollo:
 ```console
 mpm install saml.servercore@Dev

@@ -20,6 +20,9 @@ export namespace Server {
 	export import Session = __Session
 	export import WebSocket = __WebSocket
     namespace Rule {
+		namespace Base {
+			type AuthExec = (Request: Request) => boolean;
+		}
 		namespace Action {
 			type Exec = (Request: Request, Response: Response) => void;
 		}
@@ -29,6 +32,9 @@ export namespace Server {
         type Base = {
             Method: Request.Method,
             Url: string
+			Options: {
+				Auth?: Base.AuthExec
+			}
         };
         type Action = Base & {
             Type: 'Action',
@@ -58,6 +64,11 @@ export namespace Server {
             }
         };
     }
+	type SSLOptions = {
+        Public: string,
+		Private: string,
+		Port?: number
+    };
     type Templates = {
         Error?: string,
         Folder?: string
@@ -94,9 +105,7 @@ export class Server {
 	 * @param Host El host donde el servidor recibirá peticiones.
 	 * @param SSL La configuración SSL.
 	 */
-	public constructor(Port?: number, Host?: string, SSL?: {
-        Public: string, Private: string, Port?: number
-    });
+	public constructor(Port?: number, Host?: string, SSL?: Server.SSLOptions);
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.
 	 * @param Rules La regla/s que desea añadir.
@@ -108,28 +117,32 @@ export class Server {
 	 * @param Url La url donde escuchara la acción.
 	 * @param Action La acción que se ejecutara.
 	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddAction(Method: Server.Request.Method, Url: string, Action: Server.Rule.Action.Exec, AllRoutes?: boolean): Server;
+	public AddAction(Method: Server.Request.Method, Url: string, Action: Server.Rule.Action.Exec, AllRoutes?: boolean, Auth?: Server.Rule.Base.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de archivo.
 	 * @param Url La url donde escuchara la acción.
 	 * @param Source La Ruta del archivo que desea enviar.
 	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddFile(Url: string, Source: string, AllRoutes?: boolean): Server;
+	public AddFile(Url: string, Source: string, AllRoutes?: boolean, Auth?: Server.Rule.Base.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de carpeta.
 	 * @param Url La url donde escuchara la acción.
 	 * @param Source La Ruta del directorio que desea enviar.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddFolder(Url: string, Source: string): Server;
+	public AddFolder(Url: string, Source: string, Auth?: Server.Rule.Base.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de WebSocket.
 	 * @param Url La url donde escuchara la petición de conexión.
 	 * @param Action La acción que se ejecutara.
 	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddWebSocket(Url: string, Action: Server.Rule.WebSocket.Exec, AllRoutes?: boolean): Server;
+	public AddWebSocket(Url: string, Action: Server.Rule.WebSocket.Exec, AllRoutes?: boolean, Auth?: Server.Rule.Base.AuthExec): Server;
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param Template El nombre de la plantilla.

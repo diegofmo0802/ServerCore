@@ -24,6 +24,10 @@ export class WebSocket /* extends EVENTS */ {
 	 * @param AcceptKey La llave de conexión `sec-websocket-key`.
      */
     public AcceptConnection(AcceptKey: string): void;
+    /** Finaliza la conexión esperando a que se terminen de enviar/recibir los datos pendientes. */
+    End(): void;
+    /** Finaliza la conexión de forma abrupta. */
+    Destroy(): void;
     /**
 	 * Envía un dato como respuesta.
 	 * @param Datum El dato que se enviara.

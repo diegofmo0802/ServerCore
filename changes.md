@@ -3,6 +3,11 @@
 - Mail: acceso desde (saml.servercore/Mail/Mail.js)
 - JsonWT: acceso desde (saml.servercore/JsonWT/JsonWT.js)
 
+## 3.6
+
+**Añadido**
+- Server: Al crear reglas de enrutamiento puedes poner una verificación de autenticación.
+
 ## 3.5
 
 **La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones

@@ -16,12 +16,17 @@ const Server = new ServerCore(Env.Port, Env.Host);
 
 // Creando reglas de enrutamiento.
 Server.AddFile('/File', 'changes.md')
+.AddFile('/FileWA', 'changes.md', false,
+    (Request) => Request.GET.has('Auth') && Request.GET.get('Auth') == 'AuthYes'
+)
 .AddFolder('/Folder', '.Debug')
 .AddAction('ALL', '/', (Rq, Rs) => {
     Rs.SendTemplate('Test/Test.HSaml', {
         Tittle: '[Saml] · Tests',
         Sources: {
             File: '/File',
+            FileWithAuthFunction_NoAuth: '/FileWA',
+            FileWithAuthFunction_Auth: '/FileWA?Auth=AuthYes',
             Folder: '/Folder',
             WebSocket: '/WebSocket',
             "WebSocket Online": '/WebSocket2'
