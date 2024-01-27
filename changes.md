@@ -12,7 +12,11 @@
 
 **La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones
 
-# 3.5.1
+### 3.5.2
+  **Correcciones**
+  - Cookie: La función 'Del' no eliminaba correctamente las cookies.
+
+### 3.5.1
 
 **Correcciones**
   - El anterior uso de SS_UUID ahora es SessionID, el no haber hecho este cambio antes hizo que no apareciese el SessionID en los log de las peticiones HTTP y WebSocket

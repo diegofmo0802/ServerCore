@@ -51,7 +51,7 @@ class Cookie {
         let Setters = [];
         this.SetNow.forEach((Value, Name) => {
             if (Value.Delete == true) {
-                Setters.push(`${Name}=None;Expires=${(new Date).toUTCString()}`);
+                Setters.push(`${Name}=None;Path=/;Expires=${(new Date).toUTCString()}`);
             } else {
                 let Setter = `${Name}=${Value.Value}`;
                 Setter += Value.Domain   ? `;Domain=${Value.Domain}`                 : '';
