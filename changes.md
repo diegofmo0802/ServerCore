@@ -9,7 +9,7 @@
 
 ### 3.5.2
   **Correcciones**
-  - Cookie: La función `Del` no eliminaba correctamente las cookies.
+  - Cookie: La función 'Del' no eliminaba correctamente las cookies.
 
 ### 3.5.1
 
