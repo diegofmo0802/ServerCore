@@ -7,6 +7,7 @@
 
 **Añadido**
 - Server: Al crear reglas de enrutamiento puedes poner una verificación de autenticación.
+- Utilities: Se agrego a Patch la función Relative que convierte una ruta relativa a completa (Relativa desde el ModuleDir).
 
 ## 3.5
 
