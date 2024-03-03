@@ -13,6 +13,11 @@
 
 **La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones
 
+### 3.5.3
+  **Correcciones**
+  - Las carpetas no cargaban de forma adecuada ni su contenido
+  - La regla Folder que exponía el contenido global de saml esta en funcionamiento /Saml:Global
+
 ### 3.5.2
   **Correcciones**
   - Cookie: La función 'Del' no eliminaba correctamente las cookies.

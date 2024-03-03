@@ -10,13 +10,21 @@ class Path {
         this.ModuleMain = PATH.join(this.ModuleDir, 'ServerCore.js');
     }
     /**
-     * Convierte una ruta relativa en una completa.
-     * - Por el momento solo se admite `/` en lugar de `\`
-     * @param {string} Path La ruta relativa.
+     * Limpia una ruta.
+     * - Transforma las `\` en `/`
+     * @param {string} Path La ruta que desea limpiar.
      */
-    Relative(Path) {
+    Normalize(Path) {
         Path = Path.replace(/[\\/]/gi, PATH.sep);
-        Path = PATH.join(this.ModuleDir, Path);
+        return Path;
+    }
+    /**
+     * Convierte una ruta relativa en una completa.
+     * @param {string} Path La ruta relativa.
+    */
+   Relative(Path) {
+        Path = this.Normalize(Path);
+        Path =  PATH.join(this.ModuleDir, Path);
         return PATH.normalize(Path);
     }
 }

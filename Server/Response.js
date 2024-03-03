@@ -75,6 +75,7 @@ class Response {
 	 * @returns {void}
 	 */
 	SendFile(Path) {
+		Path = Utilities.Path.Normalize(Path);
 		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
@@ -129,6 +130,7 @@ class Response {
 		Path += Request.Url.slice(Rule.Url.length);
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
 		//Saml.Debug.Log('[Enrutador - Carpeta]:', Petición.Url, Ruta);
+		Path = Utilities.Path.Normalize(Path);
 		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
@@ -174,6 +176,7 @@ class Response {
 	 * @returns {void}
 	 */
 	SendTemplate(Path, Data) {
+		Path = Utilities.Path.Normalize(Path);
 		Template.Load(Path, Data).then((Template) => {
 			this.SendHeaders(200, this.GenerateHeaders('html'));
 			this.Send(Template, 'utf-8');
