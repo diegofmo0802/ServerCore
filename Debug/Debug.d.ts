@@ -27,6 +27,8 @@ export class Debug {
 	public static Debugs: Debug.Debugs;
 	/**Contiene el indicador `Mostrar todo en consola`. */
 	public static ShowAll: boolean;
+	/**El ID de la instancia de Debug. */
+	private ID: string;
 	/**Contiene el nombre del archivo `.DSaml`. */
 	private File: string;
 	/**Contiene la ruta de la Carpeta de Debug. */
@@ -50,7 +52,9 @@ export class Debug {
 	 * @param Path La Ruta de la carpeta donde se almacenaran los Log`s.
 	 * @param InConsole El indicador de `Mostrar en consola`.
 	 */
-	public constructor(ID?: string, Path?: string, InConsole?: boolean);
+	public constructor(ID?: string, Path?: string, InConsole?: boolean, InFile?: boolean);
+	/** Crea el stream para el Debug. */
+	private InitStream(): void;
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
 	 * @param Data Los datos a mostrar y almacenar.
