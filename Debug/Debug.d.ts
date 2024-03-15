@@ -35,6 +35,8 @@ export class Debug {
 	private Folder: string;
 	/**Contiene el indicador `Mostrar en consola`. */
 	private InConsole: boolean;
+	/**Contiene el indicador `Mostrar en consola`. */
+	private InFile: boolean;
 	/**Contiene la fecha en la que inicio el Debug. */
 	private StartDate: Debug.Date;
 	/**Contiene la ruta del archivo `.DSaml`. */
@@ -72,6 +74,9 @@ export class Debug {
 	 * @param Data Los datos a mostrar y almacenar.
 	 */
 	public Log(...Data: any): void
+	
+	/** Crea un prefijo de Debug con la hora del momento de su llamado. */
+	public static GetPrefix(): string;
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
 	 * @param Data Los datos a mostrar y almacenar.

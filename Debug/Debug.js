@@ -18,9 +18,9 @@ class Debug {
 	File = null;
 	/**@private @type {string} Contiene la ruta de la Carpeta de Debug. */
 	Folder = null;
-	/**@type {boolean} Contiene el indicador `Mostrar en consola`. */
+	/**@private @type {boolean} Contiene el indicador `Mostrar en consola`. */
 	InConsole = null;
-	/**@type {boolean} Contiene el indicador `Mostrar en consola`. */
+	/**@private @type {boolean} Contiene el indicador `Mostrar en consola`. */
 	InFile = null;
 	/**@private @type {import('./Debug.js').Debug.ActDate} Contiene la fecha en la que inicio el Debug. */
 	StartDate = null;
@@ -61,7 +61,14 @@ class Debug {
 	 * Define si se guardaran los logs en un archivo.
 	 * @param {boolean} InFile El estado en el que estará.
 	 */
-	SetInFile(InFile = false) { this.InFile = InFile; }
+	SetInFile(InFile = false) {
+		this.InFile = InFile;
+		if (this.InFile) this.InitStream();
+		else {
+			this.Stream.destroy();
+			this.Stream = null;
+		}
+	}
 	/** Crea el stream para el Debug. */
 	InitStream() {
 		this.File = `[${this.ID}] ${this.StartDate.Hour}.${this.StartDate.Minute}.${this.StartDate.Second}.${this.StartDate.MiliSecond}.DSaml`;
@@ -76,7 +83,10 @@ class Debug {
 		this.Stream.write('/*+----------------------------+*/\n');
 		this.Stream.write(`/*the name of the DebugFile is the DateTime of initialize Debug with ID ${this.ID}*/\n`);
 		this.Stream.write(`/*the initialize stream DateTime is ${Fecha.DDMMYYYY} << ${Fecha.HHMMSSmmm}*/\n`);
-		if (this.InFile) this.Log(`Debug: [${this.ID}] --| Guardado en |-> ${this.Path}`);
+		if (this.InFile) {
+			const Prefix = Debug.GetPrefix();
+			console.log(ConsoleUI.GenerateFormat(`&B(255,0,0)&C(255,255,0)${Prefix}&R Debug: [${this.ID}] --| Guardado en |-> ${this.Path}`));
+		}
 	}
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
@@ -84,10 +94,9 @@ class Debug {
 	 * @returns {void}
 	 */
 	Log(...Data) {
-		let ActDate = Debug.GetDate();
-		let Prefix = `[${ActDate.Hour}:${ActDate.Minute}:${ActDate.Second}:${ActDate.MiliSecond}]`;
+		const Prefix = Debug.GetPrefix();
 		if (this.InFile) {
-			if (this. Stream || this.Stream.destroyed) this.InitStream();
+			if (! this.Stream || this.Stream.destroyed) this.InitStream();
 			this.Stream.write(`${Prefix} -> ${JSON.stringify((() => {
 				let Result = [];
 				Data.forEach((Datum) => {
@@ -118,6 +127,15 @@ class Debug {
 	static Log(...Data) {
 		if (! (this.Debugs.has('_Debug'))) new Debug();
 		this.Debugs.get('_Debug').Log(...Data);
+	}
+	/**
+	 * Crea un prefijo de Debug con la hora del momento de su llamado.
+	 * @returns {string}
+	 */
+	static GetPrefix() {
+		const ActDate = Debug.GetDate();
+		const Prefix = `[${ActDate.Hour}:${ActDate.Minute}:${ActDate.Second}:${ActDate.MiliSecond}]`;
+		return Prefix;
 	}
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm
