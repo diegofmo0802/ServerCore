@@ -1,10 +1,14 @@
-import ServerCore, { Debug } from "../ServerCore.js";
+import ServerCore, { Debug, Config } from "../ServerCore.js";
 
+Config.SetShowDebug({
+    Mail: true,
+    Requests: true,
+    Server: true,
+    UpgradeRequests: true
+});
 
 // Preparación previa a los test`s
-Debug.ShowAll = true;
 const $Test = new Debug('Test', 'Test/.Debug');
-
 
 const Env = {
     Port: 3000,
