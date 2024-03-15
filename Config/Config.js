@@ -19,14 +19,26 @@ const Config = new class Config {
      * Establece la configuración de ShowDebug
      * @param {import('./Config').default.Debug} Config La configuración.
      */
-	SetShowDebug(Config) { this.ShowDebug = Config; }
-    /** devuelve la configuración de ShowDebug */
-	GetShowDebug() { return this.ShowDebug }
+	SetShowDebug(Config) {
+        this.ShowDebug = Config;
+        this.Debugs.Mail.SetInCOnsole(this.ShowDebug.Mail ?? false);
+        this.Debugs.Requests.SetInCOnsole(this.ShowDebug.Requests ?? false);
+        this.Debugs.Server.SetInCOnsole(this.ShowDebug.Server ?? false);
+        this.Debugs.UpgradeRequests.SetInCOnsole(this.ShowDebug.UpgradeRequests ?? false);
+    }
     /**
      * Establece la configuración de SaveDebug
      * @param {import('./Config').default.Debug} Config La configuración.
      */
-	SetSaveDebug(Config) { this.SaveDebug = Config; }
+	SetSaveDebug(Config) {
+        this.SaveDebug = Config;
+        this.Debugs.Mail.SetInFile(this.SaveDebug.Mail ?? false);
+        this.Debugs.Requests.SetInFile(this.SaveDebug.Requests ?? false);
+        this.Debugs.Server.SetInFile(this.SaveDebug.Server ?? false);
+        this.Debugs.UpgradeRequests.SetInFile(this.SaveDebug.UpgradeRequests ?? false);
+    }
+    /** devuelve la configuración de ShowDebug */
+	GetShowDebug() { return this.ShowDebug }
     /** devuelve la configuración de SaveDebug */
 	GetSaveDebug() { return this.SaveDebug }
 }
