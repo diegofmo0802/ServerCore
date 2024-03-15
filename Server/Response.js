@@ -7,7 +7,9 @@
 import FS from 'fs';
 import PATH from 'path';
 
-import Server, { Utilities, Template } from '../ServerCore.js';
+import Server from './Server.js';
+import Utilities from '../Utilities/Utilities.js';
+import Template from '../Template/Template.js';
 
 class Response {
 	/**@type {Server.Request} Contiene la petición que recibió el servidor. */

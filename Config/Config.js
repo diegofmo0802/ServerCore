@@ -1,4 +1,4 @@
-import { Debug } from '../ServerCore';
+import Debug from '../Debug/Debug.js';
 
 const Config = new class Config {
     /** @type {import('./Config').default.Debug} Define que se muestra en consola */

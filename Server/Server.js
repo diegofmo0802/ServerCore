@@ -9,7 +9,9 @@ import FS from 'fs';
 import HTTP from 'http';
 import HTTPS from 'https';
 
-import { Utilities, Debug } from "../ServerCore.js"
+import Utilities from '../Utilities/Utilities.js';
+import Debug from '../Debug/Debug.js';
+import Config from '../Config/Config.js';
 
 import Request from "./Request.js";
 import Response from "./Response.js";
@@ -17,8 +19,8 @@ import Session from "./Session.js";
 import WebSocket from "./WebSocket.js";
 
 const Debugs = {
-	Requests: new Debug('Srv.Requests', '.Debug/Requests', false),
-	Upgrades: new Debug('Srv.UpgradeRequests', '.Debug/UpgradeRequests', false)
+	Requests: Config.Debugs.Requests,
+	Upgrades: Config.Debugs.UpgradeRequests
 };
 
 class Server {

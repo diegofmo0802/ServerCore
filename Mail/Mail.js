@@ -5,13 +5,14 @@
  */
 
 import Debug from '../Debug/Debug.js';
+import Config from '../Config/Config.js';
 
 import TLS from 'tls';
 import NET from 'net';
 import FS from 'fs';
 import CRYPTO from 'crypto';
 
-const $Mail = new Debug('Mail', '.Debug/Mail');
+const $Mail = Config.Debugs.Mail;
 
 class Mail {
     /** @type {string} */
