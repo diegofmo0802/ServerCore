@@ -39,6 +39,8 @@ export class Debug {
 	private StartDate: Debug.Date;
 	/**Contiene la ruta del archivo `.DSaml`. */
 	private Path: string;
+	/**Contiene la ruta del archivo `.DSaml`. */
+	private RootPath: string;
 	/**Contiene el Stream del archivo `.DSaml`.*/
 	private Stream: WriteStream;
 	/**
@@ -53,6 +55,16 @@ export class Debug {
 	 * @param InConsole El indicador de `Mostrar en consola`.
 	 */
 	public constructor(ID?: string, Path?: string, InConsole?: boolean, InFile?: boolean);
+	/**
+	 * Define si se mostrará en consola o no.
+	 * @param InConsole El estado en el que estará.
+	 */
+	SetInCOnsole(InConsole: boolean): void;
+	/**
+	 * Define si se guardaran los logs en un archivo.
+	 * @param InFile El estado en el que estará.
+	 */
+	SetInFile(InFile: boolean): void;
 	/** Crea el stream para el Debug. */
 	private InitStream(): void;
 	/**

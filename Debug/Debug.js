@@ -26,6 +26,8 @@ class Debug {
 	StartDate = null;
 	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
 	Path = null;
+	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
+	RootPath = null;
 	/**@type {FS.WriteStream} Contiene el Stream del archivo `.DSaml`.*/
 	Stream = null;
 	/**
@@ -43,18 +45,29 @@ class Debug {
 		this.ID = ID;
 		Path = Path.startsWith('/') ? Path.slice(1) : Path;
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
+		this.RootPath = Path
 		this.InConsole = InConsole;
 		this.InFile = InFile;
 		this.StartDate = Debug.GetDate();
-		this.File = `[${ID}] ${this.StartDate.Hour}.${this.StartDate.Minute}.${this.StartDate.Second}.${this.StartDate.MiliSecond}.DSaml`;
-		this.Folder = `${Path}/[${this.StartDate.Day}.${this.StartDate.Month}.${this.StartDate.Year}]`;
-		this.Path = `${this.Folder}/${this.File}`;
-		if (! (FS.existsSync(this.Folder))) FS.mkdirSync(this.Folder, { recursive: true });
 		if (this.InFile) this.InitStream();
 		Debug.Debugs.set(ID, this);
 	}
+	/**
+	 * Define si se mostrará en consola o no.
+	 * @param {boolean} InConsole El estado en el que estará.
+	 */
+	SetInCOnsole(InConsole = false) { this.InConsole = InConsole; }
+	/**
+	 * Define si se guardaran los logs en un archivo.
+	 * @param {boolean} InFile El estado en el que estará.
+	 */
+	SetInFile(InFile = false) { this.InFile = InFile; }
 	/** Crea el stream para el Debug. */
 	InitStream() {
+		this.File = `[${this.ID}] ${this.StartDate.Hour}.${this.StartDate.Minute}.${this.StartDate.Second}.${this.StartDate.MiliSecond}.DSaml`;
+		this.Folder = `${this.RootPath}/[${this.StartDate.Day}.${this.StartDate.Month}.${this.StartDate.Year}]`;
+		this.Path = `${this.Folder}/${this.File}`;
+		if (! (FS.existsSync(this.Folder))) FS.mkdirSync(this.Folder, { recursive: true });
 		const Fecha = Debug.GetDate();
 		this.Stream = FS.createWriteStream(this.Path, 'utf8');
 		this.Stream.write('/*+----------------------------+*/\n');
