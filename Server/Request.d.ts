@@ -9,28 +9,26 @@ import Cookie from './Cookie.js';
 import Session from './Session.js';
 
 export namespace Request {
-    type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'ALL';
-    type GET = Map<string, any>;
-    type POST = {
-        Files: Map<string, {
+	namespace POST {
+		type File = Map<string, {
             File: Buffer,
             Name: string,
             Size: number
             Type: string
-        }>,
-        Unknown?: Buffer | String;
-        Errors?: Array<String | Error>
-        MimeType: (
-            'application/json' |
-            'application/octet-stream' |
-            'application/xml' |
-            'application/x-www-form-urlencoded' |
-            'multipart/form-data' |
-            'text/plain' |
-            'Unknown'
-        ),
-        Variables: Map<string, any>
-    }
+        }>;
+	}
+    type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'ALL';
+    type GET = Map<string, any>;
+    type POST = (
+		{ MimeType: 'application/json',                  Content: any } |
+        { MimeType: 'application/x-www-form-urlencoded', Content: Map<string, string> } |
+		{ MimeType: 'text/plain',                        Content: string } |
+		{ MimeType: 'Unknown',                           Content: Buffer } |
+        { MimeType: 'multipart/form-data',               Content: {
+			Files: Map<string, POST.File>,
+			Vars: Map<string, string>
+		} }
+	);
 }
 export class Request {
 	/**Contiene los encabezados de la petición. */
