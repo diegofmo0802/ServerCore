@@ -87,7 +87,7 @@ class Debug {
 		let ActDate = Debug.GetDate();
 		let Prefix = `[${ActDate.Hour}:${ActDate.Minute}:${ActDate.Second}:${ActDate.MiliSecond}]`;
 		if (this.InFile) {
-			if (this.Stream.destroyed) this.InitStream();
+			if (this. Stream || this.Stream.destroyed) this.InitStream();
 			this.Stream.write(`${Prefix} -> ${JSON.stringify((() => {
 				let Result = [];
 				Data.forEach((Datum) => {
