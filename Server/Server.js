@@ -142,10 +142,9 @@ class Server {
 	 * Añade una regla de enrutamiento de WebSocket.
 	 * @param {string} UrlRule La url donde escuchara la petición de conexión.
 	 * @param {Rule.WebSocketExec} Action La acción que se ejecutara.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param {Rule.AuthExec} Auth La función de comprobación de autorización.
 	 */
-	AddWebSocket(UrlRule, Action, AllRoutes = false, Auth = null) {
+	AddWebSocket(UrlRule, Action, Auth = null) {
 		this.AddRules(new Rule('WebSocket', 'ALL', UrlRule, Action, Auth));
 		return this;
 	}

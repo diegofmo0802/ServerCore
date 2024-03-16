@@ -96,10 +96,9 @@ export class Server {
 	 * Añade una regla de enrutamiento de WebSocket.
 	 * @param UrlRule La url donde escuchara la petición de conexión.
 	 * @param Action La acción que se ejecutara.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
 	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddWebSocket(UrlRule: string, Action: Rule.WebSocketExec, AllRoutes?: boolean, Auth?: Rule.ActionExec): Server;
+	public AddWebSocket(UrlRule: string, Action: Rule.WebSocketExec, Auth?: Rule.ActionExec): Server;
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param Template El nombre de la plantilla.
