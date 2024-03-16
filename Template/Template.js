@@ -5,6 +5,7 @@
  */
 
 import FS from 'fs';
+import Utilities from '../Utilities/Utilities';
 
 class Template {
 	static Expressions = {
@@ -21,6 +22,7 @@ class Template {
 	 * @returns {Promise<string>}
 	 */
 	static Load(Path, Data) {
+		Path = Utilities.Path.Normalize(Path);
 		return new Promise((PrResponse, PrError) => {
 			FS.stat(Path, (Error, Details) => {
 				if (Error) return PrError(Error.message);
