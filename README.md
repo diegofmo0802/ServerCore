@@ -116,12 +116,44 @@ Los Métodos aceptados actualmente son:
 |DELETE|El método de petición `DELETE`.             |
 |ALL   |Todos los métodos anteriormente mencionados.|
 
-Tipos de cobertura:<br/>
+Como funciona la RuleUrl:<br/>
 
-|Cobertura|Descripción                                                        |
-|--------:|:------------------------------------------------------------------|
-|Complete |Toma todas las sub-rutas y no se podrán usar                       |
-|Partial  |Se toma solo esa ruta, las sub-rutas pueden ser usadas en otra cosa|
+Actualmente la RuleUrl acepta 2 características
+ - Comodín * toma todas las sub rutas incluyendo hasta antes de *
+   - para /test/* tomaría /test y todo lo demás como /test/algo-mas/x
+   - para /test2/*/Algo tomaría /Test2/(cualquier-cosa)/Algo
+     es como el comodín $ solo que no guardara en una variable
+ - Toma parámetros de la url usando $ seguido del nombre de la variable
+   y se puede acceder a ellas desde `Request.RuleParams`
+   **Ejemplo**:
+   ```js
+   Server.AddAction('ALL', '/User/$UserID/Post/$PostID', (Rq, Rs) => {
+        Rs.SendJSON({
+            Url: Rq.Url,
+            RuleParams: Rq.RuleParams
+        });
+        /* Esto devolverá lo siguiente si la ruta fuera /User/111111/Post/222222
+           {
+              "Url": "/User/111111/Post/222222"
+              "RuleParams": {
+                  "UserID": "111111",
+                  "PostID": "222222"
+              }
+           }
+        */
+    });
+   ```
+**AuthExec**
+Es una función que recibe como parámetro la petición del http
+esta debe retornar un valor booleano, true para decir que la petición esta autenticada y false para decir que no lo esta.
+**Ejemplo**:
+```js
+// si la petición se hace con el QueryParam Auth y es igual a AuthYes se confirmara la autenticidad de la petición
+Server.AddFile('/FileWA', 'changes.md', (Request) => {
+  return Request.GET.has('Auth') && Request.GET.get('Auth') == 'AuthYes'
+});
+```
+
 
 ### Carpeta
 
@@ -139,19 +171,26 @@ Comparte una carpeta y todo su contenido tanto archivos como sub-carpetas
 Para añadir este tipo de regla usa:
 
 ```js
-Server.AddRules({
-  Method: 'ALL', Url: '/',
-  Type: 'Folder', Options: {
-    Source: './src'
-  }
-});
+// Usando AddFile
+/*
+  Esta función acepta 3 parámetros:
+  UrlRule, Source, AuthExec.
+    AuthExec es opcional.
+*/
+Server.AddFile('/MyFolder', 'Test');
 
-Server.AddRules({
-  Method: 'ALL', Url: '/',
-  Type: 'Folder', Options: {
-    Source: './global'
-  }
-});
+
+// Usando el constructor de la clase Rule:
+// De esta manera tienes mayor control sobre la creación de la regla.
+.AddRules(
+  /*
+    este constructor acepta 5 parámetros para crearse correctamente:
+    Tipo, Método, UrlRule, Content, AuthExec.
+    AuthExec es opcional.
+  */
+  new ServerCore.Rule('File', 'GET', '/MyFolder/', 'Test/', () => true),
+);
+
 ```
 
 ### Archivo
@@ -159,21 +198,25 @@ Server.AddRules({
 Comparte un archivo especifico
 
 ```js
-Server.AddRules({
-  Method: 'GET', Url: '/',
-  Type: 'File', Options: {
-    Coverage: 'Complete',
-    Source: './'
-  }
-});
+// Usando AddFolder
+/*
+  Esta función acepta 3 parámetros:
+  UrlRule, Source, AuthExec.
+    AuthExec es opcional.
+*/
+Server.AddFolder('/MyFile', 'changes.md');
 
-Server.AddRules({
-  Method: 'GET', Url: '/',
-  Type: 'File', Options: {
-    Coverage: 'Partial',
-    Source: './'
-  }
-});
+
+// Usando el constructor de la clase Rule:
+// De esta manera tienes mayor control sobre la creación de la regla.
+.AddRules(
+  /*
+    este constructor acepta 5 parámetros para crearse correctamente:
+    Tipo, Método, UrlRule, Content, AuthExec.
+    AuthExec es opcional.
+  */
+  new ServerCore.Rule('File', 'GET', '/MyFile/*', 'changes.md', () => true),
+);
 ```
 
 ### Acción
@@ -181,19 +224,39 @@ Server.AddRules({
 Te permite tener total control sobre esas peticiones:
 
 ```js
-Server.AddRules({
-  Method: 'GET', Url: '/',
-  Type: 'Action', Options: {
-    Coverage: 'Partial',
-    Action: (Petición, Respuesta) => {
-      if (Petición.Cookies.has('User_ID')) {
-        Respuesta.Enviar("El User_ID que estas usando es:" + Petición.Cookies.get('User_ID'));
-      } else {
-        Respuesta.EnviarArchivo('./ErrorUsuario.html');
-      }
+// Usando AddAction
+/*
+  Esta función acepta 4 parámetros:
+  Método, UrlRule, Action, AuthExec.
+    AuthExec es opcional.
+*/
+Server.AddAction('GET', '/', (Request, Response) => {
+    if (Request.Cookies.has('User_ID')) {
+      Response.Send("El User_ID que estas usando es:" + Request.Cookies.get('User_ID'));
+    } else {
+      Response.SendFile('./ErrorUsuario.html');
     }
   }
-});
+);
+
+
+// Usando el constructor de la clase Rule:
+// En este caso no hay diferencia a usar AddAction e incluso deberás especificar el tipo.
+Server.AddRules(
+  /*
+    este constructor acepta 5 parámetros para crearse correctamente:
+    Tipo, Método, UrlRule, Content, AuthExec.
+    AuthExec es opcional.
+  */
+  new ServerCore.Rule('Action', 'GET', '/', (Request, Response) => {
+      if (Request.Cookies.has('User_ID')) {
+        Response.Send("El User_ID que estas usando es:" + Request.Cookies.get('User_ID'));
+      } else {
+        Response.SendFile('./ErrorUsuario.html');
+      }
+    }
+  )
+);
 ```
 
 ### WebSocket
@@ -201,35 +264,75 @@ Server.AddRules({
 Esto te permite gestionar una conexión WebSocket completa:
 
 ```js
+// Usando AddWebSocket
+/*
+  Esta función acepta 3 parámetros:
+  UrlRule, Action, AuthExec.
+    AuthExec es opcional.
+*/
 const Conexiones = new Set();
-
-Server.AddRules({
-  Method: 'GET', Url: '/Test/WS-Chat',
-  Type: 'WebSocket', Options: {
-    Coverage: 'Partial',
-    Action: (Petición, WebSocket) => {
-      console.log('[WS] CM: Conexión nueva')
-      Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
-      Conexiones.add(WebSocket);
-      WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
-      WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
-      WebSocket.on('Message', (Info, Datos) => {
-        //console.log(Info.OPCode);
-        if (Info.OPCode == 1) {
-          console.log('[WS] MSS:', Datos.toString());
-          Conexiones.forEach((Usuario) => {
-            if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
-          });
-        } else if (Info.OPCode == 8) {
-          Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
-        }
+Server.AddWebSocket('/Test/WS-Chat', (Request, WebSocket) => {
+  console.log('[WS] CM: Conexión nueva')
+  Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
+  Conexiones.add(WebSocket);
+  WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
+  WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
+  WebSocket.on('Message', (Info, Datos) => {
+    //console.log(Info.OPCode);
+    if (Info.OPCode == 1) {
+      console.log('[WS] MSS:', Datos.toString());
+      Conexiones.forEach((Usuario) => {
+        if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
       });
+    } else if (Info.OPCode == 8) {
+      Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
     }
-  }
+  });
 });
+
+
+// Usando el constructor de la clase Rule:
+// En este caso no hay diferencia a usar AddWebSocket e incluso deberás especificar el tipo y el método.
+const Conexiones = new Set();
+Server.AddRules(
+  /*
+    este constructor acepta 5 parámetros para crearse correctamente:
+    Tipo, Método, UrlRule, Content, AuthExec.
+    AuthExec es opcional.
+    A pesar de recibir el método este no se tomara en cuenta para las conexiones web socket.
+  */
+  new ServerCore.Rule('WebSocket', 'GET', '/Test/WS-Chat', (Request, WebSocket) => {
+    console.log('[WS] CM: Conexión nueva')
+    Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
+    Conexiones.add(WebSocket);
+    WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
+    WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
+    WebSocket.on('Message', (Info, Datos) => {
+      //console.log(Info.OPCode);
+      if (Info.OPCode == 1) {
+        console.log('[WS] MSS:', Datos.toString());
+        Conexiones.forEach((Usuario) => {
+          if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
+        });
+      } else if (Info.OPCode == 8) {
+        Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
+      }
+    });
+  })
+);
 ```
 
 # Version Dev
+
+## En desarrollo
+
+En el momento están en desarrollo:
+- [JsonWT]: El uso de Json Web Tokens.
+- [Mail]: El envió de E-Mails.
+- [Server]: El sistema de autenticación dinámico para las reglas de enrutamiento.
+
+## Instalación
+
 Para instalar la version en desarrollo:
 ```console
 mpm install saml.servercore@Dev

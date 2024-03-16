@@ -12,16 +12,22 @@ class Debug {
 	static Debugs = new Map();
 	/**@type {boolean} Contiene el indicador `Mostrar todo en consola`. */
 	static ShowAll = false;
+	/**@private @type {string} El ID de la instancia de Debug. */
+	ID = null;
 	/**@private @type {string} Contiene el nombre del archivo `.DSaml`. */
 	File = null;
 	/**@private @type {string} Contiene la ruta de la Carpeta de Debug. */
 	Folder = null;
-	/**@type {boolean} Contiene el indicador `Mostrar en consola`. */
+	/**@private @type {boolean} Contiene el indicador `Mostrar en consola`. */
 	InConsole = null;
+	/**@private @type {boolean} Contiene el indicador `Mostrar en consola`. */
+	InFile = null;
 	/**@private @type {import('./Debug.js').Debug.ActDate} Contiene la fecha en la que inicio el Debug. */
 	StartDate = null;
 	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
 	Path = null;
+	/**@private @type {string} Contiene la ruta del archivo `.DSaml`. */
+	RootPath = null;
 	/**@type {FS.WriteStream} Contiene el Stream del archivo `.DSaml`.*/
 	Stream = null;
 	/**
@@ -30,26 +36,57 @@ class Debug {
 	 * @param {string} Path La Ruta de la carpeta donde se almacenaran los Log`s.
 	 * @param {boolean?} InConsole El indicador de `Mostrar en consola`.
 	 */
-	constructor(ID = '_Debug', Path = '.Debug/Default', InConsole = true) {
+	constructor(ID = '_Debug', Path = '.Debug/Default', InConsole = true, InFile = true) {
 		if (ID === null)        ID = '_Debug';
 		if (Path === null)      Path = '.Debug/Default';
 		if (InConsole === null) InConsole = false;
+		if (InFile === null) InFile = false;
 		if (Debug.Debugs.has(ID)) return Debug.Debugs.get(ID);
+		this.ID = ID;
 		Path = Path.startsWith('/') ? Path.slice(1) : Path;
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
+		this.RootPath = Path
 		this.InConsole = InConsole;
+		this.InFile = InFile;
 		this.StartDate = Debug.GetDate();
-		this.File = `[${ID}] ${this.StartDate.Hour}.${this.StartDate.Minute}.${this.StartDate.Second}.${this.StartDate.MiliSecond}.DSaml`;
-		this.Folder = `${Path}/[${this.StartDate.Day}.${this.StartDate.Month}.${this.StartDate.Year}]`;
+		if (this.InFile) this.InitStream();
+		Debug.Debugs.set(ID, this);
+	}
+	/**
+	 * Define si se mostrará en consola o no.
+	 * @param {boolean} InConsole El estado en el que estará.
+	 */
+	SetInCOnsole(InConsole = false) { this.InConsole = InConsole; }
+	/**
+	 * Define si se guardaran los logs en un archivo.
+	 * @param {boolean} InFile El estado en el que estará.
+	 */
+	SetInFile(InFile = false) {
+		this.InFile = InFile;
+		if (this.InFile) this.InitStream();
+		else {
+			this.Stream.destroy();
+			this.Stream = null;
+		}
+	}
+	/** Crea el stream para el Debug. */
+	InitStream() {
+		this.File = `[${this.ID}] ${this.StartDate.Hour}.${this.StartDate.Minute}.${this.StartDate.Second}.${this.StartDate.MiliSecond}.DSaml`;
+		this.Folder = `${this.RootPath}/[${this.StartDate.Day}.${this.StartDate.Month}.${this.StartDate.Year}]`;
 		this.Path = `${this.Folder}/${this.File}`;
 		if (! (FS.existsSync(this.Folder))) FS.mkdirSync(this.Folder, { recursive: true });
+		const Fecha = Debug.GetDate();
 		this.Stream = FS.createWriteStream(this.Path, 'utf8');
 		this.Stream.write('/*+----------------------------+*/\n');
 		this.Stream.write('/*| Saml/Debug by diegofmo0802 |*/\n');
 		this.Stream.write('/*|     Use Saml ReadDebug     |*/\n');
 		this.Stream.write('/*+----------------------------+*/\n');
-		console.log(`Debug: [${ID}] --| Guardado en |-> ${this.Path}`);
-		Debug.Debugs.set(ID, this);
+		this.Stream.write(`/*the name of the DebugFile is the DateTime of initialize Debug with ID ${this.ID}*/\n`);
+		this.Stream.write(`/*the initialize stream DateTime is ${Fecha.DDMMYYYY} << ${Fecha.HHMMSSmmm}*/\n`);
+		if (this.InFile) {
+			const Prefix = Debug.GetPrefix();
+			console.log(ConsoleUI.GenerateFormat(`&B(255,0,0)&C(255,255,0)${Prefix}&R Debug: [${this.ID}] --| Guardado en |-> ${this.Path}`));
+		}
 	}
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
@@ -57,16 +94,19 @@ class Debug {
 	 * @returns {void}
 	 */
 	Log(...Data) {
-		let ActDate = Debug.GetDate();
-		let Prefix = `[${ActDate.Hour}:${ActDate.Minute}:${ActDate.Second}:${ActDate.MiliSecond}]`;
-		if (! (this.Stream.destroyed)) this.Stream.write(`${Prefix} -> ${JSON.stringify((() => {
-			let Result = [];
-			Data.forEach((Datum) => {
-				if (typeof Datum === 'string') Result.push(ConsoleUI.CleanFormat(Datum));
-				else Result.push(Datum);
-			});
-			return Result;
-		})())}\n`);
+		const Prefix = Debug.GetPrefix();
+		if (this.InFile) {
+			if (! this.Stream || this.Stream.destroyed) this.InitStream();
+			this.Stream.write(`${Prefix} -> ${JSON.stringify((() => {
+				let Result = [];
+				Data.forEach((Datum) => {
+					if (typeof Datum === 'string') Result.push(ConsoleUI.CleanFormat(Datum));
+					else Result.push(Datum);
+				});
+				return Result;
+			})())}\n`);
+
+		}
 		if (this.InConsole || Debug.ShowAll) console.log(
 			ConsoleUI.GenerateFormat(`&B(255,0,0)&C(255,255,0)${Prefix}&R`),
 			...(() => {
@@ -87,6 +127,15 @@ class Debug {
 	static Log(...Data) {
 		if (! (this.Debugs.has('_Debug'))) new Debug();
 		this.Debugs.get('_Debug').Log(...Data);
+	}
+	/**
+	 * Crea un prefijo de Debug con la hora del momento de su llamado.
+	 * @returns {string}
+	 */
+	static GetPrefix() {
+		const ActDate = Debug.GetDate();
+		const Prefix = `[${ActDate.Hour}:${ActDate.Minute}:${ActDate.Second}:${ActDate.MiliSecond}]`;
+		return Prefix;
 	}
 	/**
 	 * Obtiene la fecha y hora actual y la formatea en formato DD-MM-AAAA:HH.MM.SS.mmm

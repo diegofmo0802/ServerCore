@@ -7,7 +7,10 @@
 import FS from 'fs';
 import PATH from 'path';
 
-import Server, { Utilities, Template } from '../ServerCore.js';
+import Server from './Server.js';
+import Utilities from '../Utilities/Utilities.js';
+import Template from '../Template/Template.js';
+import { error } from 'console';
 
 class Response {
 	/**@type {Server.Request} Contiene la petición que recibió el servidor. */
@@ -120,14 +123,14 @@ class Response {
 	}
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param {import('./Server.js').Server.Rule.Folder} Rule La regla de enrutamiento.
-	 * @param {import('./Request.js').Request} Request La petición que recibió el servidor.
+	 * @param {string} BasePath La regla de enrutamiento.
+	 * @param {string} RelativePath La petición que recibió el servidor.
 	 * @returns {void}
 	 */
-	SendFolder(Rule, Request) {
-		let Path = Rule.Options.Source;
+	SendFolder(BasePath, RelativePath = '') {
+		let Path = BasePath;
 		Path = Path.endsWith('/') ? Path : Path + '/';
-		Path += Request.Url.slice(Rule.Url.length);
+		Path += RelativePath;
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
 		//Saml.Debug.Log('[Enrutador - Carpeta]:', Petición.Url, Ruta);
 		Path = Utilities.Path.Normalize(Path);
@@ -142,12 +145,12 @@ class Response {
 					if (Error) return this.SendError(500, Error.message);
 					if (this.Templates.Folder) {
 						this.SendTemplate(this.Templates.Folder, {
-							Url: Request.Url,
+							Url: this.Request.Url,
 							Carpeta: Folder
 						});
 					} else {
 						this.SendTemplate(`${Utilities.Path.ModuleDir}\\Global\\Template\\Folder.HSaml`, {
-							Url: Request.Url,
+							Url: this.Request.Url,
 							Carpeta: Folder
 						});
 						//this.EnviarJSON(Carpeta);

@@ -49,10 +49,10 @@ export class Response {
 	public SendFile(Path: string): void;
 	/**
 	 * Envía el listado de una carpeta como respuesta.
-	 * @param Rule La regla de enrutamiento.
-	 * @param Request La petición que recibió el servidor.
+	 * @param BasePath La regla de enrutamiento.
+	 * @param RelativePath La petición que recibió el servidor.
 	 */
-	public SendFolder(Rule: Server.Rule.Folder, Request: Request): void;
+	public SendFolder(BasePath: string, RelativePath: string): void;
 	/**
 	 * Envía los encabezados de la respuesta.
 	 * @param Code El código de la respuesta que se dará.

@@ -12,6 +12,8 @@ import __Response from "./Response.js";
 import __Session from "./Session.js";
 import __Cookie from "./Cookie.js";
 import __WebSocket from "./WebSocket.js";
+import __Rule from './Rule.js';
+import Rule from './Rule.js';
 
 export namespace Server {
 	export import Cookie = __Cookie
@@ -19,45 +21,12 @@ export namespace Server {
 	export import Response = __Response
 	export import Session = __Session
 	export import WebSocket = __WebSocket
-    namespace Rule {
-		namespace Action {
-			type Exec = (Request: Request, Response: Response) => void;
-		}
-		namespace WebSocket {
-			type Exec = (Request: Request, WebSocket: Server.WebSocket) => void;
-		}
-        type Base = {
-            Method: Request.Method,
-            Url: string
-        };
-        type Action = Base & {
-            Type: 'Action',
-            Options: {
-                Coverage: ('Partial' | 'Complete'),
-                Action: Action.Exec
-            }
-        };
-        type File = Base & {
-            Type: 'File',
-            Options: {
-                Coverage: ('Partial' | 'Complete'),
-                Source: string,
-            }
-        };
-        type Folder = Base & {
-            Type: 'Folder',
-            Options: {
-                Source: string,
-            }
-        };
-        type WebSocket = Base & {
-            Type: 'WebSocket',
-            Options: {
-                Coverage: ('Partial' | 'Complete'),
-                Action: WebSocket.Exec
-            }
-        };
-    }
+	export import Rule = __Rule;
+	type SSLOptions = {
+        Public: string,
+		Private: string,
+		Port?: number
+    };
     type Templates = {
         Error?: string,
         Folder?: string
@@ -72,6 +41,7 @@ export class Server {
 	public static Response = __Response;
 	public static Session = __Session;
 	public static WebSocket = __WebSocket;
+	public static Rule = __Rule;
 	/**Contiene el host donde el servidor recibirá peticiones. */
 	private Host: string;
 	/**Contiene el listado de plantillas de respuesta del servidor. */
@@ -87,16 +57,14 @@ export class Server {
 	/**Contiene el servidor HTTP/S. */
 	private HttpsServer: HTTP.Server;
 	/**Contiene las reglas de enrutamiento del servidor. */
-	private Rules: Array<Server.Rule>;
+	private Rules: Rule[];
 	/**
 	 * Crea un servidor HTTP/S.
 	 * @param Port El puerto donde el servidor recibirá peticiones.
 	 * @param Host El host donde el servidor recibirá peticiones.
 	 * @param SSL La configuración SSL.
 	 */
-	public constructor(Port?: number, Host?: string, SSL?: {
-        Public: string, Private: string, Port?: number
-    });
+	public constructor(Port?: number, Host?: string, SSL?: Server.SSLOptions);
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.
 	 * @param Rules La regla/s que desea añadir.
@@ -105,31 +73,32 @@ export class Server {
 	/**
 	 * Añade una regla de enrutamiento de acción.
 	 * @param Method El Método HTTP al que deseas que se responda.
-	 * @param Url La url donde escuchara la acción.
+	 * @param UrlRule La url donde escuchara la acción.
 	 * @param Action La acción que se ejecutara.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddAction(Method: Server.Request.Method, Url: string, Action: Server.Rule.Action.Exec, AllRoutes?: boolean): Server;
+	public AddAction(Method: Server.Request.Method, UrlRule: string, Action: Rule.ActionExec, Auth?: Rule.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de archivo.
-	 * @param Url La url donde escuchara la acción.
+	 * @param UrlRule La url donde escuchara la acción.
 	 * @param Source La Ruta del archivo que desea enviar.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddFile(Url: string, Source: string, AllRoutes?: boolean): Server;
+	public AddFile(UrlRule: string, Source: string, Auth?: Rule.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de carpeta.
-	 * @param Url La url donde escuchara la acción.
+	 * @param UrlRule La url donde escuchara la acción.
 	 * @param Source La Ruta del directorio que desea enviar.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddFolder(Url: string, Source: string): Server;
+	public AddFolder(UrlRule: string, Source: string, Auth?: Rule.AuthExec): Server;
 	/**
 	 * Añade una regla de enrutamiento de WebSocket.
-	 * @param Url La url donde escuchara la petición de conexión.
+	 * @param UrlRule La url donde escuchara la petición de conexión.
 	 * @param Action La acción que se ejecutara.
-	 * @param AllRoutes Define si se ejecutara en todas las sub rutas.
+	 * @param Auth La función de comprobación de autorización.
 	 */
-	public AddWebSocket(Url: string, Action: Server.Rule.WebSocket.Exec, AllRoutes?: boolean): Server;
+	public AddWebSocket(UrlRule: string, Action: Rule.WebSocketExec, Auth?: Rule.ActionExec): Server;
 	/**
 	 * Define la plantillas `.HSaml` predeterminadas del servidor.
 	 * @param Template El nombre de la plantilla.

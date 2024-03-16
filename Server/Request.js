@@ -26,6 +26,8 @@ class Request {
 	HTTPRequest = null;
 	/**@type {string} Contiene la url de la petición. */
 	Url = null;
+	/**@type {{[Name:string]:string}} Los parámetros de la UrlRule */
+	RuleParams = {}
 	/**
 	 * Crea la forma de petición de `Saml/Servidor`.
 	 * @param {import('http').IncomingMessage} HTTPRequest La petición que recibió el servidor.
@@ -52,12 +54,6 @@ class Request {
 		return new Promise((PrResponse, PrError) => {
 			let Data = Buffer.from([]);
 			let Parts = [];
-			/**@type {import('./Request').Request.POST} */
-			let POST = {
-				Files: new Map,
-				MimeType: 'Unknown',
-				Variables: new Map
-			};
 			HTTPRequest.on('data', (Part) => {
 				if(Data.length > 1e+8) {
 					Data = null;
@@ -70,8 +66,41 @@ class Request {
 				if (this.Headers['content-type']) {
 					let [Format, ...Options] = this.Headers['content-type'].trim().split(';');
 					switch(Format.toLowerCase()) {
+						case 'text/plain': {
+							PrResponse({
+								MimeType: 'text/plain',
+								Content: Data.toString('utf-8')
+							});
+							break;
+						}
+						case 'application/json': {
+							try {
+								PrResponse({
+									MimeType: 'application/json',
+									Content: JSON.parse(Data.toString('utf-8'))
+								});
+							} catch(Error) {
+								PrError(Error);
+							}
+							break;
+						}
+						case 'application/x-www-form-urlencoded': {
+							let Content = new Map;
+							const DecodedData = Data.toString('latin1');
+							const KeyValue = DecodedData.split('&');
+							KeyValue.forEach((pair) => {
+							  const [Key, Value] = pair.split('=');
+							  Content.set(decodeURIComponent(Key), decodeURIComponent(Value));
+							});
+							PrResponse({
+								MimeType: 'application/x-www-form-urlencoded',
+								Content
+							});
+							break;
+						}
 						case 'multipart/form-data': {
-							POST.MimeType = 'multipart/form-data';
+							let Vars = new Map;
+							let Files = new Map;
 							let Separator = '--' + Options.join(';').replace(/.*boundary=(.*)/gi, (Result, Separator) => Separator);
 							let Variables = Data.toString('latin1').trim().split(Separator);
 							Variables.forEach((Variable) => {
@@ -89,7 +118,7 @@ class Request {
 											let Data = Buffer.from(Content.trim(), 'binary');
 											//let Stream = FS.createWriteStream(Ruta);
 											//Stream.write(Contenido.trim(), 'binary');
-											POST.Files.set(Buffer.from(Name, 'binary').toString(), {
+											Files.set(Buffer.from(Name, 'binary').toString(), {
 												File: Data,
 												Name: Buffer.from(File, 'binary').toString(),
 												//Ruta: Ruta,
@@ -97,21 +126,27 @@ class Request {
 												Type: Buffer.from(Type, 'binary').toString()
 											});
 										} catch(Error) {
-											console.log('Error');
+											console.log('Error', Error);
 											PrError(Error);
 										}
-									} else POST.Variables.set(Buffer.from(Name, 'binary').toString(), Content ? Buffer.from(Content, 'binary').toString().trim() : null);
+									} else Vars.set(Buffer.from(Name, 'binary').toString(), Content ? Buffer.from(Content, 'binary').toString().trim() : null);
 								}
+							});
+							PrResponse({
+								MimeType: 'multipart/form-data',
+								Content: { Files, Vars }
 							});
 							break;
 						}
 						default: {
-							POST.MimeType = 'Unknown';
-							POST.Unknown = Data;
+							PrResponse({
+								MimeType: 'Unknown',
+								Content: Data
+							});
+							break;
 						}
 					}
 				}
-				PrResponse(POST);
 			});
 			HTTPRequest.on('error', (Error) => {
 				console.log(Error);

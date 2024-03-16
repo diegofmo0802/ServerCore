@@ -27,16 +27,22 @@ export class Debug {
 	public static Debugs: Debug.Debugs;
 	/**Contiene el indicador `Mostrar todo en consola`. */
 	public static ShowAll: boolean;
+	/**El ID de la instancia de Debug. */
+	private ID: string;
 	/**Contiene el nombre del archivo `.DSaml`. */
 	private File: string;
 	/**Contiene la ruta de la Carpeta de Debug. */
 	private Folder: string;
 	/**Contiene el indicador `Mostrar en consola`. */
 	private InConsole: boolean;
+	/**Contiene el indicador `Mostrar en consola`. */
+	private InFile: boolean;
 	/**Contiene la fecha en la que inicio el Debug. */
 	private StartDate: Debug.Date;
 	/**Contiene la ruta del archivo `.DSaml`. */
 	private Path: string;
+	/**Contiene la ruta del archivo `.DSaml`. */
+	private RootPath: string;
 	/**Contiene el Stream del archivo `.DSaml`.*/
 	private Stream: WriteStream;
 	/**
@@ -50,12 +56,27 @@ export class Debug {
 	 * @param Path La Ruta de la carpeta donde se almacenaran los Log`s.
 	 * @param InConsole El indicador de `Mostrar en consola`.
 	 */
-	public constructor(ID?: string, Path?: string, InConsole?: boolean);
+	public constructor(ID?: string, Path?: string, InConsole?: boolean, InFile?: boolean);
+	/**
+	 * Define si se mostrará en consola o no.
+	 * @param InConsole El estado en el que estará.
+	 */
+	SetInCOnsole(InConsole: boolean): void;
+	/**
+	 * Define si se guardaran los logs en un archivo.
+	 * @param InFile El estado en el que estará.
+	 */
+	SetInFile(InFile: boolean): void;
+	/** Crea el stream para el Debug. */
+	private InitStream(): void;
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
 	 * @param Data Los datos a mostrar y almacenar.
 	 */
 	public Log(...Data: any): void
+	
+	/** Crea un prefijo de Debug con la hora del momento de su llamado. */
+	public static GetPrefix(): string;
 	/**
 	 * Muestra y almacena datos en la consola y en ´.DSaml´.
 	 * @param Data Los datos a mostrar y almacenar.

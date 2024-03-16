@@ -40,6 +40,10 @@ class WebSocket extends EVENTS {
             + '\r\n'
         );
     }
+    /** Finaliza la conexión esperando a que se terminen de enviar/recibir los datos pendientes. */
+    End() { this.Connection.end(); }
+    /** Finaliza la conexión de forma abrupta. */
+    Destroy() { this.Connection.destroy(); }
     /**
      * Codifica los datos para enviar por el WebSocket.
      * @param {Buffer} Data Los datos que se van a codificar.
