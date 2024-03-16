@@ -170,10 +170,11 @@ class Server {
 		for (const Rule of this.Rules) {
 			if (Rule.Test(Request.Method, Request.Url)) {
 				Rule.Exec(Request, Response);
+				Routed = true;
 				break;
 			}
 		}
-		//if (!(Routed)) Response.SendError(400, `Sin enrutador para: ${Request.Method} -> ${Request.Url}`);
+		if (!(Routed)) Response.SendError(400, `Sin enrutador para: ${Request.Method} -> ${Request.Url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
