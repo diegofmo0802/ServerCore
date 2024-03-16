@@ -23,6 +23,9 @@ Server.AddFile('/File', 'changes.md')
 .AddFile('/FileWA', 'changes.md',
     (Request) => Request.GET.has('Auth') && Request.GET.get('Auth') == 'AuthYes'
 )
+.AddRules(
+    new ServerCore.Rule('File', 'GET', '/MyFile/*', 'Test/Test.js', () => true)
+)
 .AddFolder('/Folder', '.Debug')
 .AddAction('ALL', '/', (Rq, Rs) => {
     Rs.SendTemplate('Test/Test.HSaml', {
