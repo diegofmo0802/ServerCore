@@ -20,7 +20,7 @@ const Server = new ServerCore(Env.Port, Env.Host);
 
 // Creando reglas de enrutamiento.
 Server.AddFile('/File', 'changes.md')
-.AddFile('/FileWA', 'changes.md', false,
+.AddFile('/FileWA', 'changes.md',
     (Request) => Request.GET.has('Auth') && Request.GET.get('Auth') == 'AuthYes'
 )
 .AddFolder('/Folder', '.Debug')
@@ -32,10 +32,17 @@ Server.AddFile('/File', 'changes.md')
             FileWithAuthFunction_NoAuth: '/FileWA',
             FileWithAuthFunction_Auth: '/FileWA?Auth=AuthYes',
             Folder: '/Folder',
+            RuleParams: '/RuleParams/algo1/otro2/nose3/XD',
             WebSocket: '/WebSocket',
             "WebSocket Online": '/WebSocket2'
         }
     });
+})
+.AddAction('ALL', '/RuleParams/$a/$b/$c/XD/*', (Rq, Rs) => {
+    Rs.SendJSON({
+        Url: Rq.Url,
+        RuleParams: Rq.RuleParams
+    })
 })
 .AddAction('ALL', 'WebSocket', (Rq, Rs) => {
     Rs.SendTemplate('Test/WebSocket.HSaml', {
