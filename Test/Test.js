@@ -46,7 +46,7 @@ Server.AddFile('/File', 'changes.md')
 })
 .AddAction('ALL', 'WebSocket', (Rq, Rs) => {
     Rs.SendTemplate('Test/WebSocket.HSaml', {
-        Host: 'ws://localhost/WebSocket'
+        Host: 'ws://localhost:3000/WebSocket/'
     });
 }) /*
 .AddAction('ALL', 'WebSocket2', (Rq, Rs) => {
@@ -58,6 +58,7 @@ Server.AddFile('/File', 'changes.md')
     /**@type {Set<ServerCore.WebSocket>} */
     const Clients = new Set();
     return (Rs, Ws) => {
+        console.log("new client")
         Clients.add(Ws);
         Clients.forEach(Client => { if (Client !== Ws) Client.Send('Server: Alguien se ha conectado') });
         Ws.on('Message', (Info, Data) => {
@@ -75,4 +76,4 @@ Server.AddFile('/File', 'changes.md')
             Clients.delete(Ws);
         });
     };
-})(), true);
+})());
