@@ -13,6 +13,7 @@ import Utilities from '../Utilities/Utilities.js';
 import Debug from '../Debug/Debug.js';
 import Config from '../Config/Config.js';
 
+import Rule from './Rule.js';
 import Request from "./Request.js";
 import Response from "./Response.js";
 import Session from "./Session.js";
@@ -24,6 +25,8 @@ const Debugs = {
 };
 
 class Server {
+	/**@type {typeof Rule} */
+	static Rule = Rule;
 	/**@type {typeof Request} */
 	static Request = Request;
 	/**@type {typeof Response} */
@@ -46,7 +49,7 @@ class Server {
 	HttpServer = null;
 	/**@type {HTTPS.Server} Contiene el servidor HTTP/S. */
 	HttpsServer = null;
-	/**@type {import('./Server.js').Server.Rules} Contiene las reglas de enrutamiento del servidor. */
+	/**@type {Array<Rule>} Contiene las reglas de enrutamiento del servidor. */
 	Rules = null;
 	/**
 	 * Crea un servidor HTTP/S.
@@ -93,16 +96,10 @@ class Server {
 			});
 		}
 		this.AddFolder('/Saml:Global', `${Utilities.Path.ModuleDir}\\Global`);
-		/* this.AddFolder('/Saml:Global', '')
-		this.Rules.push({
-			Method: 'ALL', Type: 'Folder', Url: '/Saml:Global', Options: {
-				Source: `${ProcessDir}/../Global`
-			}
-		}); */
 	}
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.
-	 * @param {import('./Server.js').Server.Rules} Rules La regla/s que desea añadir.
+	 * @param {Array<Rule>} Rules La regla/s que desea añadir.
 	 * @returns {Server}
 	 */
 	AddRules(...Rules) {
@@ -112,65 +109,44 @@ class Server {
 	/**
 	 * Añade una regla de enrutamiento de acción.
 	 * @param {Request.Method} Method El Método HTTP al que deseas que se responda.
-	 * @param {string} Url La url donde escuchara la acción.
-	 * @param {import('./Server').Server.Rule.Action.Exec} Action La acción que se ejecutara.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
-	 * @param {import('./Server').Server.Rule.Base.AuthExec} Auth La función de comprobación de autorización.
+	 * @param {string} UrlRule La url donde escuchara la acción.
+	 * @param {Rule.ActionExec} Action La acción que se ejecutara.
+	 * @param {Rule.AuthExec} Auth La función de comprobación de autorización.
 	 * @returns {Server}
 	 */
-	AddAction(Method, Url, Action, AllRoutes = false, Auth = null) {
-		this.AddRules({
-			Method, Url, Type: 'Action', Options: {
-				Coverage: AllRoutes ? 'Complete' : 'Partial',
-				Action, ...(Auth !== null ? { Auth } : null)
-			}
-		});
+	AddAction(Method, UrlRule, Action, Auth = null) {
+		this.AddRules(new Rule('Action', Method, UrlRule, Action, Auth));
 		return this;
 	}
 	/**
 	 * Añade una regla de enrutamiento de archivo.
-	 * @param {string} Url La url donde escuchara la acción.
+	 * @param {string} UrlRule La url donde escuchara la acción.
 	 * @param {string} Source La Ruta del archivo que desea enviar.
-	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
-	 * @param {import('./Server').Server.Rule.Base.AuthExec} Auth La función de comprobación de autorización.
+	 * @param {Rule.AuthExec} Auth La función de comprobación de autorización.
 	 */
-	AddFile(Url, Source, AllRoutes = false, Auth = null) {
-		this.AddRules({
-			Method: 'GET', Url, Type: 'File', Options: {
-				Coverage: AllRoutes ? 'Complete' : 'Partial',
-				Source, ...(Auth !== null ? { Auth } : null)
-			}
-		});
+	AddFile(UrlRule, Source, Auth = null) {
+		this.AddRules(new Rule('File', 'GET', UrlRule, Source, Auth));
 		return this;
 	}
 	/**
 	 * Añade una regla de enrutamiento de carpeta.
-	 * @param {string} Url La url donde escuchara la acción.
+	 * @param {string} UrlRule La url donde escuchara la acción.
 	 * @param {string} Source La Ruta del directorio que desea enviar.
-	 * @param {import('./Server').Server.Rule.Base.AuthExec} Auth La función de comprobación de autorización.
+	 * @param {Rule.AuthExec} Auth La función de comprobación de autorización.
 	 */
-	AddFolder(Url, Source, Auth = null) {
-		this.AddRules({
-			Method: 'GET', Url, Type: 'Folder', Options: {
-				Source, ...(Auth !== null ? { Auth } : null)
-			}
-		});
+	AddFolder(UrlRule, Source, Auth = null) {
+		this.AddRules(new Rule('Folder', 'GET', UrlRule, Source, Auth));
 		return this;
 	}
 	/**
 	 * Añade una regla de enrutamiento de WebSocket.
-	 * @param {string} Url La url donde escuchara la petición de conexión.
-	 * @param {import('./Server').Server.Rule.WebSocket.Exec} Action La acción que se ejecutara.
+	 * @param {string} UrlRule La url donde escuchara la petición de conexión.
+	 * @param {Rule.WebSocketExec} Action La acción que se ejecutara.
 	 * @param {boolean} AllRoutes Define si se ejecutara en todas las sub rutas.
-	 * @param {import('./Server').Server.Rule.Base.AuthExec} Auth La función de comprobación de autorización.
+	 * @param {Rule.AuthExec} Auth La función de comprobación de autorización.
 	 */
-	AddWebSocket(Url, Action, AllRoutes = false, Auth = null) {
-		this.AddRules({
-			Method: 'ALL', Url, Type: 'WebSocket', Options: {
-				Coverage: AllRoutes ? 'Complete' : 'Partial',
-				Action, ...(Auth !== null ? { Auth } : null)
-			}
-		});
+	AddWebSocket(UrlRule, Action, AllRoutes = false, Auth = null) {
+		this.AddRules(new Rule('WebSocket', 'ALL', UrlRule, Action, Auth));
 		return this;
 	}
 	/**
@@ -191,45 +167,13 @@ class Server {
 	 */
 	Route(Request, Response) {
 		let Routed = false;
-		for (let OriginalRule of this.Rules) {
-			let Rule = OriginalRule;
-			Rule.Url = Rule.Url.startsWith('/') ? Rule.Url : '/' + Rule.Url;
-			Rule.Url = Rule.Url.endsWith('/') ? Rule.Url : Rule.Url + '/';
-			Routed = Rule.Method == 'ALL'
-			|| Rule.Method == Request.Method
-			? Rule.Type == 'Action'
-				? Rule.Options.Coverage == 'Complete'
-					? Rule.Url.length <= Request.Url.length
-					&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
-					? true : false
-					: Rule.Url == Request.Url
-					? true : false
-				: Rule.Type == 'File'
-					? Rule.Options.Coverage == 'Complete'
-					? Rule.Url.length <= Request.Url.length
-						&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
-						? true : false
-					: Rule.Url == Request.Url
-						? true : false
-					: Rule.Type == 'Folder'
-					? Rule.Url.length <= Request.Url.length
-						&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
-						? true : false
-					: false
-			: false;
-
-			if (Routed) {
-				if (! Rule.Options.Auth || Rule.Options.Auth(Request)) {
-					switch(Rule.Type) {
-						case 'Action': Rule.Options.Action(Request, Response); break;
-						case 'File': Response.SendFile(Rule.Options.Source); break;
-						case 'Folder': Response.SendFolder(Rule, Request); break;
-					}
-				} else Response.SendError(403, `No tienes acceso a: ${Request.Method} -> ${Request.Url}`);
+		for (const Rule of this.Rules) {
+			if (Rule.Test(Request.Method, Request.Url)) {
+				Rule.Exec(Request, Response);
 				break;
 			}
 		}
-		if (!(Routed)) Response.SendError(500, `Sin enrutador para: ${Request.Method} -> ${Request.Url}`);
+		//if (!(Routed)) Response.SendError(400, `Sin enrutador para: ${Request.Method} -> ${Request.Url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
@@ -239,33 +183,18 @@ class Server {
 	 */
 	RouteWebSocket(Request, WebSocket) {
 		let Routed = false;
-		for (let OriginalRule of this.Rules) {
-			let Rule = OriginalRule;
-			Rule.Url = Rule.Url.startsWith('/') ? Rule.Url : '/' + Rule.Url;
-			Rule.Url = Rule.Url.endsWith('/') ? Rule.Url : Rule.Url + '/';
-			Routed = Rule.Method == 'ALL'
-			|| Rule.Method == Request.Method
-			? Rule.Type == 'WebSocket'
-				? Rule.Options.Coverage == 'Complete'
-					? Rule.Url.length <= Request.Url.length
-					&& Rule.Url == Request.Url.slice(0, Rule.Url.length)
-						? true : false
-					: Rule.Url == Request.Url
-						? true : false
-				: false
-			: false;
-			if (Routed && Rule.Type == 'WebSocket') {
-				if (! Rule.Options.Auth || Rule.Options.Auth(Request)) {
-					let AcceptKey = Request.Headers['sec-websocket-key'].trim();
-					WebSocket.AcceptConnection(AcceptKey);
-					Rule.Options.Action(Request, WebSocket);
-				} else {
-					WebSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
-					WebSocket.End();
-				}
-				break;
-			};
+		for (const Rule of this.Rules) {
+			if (Rule.Test(Request.Method, Request.Url, true)) {
+				let AcceptKey = Request.Headers['sec-websocket-key'].trim();
+				WebSocket.AcceptConnection(AcceptKey);
+				Rule.Exec(Request, WebSocket);
+			} else {
+				WebSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
+				WebSocket.End();
+			}
+			break;
 		}
+		if (!(Routed)) WebSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${Request.Method} -> ${Request.Url}\r\n\r\n`);
 	}
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
