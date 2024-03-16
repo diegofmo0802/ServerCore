@@ -11,6 +11,13 @@
 - Server: Se añadió soporte para recibir [Form-urlencoded, Form-data, Text, Json]
 - Config: Ahora se puede configurar el modulo para la depuración
 
+**Modificado**
+- Server: Se modifico el sistema de reglas de enrutamiento
+  - Al crear una regla puedes usar $ para crear un parámetro Url
+    - EJ: Server.AddAction("/App/User/$UserID/Post/$PostID", (rq, rs) => {}) // Guardara UserID en PostID en rq.Params.PostID y rq.Params.UserID  .
+  - Al crear una regla puedes usar * para que responda a todas las sub rutas.
+    - EJ: Server.AddAction("/App/Logo/*, (rq, rs) => {}) // Responderá a /App/Logo y todas las sub rutas.
+
 ## 3.5
 
 **La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones
@@ -41,15 +48,15 @@
 **Añadido**
   - Mail: Se añadió como exportación Beta.
   - JsonWT: Se añadió como exportación Beta.
-  - Utilities: Se creo para añadir variables o códigos útiles, tales como la ruta principal del modulo 
+  - Utilities: Se creó para añadir variables o códigos útiles, tales como la ruta principal del modulo 
     aunque esta cambie.
 **Eliminado**
   - Tools: El comando CSV-To-JSON
 **Cambios**
   - Server: El orden de los parámetros de AddFile, AddAction y AddWebSocket.
-  - Session: El atributo `path` por defecto de la cookie SS_UUID se cambio a `/` para ajustarse al
+  - Session: El atributo `path` por defecto de la cookie SS_UUID se cambió a `/` para ajustarse al
     cambio realizado en el sub modulo cookie
-  - Session: La cookie SS_UUID se renombro a Session
+  - Session: La cookie SS_UUID se renombró a Session
   - Debug: La ruta por defecto de cambio a `.Debug/Default`
   - Mail: Se eliminaron los console.log y se remitieron a Debug
 **Resumen**
@@ -62,7 +69,7 @@ const JsonWT = Beta.JsonWT;
 
 ### 3.4.1
 **Desarrollado sin añadir**
-  - Mail: permite enviar correos electrónicos a traves de un servidor smtp/s
+  - Mail: permite enviar correos electrónicos a través de un servidor smtp/s
 
 ### 3.4.0
   **Añadidos**
