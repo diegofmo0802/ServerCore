@@ -46,6 +46,7 @@ class Rule {
      * @param Client El cliente que hizo la petición.
      */
     Exec(Request, Client) {
+        Request.RuleParams = this.GetRuleParams(Request.Url);
         if (!this.AuthExec || this.AuthExec) switch (this.Type) {
             case 'Action':    this.Content(Request, Client); break;
             case 'File':      Client.SendFile(this.Content); break;
@@ -73,6 +74,16 @@ class Rule {
             }
         }
         return Result;
+    }
+    /**
+     * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.
+     * @param {string} Path La url a resolver.
+     * @returns {{ [Name: string]: string }}
+     */
+    GetRuleParams(Path) {
+        const Match = this.Expression.exec(Path);
+        if (!Match) return {};
+        return {...Match.groups};
     }
     /**
      * Extrae la Url parcial usando la expresión de la regla.

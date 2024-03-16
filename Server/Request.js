@@ -26,6 +26,8 @@ class Request {
 	HTTPRequest = null;
 	/**@type {string} Contiene la url de la petición. */
 	Url = null;
+	/**@type {{[Name:string]:string}} Los parámetros de la UrlRule */
+	RuleParams = {}
 	/**
 	 * Crea la forma de petición de `Saml/Servidor`.
 	 * @param {import('http').IncomingMessage} HTTPRequest La petición que recibió el servidor.

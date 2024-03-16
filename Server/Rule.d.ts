@@ -44,6 +44,11 @@ declare class Rule<T extends keyof Rule.Type> {
      */
     public Test(Method: Request.Method, Url: string, isWebSocket: boolean = true): boolean;
     /**
+     * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.
+     * @param Path La url a resolver.
+     */
+    public GetRuleParams(Path: string): { [Name: string]: string };
+    /**
      * Extrae la Url parcial usando la expresión de la regla.
      * @param Url La url de donde se extraerá la url parcial.
      */

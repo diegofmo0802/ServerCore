@@ -49,6 +49,8 @@ export class Request {
 	private HTTPRequest: HTTP.IncomingMessage;
 	/**Contiene la url de la petición. */
 	public Url: string;
+	/**@type {} Los parámetros de la UrlRule */
+	public RuleParams: { [Name: string]: string };
 	/**
 	 * Crea la forma de petición de `Saml/Servidor`.
 	 * @param HTTPRequest La petición que recibió el servidor.
