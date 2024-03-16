@@ -61,18 +61,23 @@ class Rule {
      */
     Test(Request, isWebSocket = false) {
         let Result = false;
-        if (!this.AuthExec || this.AuthExec(Request)) {
-            if (isWebSocket) {
-                Result = this.Type == 'WebSocket'
-                ? this.Expression.test(Request.Url)
-                : false;
-            } else {
-                Result = this.Method == Request.Method || this.Method == 'ALL'
-                ? this.Expression.test(Request.Url)
-                : false
-            }
+        if (isWebSocket) {
+            Result = this.Type == 'WebSocket'
+            ? this.Expression.test(Request.Url)
+            : false;
+        } else {
+            Result = this.Method == Request.Method || this.Method == 'ALL'
+            ? this.Expression.test(Request.Url)
+            : false
         }
         return Result;
+    }
+    /**
+     * Comprueba con la función de autenticación.
+     * @param {Request} Request La petición recibida.
+     */
+    TestAuth(Request) {
+        return !this.AuthExec || this.AuthExec(Request);
     }
     /**
      * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.

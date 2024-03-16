@@ -168,7 +168,11 @@ class Server {
 		let Routed = false;
 		for (const Rule of this.Rules) {
 			if (Rule.Test(Request)) {
-				Rule.Exec(Request, Response);
+				if (Rule.TestAuth(Request)) {
+					Rule.Exec(Request, Response);
+				} else {
+					Response.SendError(403, `No tienes permiso para acceder a: ${Request.Method} -> ${Request.Url}`);
+				}
 				Routed = true;
 				break;
 			}
@@ -184,15 +188,18 @@ class Server {
 	RouteWebSocket(Request, WebSocket) {
 		let Routed = false;
 		for (const Rule of this.Rules) {
-			if (Rule.Test(Request, true)) {
-				let AcceptKey = Request.Headers['sec-websocket-key'].trim();
-				WebSocket.AcceptConnection(AcceptKey);
-				Rule.Exec(Request, WebSocket);
-			} else {
-				WebSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
-				WebSocket.End();
+			if (Rule.Test(Request, true)) {			
+				if (Rule.TestAuth(Request)) {
+					let AcceptKey = Request.Headers['sec-websocket-key'].trim();
+					WebSocket.AcceptConnection(AcceptKey);
+					Rule.Exec(Request, WebSocket);
+				} else {
+					WebSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
+					WebSocket.End();
+				}
+				Routed = true;
+				break;
 			}
-			break;
 		}
 		if (!(Routed)) WebSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${Request.Method} -> ${Request.Url}\r\n\r\n`);
 	}

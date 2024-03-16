@@ -134,7 +134,6 @@ class Response {
 		Path = Path.endsWith('/') ? Path.slice(0, -1) : Path;
 		//Saml.Debug.Log('[Enrutador - Carpeta]:', Petición.Url, Ruta);
 		Path = Utilities.Path.Normalize(Path);
-		console.log(Path);
 		FS.stat(Path, (Error, Details) => {
 			if (Error) {
 				return Error.code == 'ENOENT'
@@ -221,7 +220,6 @@ class Response {
 				this.SendHeaders(Code, this.GenerateHeaders('html'));
 				this.Send(Template);
 			}).catch((Error) => {
-				console.log(Error);
 				this.SendHeaders(Code, this.GenerateHeaders('txt'));
 				this.Send(`Error: ${Code} -> ${Message}`);
 			});

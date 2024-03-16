@@ -43,6 +43,12 @@ declare class Rule<T extends keyof Rule.Type> {
      */
     public Test(Request: Request, isWebSocket: boolean = true): boolean;
     /**
+     * Comprueba si una url coincide con esta ruta.
+     * @param {Request} Request La petición recibida.
+     * @param isWebSocket Define si se revisará un WebSocket.
+     */
+    public TestAuth(Request: Request): boolean;
+    /**
      * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.
      * @param Path La url a resolver.
      */
