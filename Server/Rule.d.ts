@@ -38,6 +38,7 @@ declare class Rule<T extends keyof Rule.Type> {
     public Exec(Request: Request, Client: Rule.ClientType<T>): void;
     /**
      * Comprueba si una url coincide con esta ruta.
+     * también establece los Request.RuleParams.
      * @param {Request} Request La petición recibida.
      * @param isWebSocket Define si se revisará un WebSocket.
      */

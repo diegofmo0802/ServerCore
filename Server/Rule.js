@@ -46,7 +46,6 @@ class Rule {
      * @param Client El cliente que hizo la petición.
      */
     Exec(Request, Client) {
-        Request.RuleParams = this.GetRuleParams(Request.Url);
         if (!this.AuthExec || this.AuthExec) switch (this.Type) {
             case 'Action':    this.Content(Request, Client); break;
             case 'File':      Client.SendFile(this.Content); break;
@@ -56,6 +55,7 @@ class Rule {
     }
     /**
      * Comprueba si una url coincide con esta ruta.
+     * también establece los Request.RuleParams.
      * @param {Request} Request La petición recibida.
      * @param {boolean} isWebSocket Define si se revisará un WebSocket.
      */
@@ -70,6 +70,7 @@ class Rule {
             ? this.Expression.test(Request.Url)
             : false
         }
+        if (Result) Request.RuleParams = this.GetRuleParams(Request.Url);
         return Result;
     }
     /**
