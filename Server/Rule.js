@@ -10,11 +10,11 @@ import Response from './Response.js';
 import WebSocket from './WebSocket.js';
 
 class Rule {
-    /** El tipo de la regla de enrutamiento */
+    /**@type {keyof import('./Rule.js').default.Type} El tipo de la regla de enrutamiento */
     Type = null;
-    /** El método que aceptara la regla de enrutamiento */
+    /**@type {Request.Method} El método que aceptara la regla de enrutamiento */
     Method = null;
-    /** La UrlRule con la que se creo la regla de enrutamiento */
+    /**@type {string} La UrlRule con la que se creo la regla de enrutamiento */
     UrlRule = null;
     /**@type {RegExp} La expresión regular de la regla de enrutamiento */
     Expression = null;
@@ -25,7 +25,7 @@ class Rule {
     /**
      * Crea una regla de enrutamiento para ServerCore.
      * @param {keyof import('./Rule.js').default.Type} Type El tipo de regla.
-     * @param {import('./Request.js').Request.Method} Method El método de la petición de la regla.
+     * @param {Request.Method} Method El método de la petición de la regla.
      * @param {string} UrlRule Es la regla que adoptara la clase Rule.
      * @param {import('./Rule.js').default.Type[keyof import('./Rule.js').default.Type]} Content El contenido de ejecución de la regla.
      * @param {import('./Rule.js').default.Type[keyof import('./Rule.js').default.AuthExec]} AuthExec La función de autenticación.
@@ -56,20 +56,19 @@ class Rule {
     }
     /**
      * Comprueba si una url coincide con esta ruta.
-     * @param {Request.Method} Method El método de la petición.
-     * @param {string} Url La url que desea comprobar.
+     * @param {Request} Request La petición recibida.
      * @param {boolean} isWebSocket Define si se revisará un WebSocket.
      */
-    Test(Method, Url, isWebSocket = false) {
+    Test(Request, isWebSocket = false) {
         let Result = false;
         if (!this.AuthExec || this.AuthExec(Request)) {
             if (isWebSocket) {
                 Result = this.Type == 'WebSocket'
-                ? this.Expression.test(Url)
+                ? this.Expression.test(Request.Url)
                 : false;
             } else {
-                Result = this.Method == Method
-                ? this.Expression.test(Url)
+                Result = this.Method == Request.Method || this.Method == 'ALL'
+                ? this.Expression.test(Request.Url)
                 : false
             }
         }
@@ -117,7 +116,7 @@ class Rule {
                         .replace(Comps.Escape, '');
                     FutureRegEx += `(?<${ParamName}>.+)?`;
                 }
-            } else if (Zone == '*') FutureRegEx += '(?:.+)';
+            } else if (Zone == '*') FutureRegEx += '(?:.+)?';
             else FutureRegEx += Zone;
         }
         FutureRegEx += `\/?${this.Type == 'Folder' ? '.+?' : ''}$`;

@@ -168,7 +168,7 @@ class Server {
 	Route(Request, Response) {
 		let Routed = false;
 		for (const Rule of this.Rules) {
-			if (Rule.Test(Request.Method, Request.Url)) {
+			if (Rule.Test(Request)) {
 				Rule.Exec(Request, Response);
 				Routed = true;
 				break;
@@ -185,7 +185,7 @@ class Server {
 	RouteWebSocket(Request, WebSocket) {
 		let Routed = false;
 		for (const Rule of this.Rules) {
-			if (Rule.Test(Request.Method, Request.Url, true)) {
+			if (Rule.Test(Request, true)) {
 				let AcceptKey = Request.Headers['sec-websocket-key'].trim();
 				WebSocket.AcceptConnection(AcceptKey);
 				Rule.Exec(Request, WebSocket);

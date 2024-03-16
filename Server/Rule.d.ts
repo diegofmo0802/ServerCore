@@ -38,11 +38,10 @@ declare class Rule<T extends keyof Rule.Type> {
     public Exec(Request: Request, Client: Rule.ClientType<T>): void;
     /**
      * Comprueba si una url coincide con esta ruta.
-     * @param Method El método de la petición.
-     * @param Url La url que desea comprobar.
+     * @param {Request} Request La petición recibida.
      * @param isWebSocket Define si se revisará un WebSocket.
      */
-    public Test(Method: Request.Method, Url: string, isWebSocket: boolean = true): boolean;
+    public Test(Request: Request, isWebSocket: boolean = true): boolean;
     /**
      * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.
      * @param Path La url a resolver.
@@ -61,7 +60,7 @@ declare class Rule<T extends keyof Rule.Type> {
 }
 
 declare namespace Rule {
-    type AuthExec = (Request) => boolean;
+    type AuthExec = (Request: Request) => boolean;
     type ActionExec = (Request: Request, Response: Response) => void;
     type WebSocketExec = (Request: Request, WebSocket: WebSocket) => void;
     type ClientType<T extends keyof Type> = T extends 'WebSocket' ? WebSocket : Response;
