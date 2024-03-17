@@ -5,7 +5,7 @@
  */
 
 import FS from 'fs';
-import Utilities from '../Utilities/Utilities';
+import Utilities from '../Utilities/Utilities.js';
 
 class Template {
 	static Expressions = {
