@@ -113,16 +113,23 @@ class Rule {
         };
         const Zones = UrlRule.split('/').slice(1);
         let FutureRegEx = '^';
-        for (const Zone of Zones) {
+        for (let Index = 0; Index < Zones.length; Index ++) {
+            const Zone = Zones[Index];
             FutureRegEx += '\/';
             if (Comps.Param.test(Zone)) {
                 const Match = Comps.Param.exec(Zone);
                 if (Match && Match.groups) {
                     const ParamName = Match.groups['ParamName']
                         .replace(Comps.Escape, '');
-                    FutureRegEx += `(?<${ParamName}>.+)?`;
+                    FutureRegEx += `(?<${ParamName}>[^\/]+?)`;
                 }
-            } else if (Zone == '*') FutureRegEx += '(?:.+)?';
+            } else if (Zone == '*') {
+                if (Index < (Zones.length -1)) {
+                    FutureRegEx += '(?:[^\/]+)?';
+                } else {
+                    FutureRegEx += '(?:.+)?';
+                }
+            }
             else FutureRegEx += Zone;
         }
         FutureRegEx += `\/?${this.Type == 'Folder' ? '.+?' : ''}$`;
