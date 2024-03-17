@@ -20,14 +20,19 @@ export namespace Request {
     type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'ALL';
     type GET = Map<string, any>;
     type POST = (
-		{ MimeType: 'application/json',                  Content: any } |
-        { MimeType: 'application/x-www-form-urlencoded', Content: Map<string, string> } |
-		{ MimeType: 'text/plain',                        Content: string } |
-		{ MimeType: 'Unknown',                           Content: Buffer } |
-        { MimeType: 'multipart/form-data',               Content: {
-			Files: Map<string, POST.File>,
-			Vars: Map<string, string>
-		} }
+		{ MimeType: 'application/json',                  	 Content: any,
+														 	 Files: null
+		} | { MimeType: 'application/x-www-form-urlencoded', Content: Map<string, string>
+														 	 Files: null
+		} | { MimeType: 'text/plain',                        Content: string,
+														 	 Files: null
+		} | { MimeType: 'Unknown',                           Content: Buffer,
+														 	 Files: null
+		} | { MimeType: 'none',                           	 Content: {},
+														 	 Files: null
+		} | { MimeType: 'multipart/form-data',               Content: Map<string, string>
+														 	 Files: Map<string, POST.File>,
+		}
 	);
 }
 export class Request {

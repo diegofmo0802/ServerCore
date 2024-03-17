@@ -69,7 +69,8 @@ class Request {
 						case 'text/plain': {
 							PrResponse({
 								MimeType: 'text/plain',
-								Content: Data.toString('utf-8')
+								Content: Data.toString('utf-8'),
+								Files: null
 							});
 							break;
 						}
@@ -77,7 +78,8 @@ class Request {
 							try {
 								PrResponse({
 									MimeType: 'application/json',
-									Content: JSON.parse(Data.toString('utf-8'))
+									Content: JSON.parse(Data.toString('utf-8')),
+									Files: null
 								});
 							} catch(Error) {
 								PrError(Error);
@@ -94,7 +96,8 @@ class Request {
 							});
 							PrResponse({
 								MimeType: 'application/x-www-form-urlencoded',
-								Content
+								Content,
+								Files: null
 							});
 							break;
 						}
@@ -134,18 +137,25 @@ class Request {
 							});
 							PrResponse({
 								MimeType: 'multipart/form-data',
-								Content: { Files, Vars }
+								Content: Vars, Files
 							});
 							break;
 						}
 						default: {
 							PrResponse({
 								MimeType: 'Unknown',
-								Content: Data
+								Content: Data,
+								Files: null
 							});
 							break;
 						}
 					}
+				} else {
+					PrResponse({
+						MimeType: 'none',
+						Content: {},
+						Files: null
+					});
 				}
 			});
 			HTTPRequest.on('error', (Error) => {
