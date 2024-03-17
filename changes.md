@@ -18,6 +18,18 @@
   - Al crear una regla puedes usar * para que responda a todas las sub rutas.
     - EJ: Server.AddAction("/App/Logo/*, (rq, rs) => {}) // Responderá a /App/Logo y todas las sub rutas.
 
+### 3.6.1
+  **Correcciones**
+  - El package json no incluía la nueva carpeta Config, por lo que no se publico en npm.
+
+### 3.6.2
+  **Correcciones**
+  - El modulo no funcionaba correctamente por la mala importación del archivo Utilities.js en Template.js
+
+### 3.6.3
+  **Correcciones**
+  - Las UrlRules no funcionaban correctamente al capturar parámetros $ o al usar * entre // ej /algo/*/algo-mas.
+
 ## 3.5
 
 **La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones
