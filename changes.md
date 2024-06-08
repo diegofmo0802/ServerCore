@@ -36,7 +36,7 @@
 
 ### 3.6.5
   **Correcciones**
-  fix: Server.addWebSocket recibía como Auth un tipo ActionExec en lugar de AuthExec
+  - fix: Server.addWebSocket recibía como Auth un tipo ActionExec en lugar de AuthExec
 
 
 ## 3.5
