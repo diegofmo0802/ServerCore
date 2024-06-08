@@ -29,6 +29,7 @@
 ### 3.6.3
   **Correcciones**
   - Las UrlRules no funcionaban correctamente al capturar parámetros $ o al usar * entre // ej /algo/*/algo-mas.
+  - Cuando la request no tenia encabezado Mime-Type nunca se disparaba la promesa de Request.POST
 
 ## 3.5
 
