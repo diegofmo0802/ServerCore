@@ -29,7 +29,15 @@
 ### 3.6.3
   **Correcciones**
   - Las UrlRules no funcionaban correctamente al capturar parámetros $ o al usar * entre // ej /algo/*/algo-mas.
+
+### 3.6.4
+  **Correcciones**
   - Cuando la request no tenia encabezado Mime-Type nunca se disparaba la promesa de Request.POST
+
+### 3.6.5
+  **Correcciones**
+  - fix: Server.addWebSocket recibía como Auth un tipo ActionExec en lugar de AuthExec
+
 
 ## 3.5
 
