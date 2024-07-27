@@ -24,14 +24,14 @@ import _Rule from './Rule.js';
 import Rule from './Rule.js';
 
 export class Server {
-	private Host: string;
-	private Templates: Server.Templates;
-	private Protocol: Server.Protocol;
+	private host: string;
+	private templates: Server.Templates;
+	private protocol: Server.Protocol;
 	private HttpPort: number;
 	private HttpsPort: number;
 	private HttpServer: HTTP.Server;
 	private HttpsServer?: HTTP.Server;
-	private Rules: Rule[];
+	private rules: Rule[];
 	/**
 	 * Crea un servidor HTTP/S.
 	 * @param port El puerto donde el servidor recibirá peticiones.
@@ -40,51 +40,50 @@ export class Server {
 	 */
 	public constructor(port?: number, host?: string, sslOptions?: Server.SSLOptions) {
 		this.host = host ? host : '0.0.0.0';
-		this.Templates = {};
+		this.templates = {};
 		this.HttpPort = port ? port : 80;
 		this.HttpsPort = sslOptions && sslOptions.Port ? sslOptions.Port : 443;
-		this.Rules = [];
-        this.Protocol = sslOptions && sslOptions.Public && sslOptions.Private ? 'HTTPS' : 'HTTP';
+		this.rules = [];
+        this.protocol = sslOptions && sslOptions.Public && sslOptions.Private ? 'HTTPS' : 'HTTP';
 		Debug.log('&B(255,180,220)&C0---------------------------------');
 		Debug.log('&B(255,180,220)&C0- Saml/Servidor by diegofmo0802 -');
 		Debug.log('&B(255,180,220)&C0-       Servidor Iniciado       -');
 		Debug.log('&B(255,180,220)&C0---------------------------------');
 		let [HttpStarted, HttpsStarted] = [false, false];
 		this.HttpServer = HTTP.createServer((Request, Response) => {
-			this.Requests(Request, Response);
+			this.requestManager(Request, Response);
 		}).on('upgrade', (Request, Socket) => {
-			this.UpgradeRequests(Request, Socket);
+			this.upgradeManager(Request, Socket);
 		}).listen(this.HttpPort, host, () => {
-			this.Protocol = this.Protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
+			this.protocol = this.protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
 			Debug.log('&B(255,180,220)&C0-&R Host', this.host ? this.host : 'localhost');
 			Debug.log('&B(255,180,220)&C0-&R Puerto HTTP', this.HttpPort);
 			if (!(sslOptions && sslOptions.Public && sslOptions.Private) || HttpsStarted)
             Debug.log('&B(255,180,220)&C0---------------------------------');
 		});
-		if (sslOptions && sslOptions.Public && sslOptions.Private) {
-			Server.LoadCertificates(sslOptions.Public, sslOptions.Private).then((Certificates) => {
-				this.HttpsServer = HTTPS.createServer(Certificates, (Request, Response) => {
-					this.Requests(Request, Response);
-				}).on('upgrade', (Request, Socket) => {
-					this.UpgradeRequests(Request, Socket);
-				}).listen(this.HttpsPort, host, () => {
-					this.Protocol = this.Protocol == 'HTTP' ? 'HTTP/S' : 'HTTPS';
-					Debug.log('&B(255,180,220)&C0-&R Puerto HTTPS', this.HttpsPort);
-					if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
-				});
-			}).catch((Error) => {
-				Debug.log('&C(255,0,0)[Server - Core]: Error con los certificados: ', Error);
+		if (!sslOptions || !sslOptions.Public || !sslOptions.Private) return;
+		Server.loadCertificates(sslOptions.Public, sslOptions.Private).then((Certificates) => {
+			this.HttpsServer = HTTPS.createServer(Certificates, (Request, Response) => {
+				this.requestManager(Request, Response);
+			}).on('upgrade', (Request, Socket) => {
+				this.upgradeManager(Request, Socket);
+			}).listen(this.HttpsPort, host, () => {
+				this.protocol = this.protocol == 'HTTP' ? 'HTTP/S' : 'HTTPS';
+				Debug.log('&B(255,180,220)&C0-&R Puerto HTTPS', this.HttpsPort);
 				if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
 			});
-		}
-		this.AddFolder('/Saml:Global', `${Utilities.Path.moduleDir}\\Global`);
+		}).catch((Error) => {
+			Debug.log('&C(255,0,0)[Server - Core]: Error con los certificados: ', Error);
+			if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
+		});
+		this.addFolder('/Saml:Global', `${Utilities.Path.moduleDir}\\Global`);
 	}
 	/**
 	 * Añade una/varias regla/s de enrutamiento para el servidor.
 	 * @param rules La regla/s que desea añadir.
 	 */
-	public AddRules(...rules: Server.Rule[]): Server {
-		this.Rules = this.Rules.concat(rules);
+	public addRules(...rules: Server.Rule[]): Server {
+		this.rules = this.rules.concat(rules);
 		return this;
 	}
 	/**
@@ -94,8 +93,8 @@ export class Server {
 	 * @param action La acción que se ejecutara.
 	 * @param auth La función de comprobación de autorización.
 	 */
-	public AddAction(method: Server.Request.Method, urlRule: string, action: Rule.ActionExec, auth?: Rule.AuthExec): Server {
-		this.AddRules(new Rule('Action', method, urlRule, action, auth));
+	public addAction(method: Server.Request.Method, urlRule: string, action: Rule.ActionExec, auth?: Rule.AuthExec): Server {
+		this.addRules(new Rule('Action', method, urlRule, action, auth));
 		return this;
 	}
 	/**
@@ -104,8 +103,8 @@ export class Server {
 	 * @param source La Ruta del archivo que desea enviar.
 	 * @param auth La función de comprobación de autorización.
 	 */
-	public AddFile(urlRule: string, source: string, auth?: Rule.AuthExec): Server{
-		this.AddRules(new Rule('File', 'GET', urlRule, source, auth));
+	public addFile(urlRule: string, source: string, auth?: Rule.AuthExec): Server{
+		this.addRules(new Rule('File', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
@@ -114,8 +113,8 @@ export class Server {
 	 * @param source La Ruta del directorio que desea enviar.
 	 * @param auth La función de comprobación de autorización.
 	 */
-	public AddFolder(urlRule: string, source: string, auth?: Rule.AuthExec): Server {
-		this.AddRules(new Rule('Folder', 'GET', urlRule, source, auth));
+	public addFolder(urlRule: string, source: string, auth?: Rule.AuthExec): Server {
+		this.addRules(new Rule('Folder', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
@@ -124,8 +123,8 @@ export class Server {
 	 * @param action La acción que se ejecutara.
 	 * @param auth La función de comprobación de autorización.
 	 */
-	public AddWebSocket(urlRule: string, action: Rule.WebSocketExec, auth?: Rule.AuthExec): Server {
-		this.AddRules(new Rule('WebSocket', 'ALL', urlRule, action, auth));
+	public addWebSocket(urlRule: string, action: Rule.WebSocketExec, auth?: Rule.AuthExec): Server {
+		this.addRules(new Rule('WebSocket', 'ALL', urlRule, action, auth));
 		return this;
 	}
 	/**
@@ -133,8 +132,8 @@ export class Server {
 	 * @param Template El nombre de la plantilla.
 	 * @param Rule La ruta de la plantilla `.HSaml`.
 	 */
-	public SetTemplate(name: keyof Server.Templates, path: string): Server {
-		this.Templates[name] = path;
+	public setTemplate(name: keyof Server.Templates, path: string): Server {
+		this.templates[name] = path;
 		return this;
 	}
 	/**
@@ -142,12 +141,12 @@ export class Server {
 	 * @param request La petición que recibió el servidor.
 	 * @param response La respuesta que dará el servidor.
 	 */
-	private Route(request: Server.Request, response: Server.Response): void {
+	private routeRequest(request: Server.Request, response: Server.Response): void {
 		let routed = false;
-		for (const Rule of this.Rules) {
-			if (Rule.test(request)) {
-				if (Rule.testAuth(request)) {
-					Rule.exec(request, response);
+		for (const rule of this.rules) {
+			if (rule.test(request)) {
+				if (rule.testAuth(request)) {
+					rule.exec(request, response);
 				} else {
 					response.SendError(403, `No tienes permiso para acceder a: ${request.method} -> ${request.url}`);
 				}
@@ -162,49 +161,47 @@ export class Server {
 	 * @param request La petición que recibió el servidor.
 	 * @param webSocket La conexión con el cliente.
 	 */
-	private RouteWebSocket(request: Server.Request, webSocket: Server.WebSocket): void {
-		let Routed = false;
-		for (const Rule of this.Rules) {
-			if (Rule.test(request, true)) {			
-				if (Rule.testAuth(request)) {
-					console.log("[WebSocket]: routed");
+	private routeWebSocket(request: Server.Request, webSocket: Server.WebSocket): void {
+		let routed = false;
+		for (const rule of this.rules) {
+			if (rule.test(request, true)) {			
+				if (rule.testAuth(request)) {
 					const AcceptKey = (request.headers['sec-websocket-key'] ?? '').trim();
 					webSocket.AcceptConnection(AcceptKey, request.cookies);
-					Rule.exec(request, webSocket);
+					rule.exec(request, webSocket);
 				} else {
-					console.log("[WebSocket]: Forbidden");
 					webSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
 					webSocket.End();
 				}
-				Routed = true;
+				routed = true;
 				break;
 			}
 		}
-		if (!(Routed)) console.log("[WebSocket]: no routed");
-		if (!(Routed)) webSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
+		// if (!(routed)) console.log("[WebSocket]: no routed");
+		if (!(routed)) webSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
 	}
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
 	 * @param HttpRequest La petición que recibió el servidor.
 	 * @param HttpResponse La conexión con el cliente.
 	 */
-	private Requests(HttpRequest: HTTP.IncomingMessage, HttpResponse: HTTP.ServerResponse): void {
+	private requestManager(HttpRequest: HTTP.IncomingMessage, HttpResponse: HTTP.ServerResponse): void {
 		const Request = new Server.Request(HttpRequest);
-		const Response = new Server.Response(Request, HttpResponse, this.Templates);
+		const Response = new Server.Response(Request, HttpResponse, this.templates);
 		Debugs.Requests.log(
 			'[Petición]:',
 			Request.ip,
 			Request.method,
 			Request.url, Request.cookies.get('Session')
 		);
-		this.Route(Request, Response);
+		this.routeRequest(Request, Response);
 	};
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
 	 * @param HttpRequest La petición que recibió el servidor.
 	 * @param Socket La respuesta que dará el servidor.
 	 */
-	private UpgradeRequests(HttpRequest: HTTP.IncomingMessage, Socket: Duplex): void {
+	private upgradeManager(HttpRequest: HTTP.IncomingMessage, Socket: Duplex): void {
 		let Request = new Server.Request(HttpRequest);
 		let WebSocket = new Server.WebSocket(Socket);
 		Debugs.UpgradeRequests.log(
@@ -213,14 +210,14 @@ export class Server {
 			Request.method,
 			Request.url, Request.cookies.get('Session')
 		);
-		this.RouteWebSocket(Request, WebSocket);
+		this.routeWebSocket(Request, WebSocket);
 	}
 	/**
 	 * Carga la llave y certificado SSL y devuelve su contenido en strings
 	 * @param pathCert La ruta de el certificado SSL.
 	 * @param pathKey La ruta de la llave SSL.
 	 */
-	public static async LoadCertificates(pathCert: string, pathKey: string): Promise<Server.Certificates> {
+	public static async loadCertificates(pathCert: string, pathKey: string): Promise<Server.Certificates> {
         pathCert = Utilities.Path.normalize(pathCert);
         pathKey = Utilities.Path.normalize(pathKey);
         const certInfo = await FS.promises.stat(pathCert);
