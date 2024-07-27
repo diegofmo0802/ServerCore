@@ -15,22 +15,22 @@ export class Cookie {
         this.data = new Map();
         this.news = new Map();
         if (!cookieHeader) return;
-        const Division = cookieHeader.split(';');
-        for (const Part of Division) {
-            const [Name, ...Value] = Part.split('=');
-            this.data.set(Name.trim(), Value.join('=').trim());
+        const cookies = cookieHeader.split(';');
+        for (const cookie of cookies) {
+            const [name, ...value] = cookie.split('=');
+            this.data.set(name.trim(), value.join('=').trim());
         }
     }
     /**
      * Comprueba si una cookie existe.
-     * @param Name El nombre de la cookie que desea buscar.
+     * @param name El nombre de la cookie que desea buscar.
      */
-    public has(Name: string): boolean { return this.data.has(Name); }
+    public has(name: string): boolean { return this.data.has(name); }
     /**
      * Recupera una cookie si esta existe.
-     * @param Name El nombre de la cookie que desea buscar.
+     * @param name El nombre de la cookie que desea buscar.
      */
-    public get(Name: string): string | undefined { return this.data.get(Name); };
+    public get(name: string): string | undefined { return this.data.get(name); };
     /**
      * Devuelve un objeto con todas las cookies
      * - Este objeto no esta vinculado, cualquier cambio en el
@@ -38,13 +38,13 @@ export class Cookie {
      */
     public getAll(): Cookie.CookieObject { 
         const cookies: Cookie.CookieObject = {};
-        this.data.forEach((Value, Key) => cookies[Key] = Value);
+        this.data.forEach((value, key) => cookies[key] = value);
         return cookies;
      }
     /** 
      * Devuelve un array con los valores de los encabezados "Set-Cookie".
      */
-    public getSetters(): Array<string>  {
+    public getSetters(): string[]  {
         const setStrings: string[] = [];
         this.news.forEach((value, name) => {
             if (value.delete) {
