@@ -121,27 +121,26 @@ export class Response {
 	 * @param basePath La regla de enrutamiento.
 	 * @param relativePath La petición que recibió el servidor.
 	 */
-	public async SendFolder(basePath: string, relativePath: string): Promise<void> {
+	public async sendFolder(basePath: string, relativePath: string): Promise<void> {
         basePath = basePath.endsWith('/') ? basePath : basePath + '/';
         relativePath = relativePath.endsWith('/') ? relativePath.slice(0, -1) : relativePath;
 		const path = Utilities.Path.normalize(basePath + relativePath);
         try {
             const details = await FS.promises.stat(path);
             if (details.isFile()) return this.sendFile(path);
-            else if (details.isDirectory()) {
-                const folder = await FS.promises.readdir(path);
-                if (this.templates.Folder) {
-                    this.SendTemplate(this.templates.Folder, {
-                        Url: this.request.Url,
-                        Carpeta: folder
-                    });
-                } else {
-                    this.SendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
-                        Url: this.request.Url,
-                        Carpeta: folder
-                    });
-                }
-            } else this.SendError(404, 'El archivo/Directorio no existe.');
+            if (!details.isDirectory()) return this.SendError(404, 'El archivo/Directorio no existe.');
+            const folder = await FS.promises.readdir(path);
+            if (this.templates.Folder) {
+                this.SendTemplate(this.templates.Folder, {
+                    Url: this.request.Url,
+                    Carpeta: folder
+                });
+            } else {
+                this.SendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
+                    Url: this.request.Url,
+                    Carpeta: folder
+                });
+            }
         } catch(error) {
 			// console.error(error);
             this.SendError(500, error instanceof Error ? error.message : '[Fallo En Respuesta] - El archivo/Directorio no existe.');

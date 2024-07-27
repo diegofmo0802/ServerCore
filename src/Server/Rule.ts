@@ -49,7 +49,7 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         if (this.testAuth(request)) switch (this.type) {
             case 'Action':    (this as Rule<'Action'>).content(request, (client as Rule.ClientType<'Action'>)); break;
             case 'File':      (client as Rule.ClientType<'File'>).sendFile((this as Rule<'File'>).content); break;
-            case 'Folder':    (client as Rule.ClientType<'Folder'>).SendFolder((this as Rule<'Folder'>).content, this.getSurplus(request.Url)); break;
+            case 'Folder':    (client as Rule.ClientType<'Folder'>).sendFolder((this as Rule<'Folder'>).content, this.getSurplus(request.Url)); break;
             case 'WebSocket': (this as Rule<'WebSocket'>).content(request, (client as Rule.ClientType<'WebSocket'>)); break;
         }
     }
