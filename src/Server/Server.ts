@@ -24,21 +24,13 @@ import _Rule from './Rule.js';
 import Rule from './Rule.js';
 
 export class Server {
-	/**Contiene el host donde el servidor recibirá peticiones. */
 	private Host: string;
-	/**Contiene el listado de plantillas de respuesta del servidor. */
 	private Templates: Server.Templates;
-	/**El protocolo en el que se esta ejecutando el servidor. */
 	private Protocol: Server.Protocol;
-	/**Contiene el puerto donde el servidor recibirá peticiones HTTP. */
 	private HttpPort: number;
-	/**Contiene el puerto donde el servidor recibirá peticiones HTTPS. */
 	private HttpsPort: number;
-	/**Contiene el servidor HTTP/S. */
 	private HttpServer: HTTP.Server;
-	/**Contiene el servidor HTTP/S. */
 	private HttpsServer?: HTTP.Server;
-	/**Contiene las reglas de enrutamiento del servidor. */
 	private Rules: Rule[];
 	/**
 	 * Crea un servidor HTTP/S.
@@ -47,7 +39,7 @@ export class Server {
 	 * @param sslOptions La configuración SSL.
 	 */
 	public constructor(port?: number, host?: string, sslOptions?: Server.SSLOptions) {
-		this.Host = host ? host : '0.0.0.0';
+		this.host = host ? host : '0.0.0.0';
 		this.Templates = {};
 		this.HttpPort = port ? port : 80;
 		this.HttpsPort = sslOptions && sslOptions.Port ? sslOptions.Port : 443;
@@ -64,7 +56,7 @@ export class Server {
 			this.UpgradeRequests(Request, Socket);
 		}).listen(this.HttpPort, host, () => {
 			this.Protocol = this.Protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
-			Debug.log('&B(255,180,220)&C0-&R Host', this.Host ? this.Host : 'localhost');
+			Debug.log('&B(255,180,220)&C0-&R Host', this.host ? this.host : 'localhost');
 			Debug.log('&B(255,180,220)&C0-&R Puerto HTTP', this.HttpPort);
 			if (!(sslOptions && sslOptions.Public && sslOptions.Private) || HttpsStarted)
             Debug.log('&B(255,180,220)&C0---------------------------------');
