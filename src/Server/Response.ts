@@ -72,7 +72,7 @@ export class Response {
 	 * @param data El dato que se enviara.
 	 * @param encode La Codificación con la que se enviara la respuesta.
 	 */
-	public Send(data: string | Buffer, encode?: BufferEncoding): void  {
+	public send(data: string | Buffer, encode?: BufferEncoding): void  {
 		encode = encode ? encode : 'utf-8';
 		this.httpResponse.end(data, encode);
 	}
@@ -88,7 +88,7 @@ export class Response {
             if (!this.request.Headers.range) {
                 const stream = FS.createReadStream(path);
 				this.httpResponse.setHeader('Content-Length', details.size);
-				this.SendHeaders(200, this.generateHeaders(PATH.extname(path)));
+				this.sendHeaders(200, this.generateHeaders(PATH.extname(path)));
 				stream.pipe(this.httpResponse);
             } else {
                 const info = /bytes=(\d*)?-?(\d*)?/i
@@ -108,7 +108,7 @@ export class Response {
 				const file = FS.createReadStream(path, { start, end });
 				this.httpResponse.setHeader('Content-Length', size + 1);
 				this.httpResponse.setHeader('Content-Range', `bytes ${start}-${end}/${details.size}`);
-				this.SendHeaders(206, this.generateHeaders(PATH.extname(path)));
+				this.sendHeaders(206, this.generateHeaders(PATH.extname(path)));
 				file.pipe(this.httpResponse);
             }
         } catch(error) {
@@ -131,12 +131,12 @@ export class Response {
             if (!details.isDirectory()) return this.SendError(404, 'El archivo/Directorio no existe.');
             const folder = await FS.promises.readdir(path);
             if (this.templates.Folder) {
-                this.SendTemplate(this.templates.Folder, {
+                this.sendTemplate(this.templates.Folder, {
                     Url: this.request.Url,
                     Carpeta: folder
                 });
             } else {
-                this.SendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
+                this.sendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
                     Url: this.request.Url,
                     Carpeta: folder
                 });
@@ -151,9 +151,9 @@ export class Response {
 	 * @param code El código de la respuesta que se dará.
 	 * @param headers Los encabezados que se enviaran.
 	 */
-	public SendHeaders(code: number, headers: Request.Headers): void {
-		const CookieSetters = this.request.Cookies.getSetters();
-		if (CookieSetters.length > 0) headers['set-cookie'] = CookieSetters;
+	public sendHeaders(code: number, headers: Request.Headers): void {
+		const cookieSetters = this.request.Cookies.getSetters();
+		if (cookieSetters.length > 0) headers['set-cookie'] = cookieSetters;
 		this.httpResponse.writeHead(code, headers);
 	}
 	/**
@@ -161,12 +161,12 @@ export class Response {
 	 * @param path La ruta de la plantilla.
 	 * @param Data Los datos con los que se compilara la plantilla.
 	 */
-	public async SendTemplate(path: string, Data: object): Promise<void> {
+	public async sendTemplate(path: string, Data: object): Promise<void> {
 		path = Utilities.Path.normalize(path);
         try {
             const template = await Template.load(path, Data);
-            this.SendHeaders(200, this.generateHeaders('html'));
-			this.Send(template, 'utf-8');
+            this.sendHeaders(200, this.generateHeaders('html'));
+			this.send(template, 'utf-8');
         } catch(error) {
 			// console.error(error);
             this.SendError(500, error instanceof Error ? error.message : '[Fallo En Respuesta] - La plantilla no existe.');
@@ -176,9 +176,9 @@ export class Response {
 	 * Envía datos en formato JSON como respuesta.
 	 * @param data El dato que se enviara.
 	 */
-	public SendJSON(data: any): void {
-        this.SendHeaders(200, this.generateHeaders('JSON'));
-		this.Send(JSON.stringify(data), 'utf-8');
+	public sendJson(data: any): void {
+        this.sendHeaders(200, this.generateHeaders('JSON'));
+		this.send(JSON.stringify(data), 'utf-8');
     }
 	/**
 	 * Envía un error como respuesta.
@@ -191,19 +191,19 @@ export class Response {
                 const template = await Template.load(this.templates.Error, {
                     Código: code, Mensaje: message
                 });
-                this.SendHeaders(code, this.generateHeaders('html'));
-                this.Send(template);
+                this.sendHeaders(code, this.generateHeaders('html'));
+                this.send(template);
             } else {
                 const template = await Template.load(Utilities.Path.relative("\\Global\\Template\\Error.HSaml"), {
                     Código: code, Mensaje: message
                 });
-                this.SendHeaders(code, this.generateHeaders('html'));
-                this.Send(template);
+                this.sendHeaders(code, this.generateHeaders('html'));
+                this.send(template);
             }
         } catch(error) {
-			// console.error(error);
-            this.SendHeaders(code, this.generateHeaders('txt'));
-            this.Send(`Error: ${code} -> ${message}`);
+			console.error(error);
+            this.sendHeaders(code, this.generateHeaders('txt'));
+            this.send(`Error: ${code} -> ${message}`);
         }
 	}
 }
