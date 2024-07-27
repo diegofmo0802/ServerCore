@@ -19,11 +19,11 @@ import Cookie from './Cookie.js';
 
 export class Session extends EVENTS {
     /**Contiene las instancias de session. */
-    private static Sessions: Map<string, Session> = new Map;
+    private static sessions: Map<string, Session> = new Map;
     /**Contiene los datos almacenados en la sesión. */
-    private Data: Map<string, any>;
+    private data: Map<string, any>;
     /**Contiene la SS_UUID de la sesión. */
-    private SessionID: string;
+    private sessionID: string;
     public static getInstance(cookies: Cookie) {
         let sessionID = cookies.get('Session');
         if (!sessionID) {
@@ -36,10 +36,10 @@ export class Session extends EVENTS {
                 })()
             });
         }
-        let session = Session.Sessions.get(sessionID)
+        let session = Session.sessions.get(sessionID)
         if (!session) {
             session = new Session(sessionID);
-            Session.Sessions.set(sessionID, session);
+            Session.sessions.set(sessionID, session);
         }
         return session;
     }
@@ -50,23 +50,23 @@ export class Session extends EVENTS {
      * @param response La respuesta que dará el servidor.
     */
     private constructor(sessionID: string) { super();
-        this.Data = new Map();
-        this.SessionID = sessionID;
+        this.data = new Map();
+        this.sessionID = sessionID;
     }
     /**
      * Devuelve el SS_UUID de la sesión.
     */
-   public getID(): string { return this.SessionID; }
+   public getID(): string { return this.sessionID; }
     /**
      * Comprueba si un dato existe en la sesión.
      * @param name El nombre (key) del dato que desea buscar.
      */
-    public has(name: string): boolean { return this.Data.has(name); }
+    public has(name: string): boolean { return this.data.has(name); }
     /**
      * Recupera un dato de la sesión si este existe.
      * @param name El nombre (key) del dato que desea buscar.
      */
-    public get(name: string): any | undefined { return this.Data.get(name); }
+    public get(name: string): any | undefined { return this.data.get(name); }
     /**
      * Devuelve un objeto con todos los datos de la session.
      * - Este objeto no esta vinculado, cualquier cambio en el
@@ -74,7 +74,7 @@ export class Session extends EVENTS {
      */
     public getAll(): Session.SessionObject { 
         const Data: Session.SessionObject = {};
-        this.Data.forEach((Value, Key) => Data[Key] = Value);
+        this.data.forEach((Value, Key) => Data[Key] = Value);
         return Data;
      }
     /**
@@ -82,12 +82,12 @@ export class Session extends EVENTS {
      * @param name El nombre (key) del dato que desea buscar.
      * @param value El valor que se asignara.
      */
-    public set(name: string, value: any): void { this.Data.set(name, value); }
+    public set(name: string, value: any): void { this.data.set(name, value); }
     /**
      * Elimina un dato de la sesión si este existe.
      * @param name El nombre (key) del dato que desea buscar.
      */
-    public delete(name: string): void { this.Data.delete(name); }
+    public delete(name: string): void { this.data.delete(name); }
 }
 
 export namespace Session {
