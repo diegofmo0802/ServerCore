@@ -15,11 +15,11 @@ import Template from '../Template.js';
 
 export class Response {
 	/**Contiene la petición que recibió el servidor. */
-	public Request: Request;
+	public request: Request;
 	/**Contiene el listado de plantillas de respuesta del servidor. */
-	private Templates: Server.Templates;
+	private templates: Server.Templates;
 	/**Contiene la respuesta que dará el servidor. */
-	public HTTPResponse: HTTP.ServerResponse;
+	public httpResponse: HTTP.ServerResponse;
 	/**
 	 * Crea la forma de Respuesta de `Saml/Servidor`.
 	 * @param request La petición que recibió el servidor.
@@ -27,21 +27,21 @@ export class Response {
 	 * @param templates El listado de plantillas de respuesta del servidor.
 	 */
 	public constructor(request: Request, httpResponse: HTTP.ServerResponse, templates: Server.Templates = {}) {
-        this.Request = request;
-        this.Templates = templates ? templates : {};
-        this.HTTPResponse = httpResponse;
-        this.HTTPResponse.setHeader('X-Powered-By', 'ServerCore');
-        this.HTTPResponse.setHeader('X-Version', '3.7.0-dev.1');
+        this.request = request;
+        this.templates = templates ? templates : {};
+        this.httpResponse = httpResponse;
+        this.httpResponse.setHeader('X-Powered-By', 'ServerCore');
+        this.httpResponse.setHeader('X-Version', '3.7.0-dev.1');
     }
 	/**
 	 * Crea encabezados para los tipos de archivo admitidos.
 	 * - Se añadirán mas tipos permitidos con el tiempo.
 	 * @param extension La extension de archivo.
 	 */
-	public GenerateHeaders(extension: string): Request.Headers {
+	public generateHeaders(extension: string): Request.Headers {
 		extension = extension.startsWith('.') ? extension.slice(1) : extension;
         extension = extension.toLowerCase();
-		let Headers: Request.Headers = {};
+		const headers: Request.Headers = {};
 		const contentTypeMap: Response.contentTypeMap = {
             'html': 'text/html',
             'js': 'text/javascript',
@@ -61,11 +61,11 @@ export class Response {
 			'svg', 'png', 'jpg', 'jpeg', 'mp3', 'wav', 'mp4'
 		];
 		const type = contentTypeMap[extension]
-		if  (type) Headers['Content-Type'] = type;
+		if  (type) headers['Content-Type'] = type;
 		if (acceptRangeFormats.includes(extension)) {
-            Headers['Accept-Ranges'] = 'bytes';
+            headers['Accept-Ranges'] = 'bytes';
         }
-		return Headers;
+		return headers;
 	}
 	/**
 	 * Envía un dato como respuesta.
@@ -74,25 +74,25 @@ export class Response {
 	 */
 	public Send(data: string | Buffer, encode?: BufferEncoding): void  {
 		encode = encode ? encode : 'utf-8';
-		this.HTTPResponse.end(data, encode);
+		this.httpResponse.end(data, encode);
 	}
 	/**
 	 * Envía un Archivo como respuesta.
 	 * @param path El dato que se enviara.
 	 */
-	public async SendFile(path: string): Promise<void>  {
+	public async sendFile(path: string): Promise<void>  {
 		path = Utilities.Path.normalize(path);
         try {
             const details = await FS.promises.stat(path);
             if (!details.isFile()) return this.SendError(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
-            if (!this.Request.Headers.range) {
+            if (!this.request.Headers.range) {
                 const stream = FS.createReadStream(path);
-				this.HTTPResponse.setHeader('Content-Length', details.size);
-				this.SendHeaders(200, this.GenerateHeaders(PATH.extname(path)));
-				stream.pipe(this.HTTPResponse);
+				this.httpResponse.setHeader('Content-Length', details.size);
+				this.SendHeaders(200, this.generateHeaders(PATH.extname(path)));
+				stream.pipe(this.httpResponse);
             } else {
                 const info = /bytes=(\d*)?-?(\d*)?/i
-				.exec(this.Request.Headers.range);
+				.exec(this.request.Headers.range);
                 if (!info) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
 				const [startString, endString] = info.slice(1);
                 if (!startString) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
@@ -103,16 +103,13 @@ export class Response {
                 : maxSize >= details.size
                     ? details.size - 1
                     : maxSize;
-				if (start < details.size && end <= details.size) {
-					const size = end - start;
-					const file = FS.createReadStream(path, { start, end });
-					this.HTTPResponse.setHeader('Content-Length', size + 1);
-					this.HTTPResponse.setHeader('Content-Range', `bytes ${start}-${end}/${details.size}`);
-					this.SendHeaders(206, this.GenerateHeaders(PATH.extname(path)));
-					file.pipe(this.HTTPResponse);
-				} else {
-					this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
-				}
+				if (start > details.size || end > details.size) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
+				const size = end - start;
+				const file = FS.createReadStream(path, { start, end });
+				this.httpResponse.setHeader('Content-Length', size + 1);
+				this.httpResponse.setHeader('Content-Range', `bytes ${start}-${end}/${details.size}`);
+				this.SendHeaders(206, this.generateHeaders(PATH.extname(path)));
+				file.pipe(this.httpResponse);
             }
         } catch(error) {
 			// console.error(error);
@@ -130,17 +127,17 @@ export class Response {
 		const path = Utilities.Path.normalize(basePath + relativePath);
         try {
             const details = await FS.promises.stat(path);
-            if (details.isFile()) return this.SendFile(path);
+            if (details.isFile()) return this.sendFile(path);
             else if (details.isDirectory()) {
                 const folder = await FS.promises.readdir(path);
-                if (this.Templates.Folder) {
-                    this.SendTemplate(this.Templates.Folder, {
-                        Url: this.Request.Url,
+                if (this.templates.Folder) {
+                    this.SendTemplate(this.templates.Folder, {
+                        Url: this.request.Url,
                         Carpeta: folder
                     });
                 } else {
                     this.SendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
-                        Url: this.Request.Url,
+                        Url: this.request.Url,
                         Carpeta: folder
                     });
                 }
@@ -156,9 +153,9 @@ export class Response {
 	 * @param headers Los encabezados que se enviaran.
 	 */
 	public SendHeaders(code: number, headers: Request.Headers): void {
-		const CookieSetters = this.Request.Cookies.getSetters();
+		const CookieSetters = this.request.Cookies.getSetters();
 		if (CookieSetters.length > 0) headers['set-cookie'] = CookieSetters;
-		this.HTTPResponse.writeHead(code, headers);
+		this.httpResponse.writeHead(code, headers);
 	}
 	/**
 	 * Envía una plantilla `.HSaml` como respuesta.
@@ -169,7 +166,7 @@ export class Response {
 		path = Utilities.Path.normalize(path);
         try {
             const template = await Template.load(path, Data);
-            this.SendHeaders(200, this.GenerateHeaders('html'));
+            this.SendHeaders(200, this.generateHeaders('html'));
 			this.Send(template, 'utf-8');
         } catch(error) {
 			// console.error(error);
@@ -181,7 +178,7 @@ export class Response {
 	 * @param data El dato que se enviara.
 	 */
 	public SendJSON(data: any): void {
-        this.SendHeaders(200, this.GenerateHeaders('JSON'));
+        this.SendHeaders(200, this.generateHeaders('JSON'));
 		this.Send(JSON.stringify(data), 'utf-8');
     }
 	/**
@@ -191,22 +188,22 @@ export class Response {
 	 */
 	public async SendError(code: number, message: string): Promise<void> {
         try {
-            if (this.Templates.Error) {
-                const template = await Template.load(this.Templates.Error, {
+            if (this.templates.Error) {
+                const template = await Template.load(this.templates.Error, {
                     Código: code, Mensaje: message
                 });
-                this.SendHeaders(code, this.GenerateHeaders('html'));
+                this.SendHeaders(code, this.generateHeaders('html'));
                 this.Send(template);
             } else {
                 const template = await Template.load(Utilities.Path.relative("\\Global\\Template\\Error.HSaml"), {
                     Código: code, Mensaje: message
                 });
-                this.SendHeaders(code, this.GenerateHeaders('html'));
+                this.SendHeaders(code, this.generateHeaders('html'));
                 this.Send(template);
             }
         } catch(error) {
 			// console.error(error);
-            this.SendHeaders(code, this.GenerateHeaders('txt'));
+            this.SendHeaders(code, this.generateHeaders('txt'));
             this.Send(`Error: ${code} -> ${message}`);
         }
 	}
