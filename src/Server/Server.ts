@@ -157,13 +157,13 @@ export class Server {
 				if (Rule.testAuth(request)) {
 					Rule.exec(request, response);
 				} else {
-					response.SendError(403, `No tienes permiso para acceder a: ${request.Method} -> ${request.Url}`);
+					response.SendError(403, `No tienes permiso para acceder a: ${request.method} -> ${request.url}`);
 				}
 				routed = true;
 				break;
 			}
 		}
-		if (!(routed)) response.SendError(400, `Sin enrutador para: ${request.Method} -> ${request.Url}`);
+		if (!(routed)) response.SendError(400, `Sin enrutador para: ${request.method} -> ${request.url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
@@ -176,8 +176,8 @@ export class Server {
 			if (Rule.test(request, true)) {			
 				if (Rule.testAuth(request)) {
 					console.log("[WebSocket]: routed");
-					const AcceptKey = (request.Headers['sec-websocket-key'] ?? '').trim();
-					webSocket.AcceptConnection(AcceptKey, request.Cookies);
+					const AcceptKey = (request.headers['sec-websocket-key'] ?? '').trim();
+					webSocket.AcceptConnection(AcceptKey, request.cookies);
 					Rule.exec(request, webSocket);
 				} else {
 					console.log("[WebSocket]: Forbidden");
@@ -189,7 +189,7 @@ export class Server {
 			}
 		}
 		if (!(Routed)) console.log("[WebSocket]: no routed");
-		if (!(Routed)) webSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.Method} -> ${request.Url}\r\n\r\n`);
+		if (!(Routed)) webSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
 	}
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.
@@ -201,9 +201,9 @@ export class Server {
 		const Response = new Server.Response(Request, HttpResponse, this.Templates);
 		Debugs.Requests.log(
 			'[Petición]:',
-			Request.IP,
-			Request.Method,
-			Request.Url, Request.Cookies.get('Session')
+			Request.ip,
+			Request.method,
+			Request.url, Request.cookies.get('Session')
 		);
 		this.Route(Request, Response);
 	};
@@ -217,9 +217,9 @@ export class Server {
 		let WebSocket = new Server.WebSocket(Socket);
 		Debugs.UpgradeRequests.log(
 			'[WebSocket]:',
-			Request.IP,
-			Request.Method,
-			Request.Url, Request.Cookies.get('Session')
+			Request.ip,
+			Request.method,
+			Request.url, Request.cookies.get('Session')
 		);
 		this.RouteWebSocket(Request, WebSocket);
 	}

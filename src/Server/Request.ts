@@ -11,25 +11,25 @@ import Session from './Session.js';
 
 export class Request {
 	/**Contiene los encabezados de la petición. */
-	public Headers: Request.Headers;
+	public headers: Request.Headers;
 	/**Contiene las cookies de la petición. */
-	public Cookies: Cookie;
+	public cookies: Cookie;
 	/**Contiene los datos POST que se enviaron. */
-	public GET: Request.GET;
+	public queryParams: Request.GET;
 	/**Contiene la dirección IP de quien realizo la petición. */
-	public IP?: string | string[];
+	public ip?: string | string[];
 	/**Contiene el método de la petición. */
-	public Method: Request.Method;
+	public method: Request.Method;
 	/**Contiene los datos POST que se enviaron. */
-	public POST: Promise<Request.POST>;
+	public post: Promise<Request.POST>;
 	/**Contiene la Sesión del dispositivo donde se realizo la petición.*/
-	private Session: Session;
+	private session: Session;
 	/**Contiene la petición que recibió el servidor. */
-	private HTTPRequest: HTTP.IncomingMessage;
+	private httpRequest: HTTP.IncomingMessage;
 	/**Contiene la url de la petición. */
-	public Url: string;
+	public url: string;
 	/**@type Los parámetros de la UrlRule */
-	public RuleParams: Request.RuleParams = {};
+	public ruleParams: Request.RuleParams = {};
 	/**
 	 * Crea la forma de petición de `Saml/Servidor`.
 	 * @param httpRequest La petición que recibió el servidor.
@@ -39,22 +39,22 @@ export class Request {
         const remoteIP = httpRequest.socket.remoteAddress;
         const method = httpRequest.method ?? 'GET';
         const url = httpRequest.url       ?? '/'
-		this.HTTPRequest = httpRequest;
-		this.IP = forwardedIP ? forwardedIP : remoteIP ? remoteIP : '0.0.0.0';
-		this.Method = this.GetMethod(method);
-		this.Url = url.split('?')[0];
-		this.Url = decodeURI(this.Url.endsWith('/') ? this.Url : this.Url + '/');
-        this.Headers = httpRequest.headers;
-		this.Cookies = new Cookie(this.Headers.cookie);
-		this.Session = Session.getInstance(this.Cookies);
-		this.GET = this.GetData(url);
-		this.POST = this.GetPostData(httpRequest);
+		this.httpRequest = httpRequest;
+		this.ip = forwardedIP ? forwardedIP : remoteIP ? remoteIP : '0.0.0.0';
+		this.method = this.getMethod(method);
+		this.url = url.split('?')[0];
+		this.url = decodeURI(this.url.endsWith('/') ? this.url : this.url + '/');
+        this.headers = httpRequest.headers;
+		this.cookies = new Cookie(this.headers.cookie);
+		this.session = Session.getInstance(this.cookies);
+		this.queryParams = this.getQueryParams(url);
+		this.post = this.getPostData(httpRequest);
 	}
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
 	 * @param httpRequest La petición que recibió el servidor.
 	 */
-	private GetPostData(httpRequest: HTTP.IncomingMessage): Promise<Request.POST> {
+	private getPostData(httpRequest: HTTP.IncomingMessage): Promise<Request.POST> {
 		return new Promise((resolve, reject) => {
 			let data = Buffer.from([]);
 			const parts: any[] = [];
@@ -66,8 +66,8 @@ export class Request {
 			});
 			httpRequest.on('end', () => {
 				data = Buffer.concat(parts);
-				if (this.Headers['content-type']) {
-					const [format, ...options] = this.Headers['content-type'].trim().split(';');
+				if (this.headers['content-type']) {
+					const [format, ...options] = this.headers['content-type'].trim().split(';');
 					switch(format.toLowerCase()) {
 						case 'text/plain': {
 							resolve({
@@ -169,7 +169,7 @@ export class Request {
 	 * Define que método se uso para realizar la petición.
 	 * @param method El método con el que se realizo la petición.
 	 */
-	private GetMethod(method: string): Request.Method {
+	private getMethod(method: string): Request.Method {
 		return method == 'POST'
 		? 'POST'
 		: method == 'PUT' ? 'PUT'
@@ -180,7 +180,7 @@ export class Request {
 	 * Obtiene los datos enviados por medio de URL QUERY.
 	 * @param Url La url recibida de la petición http.
 	 */
-	private GetData(Url: string): Map<string, string> {
+	private getQueryParams(Url: string): Map<string, string> {
 		let UrlObject = new URI.URL(`http://x.x${Url}`);
 		return new Map(UrlObject.searchParams);
 	}

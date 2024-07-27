@@ -85,14 +85,14 @@ export class Response {
         try {
             const details = await FS.promises.stat(path);
             if (!details.isFile()) return this.SendError(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
-            if (!this.request.Headers.range) {
+            if (!this.request.headers.range) {
                 const stream = FS.createReadStream(path);
 				this.httpResponse.setHeader('Content-Length', details.size);
 				this.sendHeaders(200, this.generateHeaders(PATH.extname(path)));
 				stream.pipe(this.httpResponse);
             } else {
                 const info = /bytes=(\d*)?-?(\d*)?/i
-				.exec(this.request.Headers.range);
+				.exec(this.request.headers.range);
                 if (!info) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
 				const [startString, endString] = info.slice(1);
                 if (!startString) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
@@ -132,12 +132,12 @@ export class Response {
             const folder = await FS.promises.readdir(path);
             if (this.templates.Folder) {
                 this.sendTemplate(this.templates.Folder, {
-                    Url: this.request.Url,
+                    Url: this.request.url,
                     Carpeta: folder
                 });
             } else {
                 this.sendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
-                    Url: this.request.Url,
+                    Url: this.request.url,
                     Carpeta: folder
                 });
             }
@@ -152,7 +152,7 @@ export class Response {
 	 * @param headers Los encabezados que se enviaran.
 	 */
 	public sendHeaders(code: number, headers: Request.Headers): void {
-		const cookieSetters = this.request.Cookies.getSetters();
+		const cookieSetters = this.request.cookies.getSetters();
 		if (cookieSetters.length > 0) headers['set-cookie'] = cookieSetters;
 		this.httpResponse.writeHead(code, headers);
 	}

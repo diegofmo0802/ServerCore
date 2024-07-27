@@ -45,11 +45,11 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
      * @param client El cliente que hizo la petición.
      */
     public exec(request: Request, client: Rule.ClientType<T>): void  {
-        request.RuleParams = this.getParams(request.Url);
+        request.ruleParams = this.getParams(request.url);
         if (this.testAuth(request)) switch (this.type) {
             case 'Action':    (this as Rule<'Action'>).content(request, (client as Rule.ClientType<'Action'>)); break;
             case 'File':      (client as Rule.ClientType<'File'>).sendFile((this as Rule<'File'>).content); break;
-            case 'Folder':    (client as Rule.ClientType<'Folder'>).sendFolder((this as Rule<'Folder'>).content, this.getSurplus(request.Url)); break;
+            case 'Folder':    (client as Rule.ClientType<'Folder'>).sendFolder((this as Rule<'Folder'>).content, this.getSurplus(request.url)); break;
             case 'WebSocket': (this as Rule<'WebSocket'>).content(request, (client as Rule.ClientType<'WebSocket'>)); break;
         }
     }
@@ -63,11 +63,11 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         let result = false;
         if (isWebSocket) {
             result = this.type == 'WebSocket'
-            ? this.expression.test(request.Url)
+            ? this.expression.test(request.url)
             : false;
         } else {
-            result = this.method == request.Method || this.method == 'ALL'
-            ? this.expression.test(request.Url)
+            result = this.method == request.method || this.method == 'ALL'
+            ? this.expression.test(request.url)
             : false
         }
         return result;
