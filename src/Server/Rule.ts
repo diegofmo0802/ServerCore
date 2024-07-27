@@ -56,7 +56,7 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
     /**
      * Comprueba si una url coincide con esta ruta.
      * también establece los Request.RuleParams.
-     * @param {Request} request La petición recibida.
+     * @param request La petición recibida.
      * @param isWebSocket Define si se revisará un WebSocket.
      */
     public test(request: Request, isWebSocket: boolean = false): boolean {
@@ -74,7 +74,7 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
     }
     /**
      * Comprueba si una url coincide con esta ruta.
-     * @param {Request} request La petición recibida.
+     * @param request La petición recibida.
      * @param isWebSocket Define si se revisará un WebSocket.
      */
     public testAuth(request: Request): boolean {
@@ -101,30 +101,30 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
     }
     /**
      * Crea una expresión regular para poder comprobar con ella las rutas.
-     * @param UrlRule La UrlRule Con la que se formara la RegExp.
+     * @param urlRule La UrlRule Con la que se formara la RegExp.
      */
-    private getExpression(UrlRule: string): RegExp  {
+    private getExpression(urlRule: string): RegExp  {
         const validators = {
-            Param: /^\$(?<param>.+)$/,
-            Escape: /\\(?![\$\[\]\*\+\?\.\(\)\{\}\^\|\-])|(?<!\\)[\$\[\]\*\+\?\.\(\)\{\}\^\|\-]/gi,
+            param: /^\$(?<param>.+)$/,
+            scape: /\\(?![\$\[\]\*\+\?\.\(\)\{\}\^\|\-])|(?<!\\)[\$\[\]\*\+\?\.\(\)\{\}\^\|\-]/gi,
         };
-        const zones = UrlRule.split('/').slice(1);
+        const zones = urlRule.split('/').slice(1);
         let regExpString = '^';
         for (let index = 0; index < zones.length; index ++) {
-            const Zone = zones[index];
+            const zone = zones[index];
             regExpString += '\/';
-            if (validators.Param.test(Zone)) {
-                const match = validators.Param.exec(Zone);
+            if (validators.param.test(zone)) {
+                const match = validators.param.exec(zone);
                 if (match && match.groups) {
                     const param = match.groups['param']
-                        .replace(validators.Escape, '');
+                        .replace(validators.scape, '');
                     regExpString += `(?<${param}>[^\/]+?)`;
                 }
-            } else if (Zone == '*') {
+            } else if (zone == '*') {
                 regExpString += index < (zones.length -1)
                 ? '(?:[^\/]+)?'
                 : '(?:.+)?';
-            } else regExpString += Zone;
+            } else regExpString += zone;
         }
         regExpString += `\/?${this.type == 'Folder' ? '.+?' : ''}$`;
         return new RegExp(regExpString);
