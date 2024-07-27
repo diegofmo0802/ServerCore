@@ -17,9 +17,9 @@
                     <input id="Carpeta_Cambiar"type="button" value="Cambiar Ruta"/>
                 </div>
                 <ul class="Lista">
-                    $(Carpeta) {
+                    $(Carpeta,, name) {
                         <li>
-                            <a class="Elemento" href="${Url}$Value">$Value</a>
+                            <a class="Elemento" href="${Url}%name%">%name%</a>
                         </li>
                     }
                 </ul>
