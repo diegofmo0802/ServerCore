@@ -167,18 +167,18 @@ export class Server {
 			if (rule.test(request, true)) {			
 				if (rule.testAuth(request)) {
 					const AcceptKey = (request.headers['sec-websocket-key'] ?? '').trim();
-					webSocket.AcceptConnection(AcceptKey, request.cookies);
+					webSocket.acceptConnection(AcceptKey, request.cookies);
 					rule.exec(request, webSocket);
 				} else {
-					webSocket.Send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
-					webSocket.End();
+					webSocket.send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
+					webSocket.end();
 				}
 				routed = true;
 				break;
 			}
 		}
 		// if (!(routed)) console.log("[WebSocket]: no routed");
-		if (!(routed)) webSocket.Send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
+		if (!(routed)) webSocket.send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
 	}
 	/**
 	 * Se ejecutara cuando el servidor reciba una petición.

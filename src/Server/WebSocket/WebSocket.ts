@@ -13,21 +13,21 @@ import Cookie from '../Cookie.js';
 
 export class WebSocket extends EVENTS {
     /**Contiene la conexión con el cliente. */
-    private Connection: Duplex;
+    private connection: Duplex;
     /**
      * Crea una conexión WebSocket.
      * @param client La conexión Duplex con el cliente.
      */
     public constructor(client: Duplex) { super();
-        this.Connection = client;
-        this.StartEvents();
+        this.connection = client;
+        this.initEvents();
     }
     /**
      * Acepta la conexión del cliente.
 	 * @param acceptKey La llave de conexión `sec-websocket-key`.
      */
-    public AcceptConnection(acceptKey: string, cookies?: Cookie): void  {
-        const setCookies = cookies
+    public acceptConnection(acceptKey: string, cookies?: Cookie): void  {
+        const cookieSetters = cookies
         ? cookies.getSetters().map((setter) => `Set-Cookie: ${setter}`)
         : [];
         const acceptToken = CRYPTO.createHash('SHA1').update(
@@ -38,41 +38,41 @@ export class WebSocket extends EVENTS {
             'Upgrade: websocket',
             'Connection: Upgrade',
             `Sec-WebSocket-Accept: ${acceptToken}`,
-            ...setCookies, '\r\n'
+            ...cookieSetters, '\r\n'
         ].join('\r\n');
-        this.Connection.write(headers);
+        this.connection.write(headers);
     }
     /** Finaliza la conexión esperando a que se terminen de enviar/recibir los datos pendientes. */
-    public End(): void { this.Connection.end(); }
+    public end(): void { this.connection.end(); }
     /** Finaliza la conexión de forma abrupta. */
-    public Destroy(): void { this.Connection.destroy(); }
+    public destroy(): void { this.connection.destroy(); }
     /**
 	 * Envía un dato como respuesta.
 	 * @param data El dato que se enviara.
      */
-    public Send(data: String | Buffer): void {
+    public send(data: String | Buffer): void {
         const [buffer, isText] = typeof data == 'string'
         ? [this.stringToBuffer(data), true]
         : data instanceof Buffer
             ? [data, false]
             : [this.stringToBuffer('[Error]: Dato enviado no soportado por Saml/WebSocket'), true];
-        const Message = this.Encode(buffer, isText);
-        this.Connection.write(Message);
+        const message = this.encode(buffer, isText);
+        this.connection.write(message);
     }
     /**
 	 * Envía un JSON como respuesta.
-	 * @param Data los datos que enviaras como JSON.
+	 * @param data los datos que enviaras como JSON.
      */
-    public SendJSON(Data: any): void {
-        const Message = JSON.stringify(Data);
-        this.Send(Message);
+    public SendJson(data: any): void {
+        const message = JSON.stringify(data);
+        this.send(message);
     }
     /**
      * Codifica los datos para enviar por el WebSocket.
      * @param data Los datos que se van a codificar.
      * @param Text indica si el contenido es texto o no.
      */
-    private Encode(data: Buffer, isText: boolean = false): Buffer {
+    private encode(data: Buffer, isText: boolean = false): Buffer {
         const encoded = isText ? [129] : [130];
         if (data.length <= 125) {
             encoded[1] = data.length;
@@ -105,12 +105,12 @@ export class WebSocket extends EVENTS {
         return Buffer.from(message, 'utf-8');
     }
     /**Añade los disparadores de evento.*/
-    private StartEvents(): void {
+    private initEvents(): void {
         let surplus: Buffer = Buffer.alloc(0);
         let currentChunk: Chunk | null = null;
         let chunks: Chunk[] = [];
 
-        this.Connection.on('data', (data: Buffer) => {
+        this.connection.on('data', (data: Buffer) => {
             if (surplus) {
                 data = Buffer.concat([surplus, data]);
                 surplus = Buffer.alloc(0);
@@ -122,17 +122,18 @@ export class WebSocket extends EVENTS {
                 surplus = currentChunk.surplus;
                 if (currentChunk.fin) {
                     const decoded = Buffer.concat(chunks.map(chunk => chunk.decode()));
-                    this.emit('message',{
-                        OPCode: chunks[0].opCode
-                    }, decoded);
+                    this.emit('message', decoded, {
+                        opCode: chunks[0].opCode,
+                        size: chunks[0].size
+                    });
                     chunks = [];
                 }
                 currentChunk = null;
             }
         });
-        this.Connection.on('close', ()      => this.emit('close'));
-        this.Connection.on('end',   ()      => this.emit('finish'));
-        this.Connection.on('error', (error) => this.emit('error', error));
+        this.connection.on('close', ()      => this.emit('close'));
+        this.connection.on('end',   ()      => this.emit('finish'));
+        this.connection.on('error', (error) => this.emit('error', error));
     }
 
     public on(event: 'close',    listener: WebSocket.listener.close): this;
@@ -156,7 +157,7 @@ export namespace WebSocket {
         export type close = () => void;
         export type error = (error: Error) => void;
         export type finish = () => void;
-        export type message = (info: dataInfo, Datos: Buffer) => void;
+        export type message = (datos: Buffer, info: dataInfo) => void;
     }
     export interface dataInfo {
         opCode: number;
