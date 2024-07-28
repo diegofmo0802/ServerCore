@@ -75,7 +75,6 @@ export class Debug {
 	 */
     private getFilePath(): string {
         if (this.path) return this.path;
-		console.log(this.startDate);
 		const file = `[${this.id}] - ${this.startDate.hour}.${this.startDate.minute}.${this.startDate.second}.${this.startDate.miliSecond}.DSaml`;
 		const folder = `${this.rootPath}/[${this.startDate.day}.${this.startDate.month}.${this.startDate.year}]`;
 		const path = `${folder}/${file}`;
