@@ -3,6 +3,38 @@
 - Mail: acceso desde (saml.servercore/Mail/Mail.js)
 - JsonWT: acceso desde (saml.servercore/JsonWT/JsonWT.js)
 
+## 3.7
+> [!IMPORTANT]
+> **ServerCore** ha sido movido al lenguaje TypeScript
+> es posible que surjan errores que no existían anteriormente
+> si sufre algún error que no pueda corregir puedes decírnoslo
+> trataremos de ayudarte a resolver el inconveniente
+
+### 3.7.0
+#### Cambios
+- El proyecto fue movido al lenguaje TypeScript
+- Las propiedades y métodos ahora comienzan por minúscula (Load -> load ...);
+
+**Template**
+- El método `load` ahora funciona con async/await en lugar de retornar una promesa directamente;
+- En la carga de objetos/arrays $(name) {$key:$value}
+  ahora se puede usar $(name) {%key%: %value%}
+  o puedes usar $(name, customKeyName, customValueName) {%customKeyName%:%customValueName%}
+**Utilities**
+- Se agrego la función loadEnv, flattenObject, sleep
+**Debug**
+- Ahora solo se puede usar desde el método `getInstance` (esta sujeto a posibles cambios)
+**Config**
+- se convirtió en un singleton
+**Response**
+- el método send fue limitado a recibir string|buffer
+- los métodos sendFile, sendFolder y sendTemplate ahora funcionan con async/await
+**Request**
+- el atributo GET pasa a ser queryParams
+**WebSocket
+- la lógica detrás de la recepción de webSocket fue separada hacia Chunk.ts
+- Chunk.ts fue optimizado
+
 ## 3.6
 
 **Añadido**
