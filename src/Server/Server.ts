@@ -42,9 +42,9 @@ export class Server {
 		this.host = host ? host : '0.0.0.0';
 		this.templates = {};
 		this.HttpPort = port ? port : 80;
-		this.HttpsPort = sslOptions && sslOptions.Port ? sslOptions.Port : 443;
+		this.HttpsPort = sslOptions && sslOptions.port ? sslOptions.port : 443;
 		this.rules = [];
-        this.protocol = sslOptions && sslOptions.Public && sslOptions.Private ? 'HTTPS' : 'HTTP';
+        this.protocol = sslOptions && sslOptions.pubKey && sslOptions.privKey ? 'HTTPS' : 'HTTP';
 		this.addFolder('/Saml:Global', `${Utilities.Path.moduleDir}\\global`);
 		Debug.log('&B(255,180,220)&C0---------------------------------');
 		Debug.log('&B(255,180,220)&C0- Saml/Servidor by diegofmo0802 -');
@@ -59,11 +59,11 @@ export class Server {
 			this.protocol = this.protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
 			Debug.log('&B(255,180,220)&C0-&R Host', this.host ? this.host : 'localhost');
 			Debug.log('&B(255,180,220)&C0-&R Puerto HTTP', this.HttpPort);
-			if (!(sslOptions && sslOptions.Public && sslOptions.Private) || HttpsStarted)
+			if (!(sslOptions && sslOptions.pubKey && sslOptions.privKey) || HttpsStarted)
             Debug.log('&B(255,180,220)&C0---------------------------------');
 		});
-		if (!sslOptions || !sslOptions.Public || !sslOptions.Private) return;
-		Server.loadCertificates(sslOptions.Public, sslOptions.Private).then((Certificates) => {
+		if (!sslOptions || !sslOptions.pubKey || !sslOptions.privKey) return;
+		Server.loadCertificates(sslOptions.pubKey, sslOptions.privKey).then((Certificates) => {
 			this.HttpsServer = HTTPS.createServer(Certificates, (Request, Response) => {
 				this.requestManager(Request, Response);
 			}).on('upgrade', (Request, Socket) => {
@@ -242,9 +242,9 @@ export namespace Server {
         key: Buffer | string
     }
 	export type SSLOptions = {
-        Public: string,
-		Private: string,
-		Port?: number
+        pubKey: string,
+		privKey: string,
+		port?: number
     };
     export type Templates = {
         Error?: string,
