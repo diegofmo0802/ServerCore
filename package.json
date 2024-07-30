@@ -19,13 +19,14 @@
   },
   "files": [
     "build/",
-    "Global/",
+    "examples/",
+    "global/",
+    "tests/",
     ".gitignore",
     "changes.md",
     "LICENSE",
     "Notes.md",
-    "README.md",
-    "tsconfig.json"
+    "README.md"
   ],
   "keywords": [
     "server",
