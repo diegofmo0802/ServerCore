@@ -136,7 +136,7 @@ export class Response {
                     Carpeta: folder
                 });
             } else {
-                this.sendTemplate(Utilities.Path.relative('\\Global\\Template\\Folder.HSaml'), {
+                this.sendTemplate(Utilities.Path.relative('\\global\\Template\\Folder.HSaml'), {
                     Url: this.request.url,
                     Carpeta: folder
                 });
@@ -194,7 +194,7 @@ export class Response {
                 this.sendHeaders(code, this.generateHeaders('html'));
                 this.send(template);
             } else {
-                const template = await Template.load(Utilities.Path.relative("\\Global\\Template\\Error.HSaml"), {
+                const template = await Template.load(Utilities.Path.relative("\\global\\Template\\Error.HSaml"), {
                     Código: code, Mensaje: message
                 });
                 this.sendHeaders(code, this.generateHeaders('html'));
