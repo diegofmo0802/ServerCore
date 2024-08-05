@@ -1,5 +1,5 @@
 /**
- * @author diegofmo0802 <diegofmo0802@gmail.com>
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
  * @description contains the basic functionalities for module saml tools
  * @license Apache-2.0
  */

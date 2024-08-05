@@ -1,5 +1,5 @@
 /**
- * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
  * @description Añade la forma de Petición de `Saml/Server-core`.
  * @license Apache-2.0
  */

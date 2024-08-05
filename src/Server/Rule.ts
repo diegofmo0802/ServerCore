@@ -1,5 +1,5 @@
 /**
- * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
  * @description Contiene lo necesario para las reglas de enrutamiento de ServerCore.
  * @license Apache-2.0
  */

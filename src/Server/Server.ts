@@ -1,5 +1,5 @@
 /**
- * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
  * @description Añade una forma sencilla de crear servidores HTTP/S y WS/S.
  * @license Apache-2.0
  */
