@@ -54,7 +54,7 @@ export class JwtManager {
      * @param options the options to verify the jwt
      * @returns the verified jwt
      */
-    public verify(jwt: string, options: JwtManager.verifyOptions = {}): JwtManager.jwtObject {
+    public parse(jwt: string, options: JwtManager.verifyOptions = {}): JwtManager.jwtObject {
         return JwtManager.parse(jwt, this.pubKey ?? this.privKey, options);
     }
 
