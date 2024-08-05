@@ -1,9 +1,11 @@
 import { JwtManager } from "../../build/Beta/JwtManager/JwtManager.js";
-
 import CRYPTO from 'crypto';
+import Utilities from "../../build/Utilities.js";
+import { strict as assert } from 'assert';
 
-const MASKS = ['256', '384', '512']
-const SECRET = 'secret'
+const MASKS = ['256', '384', '512'];
+const SECRET = 'secret';
+
 const { publicKey: RSA_PUB_KEY, privateKey: RSA_PRIV_KEY } = CRYPTO.generateKeyPairSync('rsa', {
     modulusLength: 2048,
     publicKeyEncoding: {
@@ -15,6 +17,7 @@ const { publicKey: RSA_PUB_KEY, privateKey: RSA_PRIV_KEY } = CRYPTO.generateKeyP
         format: 'pem'
     }
 });
+
 const { publicKey: PSS_PUB_KEY, privateKey: PSS_PRIV_KEY } = CRYPTO.generateKeyPairSync('rsa-pss', {
     modulusLength: 2048,
     publicKeyEncoding: {
@@ -26,6 +29,7 @@ const { publicKey: PSS_PUB_KEY, privateKey: PSS_PRIV_KEY } = CRYPTO.generateKeyP
         format: 'pem'
     }
 });
+
 const { publicKey: EC_PUB_KEY, privateKey: EC_PRIV_KEY } = CRYPTO.generateKeyPairSync('ec', {
     namedCurve: 'secp256k1',
     publicKeyEncoding: {
@@ -43,36 +47,64 @@ const body = {
     XD: "xd"
 };
 
-const options =  {
+const options = {
     expire: new Date(Date.now() + 10000)
 };
 
-for (let index = 0; index < 1; index++) {
-    const jwt = new JwtManager('HS' + MASKS[index], SECRET);
+const testBase64UrlEncode = () => {
+    assert.equal(Utilities.base64UrlEncode('hello world'), 'aGVsbG8gd29ybGQ');
+    console.log('Utilities.base64UrlEncode passed');
+};
+
+const testBase64UrlDecode = () => {
+    assert.equal(Utilities.base64UrlDecode('aGVsbG8gd29ybGQ'), 'hello world');
+    console.log('Utilities.base64UrlDecode passed');
+};
+
+const testJwtManagerSignVerify = (algorithm, key, pubKey) => {
+    const jwt = new JwtManager(algorithm, key);
     console.log('--------------------------')
-    const JWTObject1 = jwt.sign(body, options);
-    console.log('jwt:', JWTObject1);
-    console.log('secret:', SECRET, '\n', jwt.verify(JWTObject1), '\n');
-    console.log('RSA  ---------------------')
-    const jwtRsa = new JwtManager('RS' + MASKS[index], RSA_PRIV_KEY);
-    const JWTObject2 = jwtRsa.sign(body, options)
-    console.log('jwt:', JWTObject2);
-    console.log('Private Key:', RSA_PRIV_KEY);
-    console.log('Public Key:', RSA_PUB_KEY);
-    console.log(jwtRsa.verify(JWTObject2), '\n');
-    console.log('PSS  ---------------------')
-    const jwtPss = new JwtManager('PS' + MASKS[index], PSS_PRIV_KEY);
-    jwtPss.sign(body, options)
-    const JWTObject3 = jwtPss.sign(body, options)
-    console.log('jwt:', JWTObject3);
-    console.log('Private Key:', PSS_PRIV_KEY);
-    console.log('Public Key:', PSS_PUB_KEY);
-    console.log(jwtPss.verify(JWTObject3), '\n');
-    console.log('ECDSA  -------------------')
-    const jwtEc = new JwtManager('ES' + MASKS[index], EC_PRIV_KEY);
-    const JWTObject4 = jwtEc.sign(body, options)
-    console.log('jwt:', JWTObject4);
-    console.log('Private Key:', EC_PRIV_KEY);
-    console.log('Public Key:', EC_PUB_KEY);
-    console.log(jwtEc.verify(JWTObject4), '\n');
-}
+    const JWTObject = jwt.sign(body, options);
+    console.log('jwt:', JWTObject);
+    if (algorithm.startsWith('HS')) {
+        console.log('secret:', key);
+    } else {
+        console.log('Private Key:', key);
+        if (pubKey) {
+            console.log('Public Key:', pubKey);
+        }
+    }
+    const verificationResult = jwt.verify(JWTObject);
+    console.log(verificationResult, '\n');
+    assert.equal(verificationResult.verify, true);
+    assert.deepEqual(verificationResult.body, body);
+    console.log(`${algorithm} test passed`);
+};
+
+const runTests = () => {
+    try {
+        testBase64UrlEncode();
+        testBase64UrlDecode();
+
+        for (let index = 0; index < MASKS.length; index++) {
+            const algorithm = 'HS' + MASKS[index];
+            testJwtManagerSignVerify(algorithm, SECRET);
+
+            const algorithmRS = 'RS' + MASKS[index];
+            testJwtManagerSignVerify(algorithmRS, RSA_PRIV_KEY, RSA_PUB_KEY);
+
+            const algorithmPS = 'PS' + MASKS[index];
+            testJwtManagerSignVerify(algorithmPS, PSS_PRIV_KEY, PSS_PUB_KEY);
+
+            const algorithmES = 'ES' + MASKS[index];
+            testJwtManagerSignVerify(algorithmES, EC_PRIV_KEY, EC_PUB_KEY);
+        }
+
+        console.log('All tests passed');
+    } catch (error) {
+        console.error('Test failed:', error.message);
+    }
+};
+
+
+runTests();
