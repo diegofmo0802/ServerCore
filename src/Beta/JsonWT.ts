@@ -1,5 +1,5 @@
 /**
- * @author diegofmo0802 <diegofmo0802@gmail.com>.
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
  * @description add the json web token manager to the server core.
  * @license Apache-2.0
  */
