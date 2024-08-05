@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import Utilities from "../../Utilities.js";
+import Utilities from "../Utilities.js";
 
 import CRYPTO from 'crypto';
 

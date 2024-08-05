@@ -13,12 +13,12 @@ import ServerCore from "./Server/Server.js";
 import Utilities from "./Utilities.js";
 
 // Utilidades en desarrollo y sin añadir (Beta).
-import JsonWT from "./Beta/JsonWT.js";
+import JwtManager from "./Beta/JwtManager.js";
 import Mail from "./Beta/Mail.js";
 
 // Para exportar las utilidades en desarrollo y sin añadir.
 const Beta = {
-	JsonWT, Mail
+	JwtManager, Mail
 };
 
 // Exportación de utilidades.
