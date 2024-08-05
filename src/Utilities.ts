@@ -89,6 +89,22 @@ export class Utilities {
     public static sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+    /**
+     * encode to base64url
+     * @param data the data to encode
+     * @returns the encoded data
+     */
+    public static base64UrlEncode(data: string): string {
+        return Buffer.from(data).toString('base64url');
+    }
+    /**
+     * decode from base64url
+     * @param data the data to decode
+     * @returns the decoded data
+     */
+    public static base64UrlDecode(data: string): string {
+        return Buffer.from(data, 'base64url').toString('utf8');
+    }
 };
 
 export namespace Utilities {
