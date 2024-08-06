@@ -218,7 +218,7 @@ export namespace Request {
 														 	 files: null
 		} | { mimeType: 'Unknown',                           content: Buffer,
 														 	 files: null
-		} | { mimeType: 'none',                           	 content: {},
+		} | { mimeType: 'none',                           	 content: POST.VarList,
 														 	 files: null
 		} | { mimeType: 'multipart/form-data',               content: POST.VarList,
 														 	 files: POST.FileList,
