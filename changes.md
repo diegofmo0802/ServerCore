@@ -29,6 +29,8 @@
 **Response**
 - el método send fue limitado a recibir string|buffer
 - los métodos sendFile, sendFolder y sendTemplate ahora funcionan con async/await
+- el objeto POST.content ya no sera un Map cuando corresponde si no un objeto Request.POST.VarList
+- el objeto POST.files siempre tendrá el tipo Request.POST.FileList
 **Request**
 - el atributo GET pasa a ser queryParams
 **WebSocket**
