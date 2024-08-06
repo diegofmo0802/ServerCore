@@ -195,10 +195,10 @@ export namespace Request {
             mimeType: string;
         }
 		export interface FileList {
-			[name: string]: File;
+			[name: string]: File | undefined;
 		}
 		export interface VarList {
-			[name: string]: string;
+			[name: string]: string | undefined;
 		}
 	}
 	export interface Headers extends HTTP.IncomingHttpHeaders {
