@@ -88,12 +88,12 @@ export class Request {
 							break;
 						}
 						case 'application/x-www-form-urlencoded': {
-							const content: Map<string, string> = new Map;
+							const content: Request.POST.VarList = {};
 							const decoded = data.toString('latin1');
 							const fragments = decoded.split('&');
 							fragments.forEach((pair) => {
 							  const [key, value] = pair.split('=');
-							  content.set(decodeURIComponent(key), decodeURIComponent(value));
+							  content[decodeURIComponent(key)] = decodeURIComponent(value);
 							});
 							resolve({
 								mimeType: 'application/x-www-form-urlencoded',
@@ -103,8 +103,8 @@ export class Request {
 							break;
 						}
 						case 'multipart/form-data': {
-							const vars: Request.POST.VarMap = new Map;
-							const files: Request.POST.FileMap = new Map;
+							const vars: Request.POST.VarList = {};
+							const files: Request.POST.FileList = {};
 							const separator = '--' + options.join(';').replace(/.*boundary=(.*)/gi, (result, separator) => separator);
 							const fragments = data.toString('latin1').trim().split(separator);
 							fragments.forEach((fragment) => {
@@ -122,18 +122,18 @@ export class Request {
 											const data = Buffer.from(content.trim(), 'binary');
 											//let Stream = FS.createWriteStream(Ruta);
 											//Stream.write(Contenido.trim(), 'binary');
-											files.set(Buffer.from(varName, 'binary').toString(), {
+											files[Buffer.from(varName, 'binary').toString()] = {
 												content: data,
 												name: Buffer.from(fileName, 'binary').toString(),
 												//Ruta: Ruta,
 												size: data.byteLength,
 												mimeType: Buffer.from(mimeType, 'binary').toString()
-											});
+											};
 										} catch(error) {
 											console.log('Error', error);
 											reject(error);
 										}
-									} else vars.set(Buffer.from(varName, 'binary').toString(), Buffer.from(content, 'binary').toString().trim());
+									} else vars[Buffer.from(varName, 'binary').toString()] = Buffer.from(content, 'binary').toString().trim();
 								}
 							});
 							resolve({
@@ -194,8 +194,12 @@ export namespace Request {
             size: number;
             mimeType: string;
         }
-		export type FileMap = Map<string, File>;
-        export type VarMap = Map<string, string>;
+		export interface FileList {
+			[name: string]: File;
+		}
+		export interface VarList {
+			[name: string]: string;
+		}
 	}
 	export interface Headers extends HTTP.IncomingHttpHeaders {
 		
@@ -208,7 +212,7 @@ export namespace Request {
     export type POST = (
 		{ mimeType: 'application/json',                  	 content: any,
 														 	 files: null
-		} | { mimeType: 'application/x-www-form-urlencoded', content: Map<string, string>
+		} | { mimeType: 'application/x-www-form-urlencoded', content: POST.VarList
 														 	 files: null
 		} | { mimeType: 'text/plain',                        content: string,
 														 	 files: null
@@ -216,8 +220,8 @@ export namespace Request {
 														 	 files: null
 		} | { mimeType: 'none',                           	 content: {},
 														 	 files: null
-		} | { mimeType: 'multipart/form-data',               content: POST.VarMap,
-														 	 files: POST.FileMap,
+		} | { mimeType: 'multipart/form-data',               content: POST.VarList,
+														 	 files: POST.FileList,
 		}
 	);
 }
