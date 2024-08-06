@@ -1,11 +1,12 @@
 {
   "name": "saml.servercore",
-  "version": "3.7.0-Dev.6",
+  "version": "3.7.0-Dev.5",
   "description": "a module for http/s and ws/s servers",
   "type": "module",
   "main": "build/ServerCore.js",
   "scripts": {
-    "test": "node tests/test.js"
+    "test": "node tests/test.js",
+    "dev.publish": "rm build/* -R && tsc && npm publish --tag Dev"
   },
   "author": {
     "name": "diegofmo0802",
