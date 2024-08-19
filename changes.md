@@ -22,6 +22,7 @@
   o puedes usar $(name, customKeyName, customValueName) {%customKeyName%:%customValueName%}
 **Utilities**
 - Se agrego la función loadEnv, flattenObject, sleep
+- Se modifico la función flattenObject, ahora mantiene valores nulos y undefined y proporciona mejor tipado
 **Debug**
 - Ahora solo se puede usar desde el método `getInstance` (esta sujeto a posibles cambios)
 **Config**
