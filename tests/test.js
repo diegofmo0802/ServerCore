@@ -2,6 +2,8 @@
 
 import Rule from "../build/Server/Rule.js";
 import ServerCore, { Debug, Config, Utilities } from "../build/ServerCore.js";
+import "./debug.js";
+import "./utilities.js";
 
 /* | HABILITAR VISTA EN CONSOLA DE LOS DEBUGS DE SERVER CORE | */
 const config = Config.getInstance();

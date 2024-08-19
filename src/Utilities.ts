@@ -69,15 +69,14 @@ export class Utilities {
      * @param prefix the prefix to add to the flattened keys
      * @returns the flattened object
      */
-    public static flattenObject(object: Utilities.flattenObject, prefix: string = ''): Utilities.flattenObject {
-        const result: Utilities.flattenObject = {};
+    public static flattenObject<obj extends any>(object: obj, prefix: string = ''): Utilities.flatten.Object<obj> {
+        const result: any = {};
         for (const key in object) {
+            const value = object[key]
             const newKey = prefix ? `${prefix}.${key}` : key;
-            if (typeof object[key] === 'object') {
-                Object.assign(result, Utilities.flattenObject(object[key], newKey));
-            } else {
-                result[newKey] = object[key];
-            }
+            if (value && typeof value === 'object')
+            Object.assign(result, Utilities.flattenObject(object[key], newKey));
+            else result[newKey] = value;
         }
         return result;
     }
@@ -108,8 +107,23 @@ export class Utilities {
 };
 
 export namespace Utilities {
-    export interface flattenObject {
-        [key: string]: any;
+    export namespace flatten {
+        type Flatten<T> = {
+            [K in keyof T]: T[K] extends object
+                ? `${K & string}.${Flatten<T[K]>}`
+                : K & string
+        }[keyof T];
+        export type Object<T> = {
+            [P in Flatten<T>]: P extends `${infer K}.${infer Rest}`
+                ? K extends keyof T
+                    ? Rest extends Flatten<T[K]>
+                        ? Object<T[K]>[Rest]
+                        : never
+                    : never
+                : P extends keyof T
+                    ? T[P]
+                    : never;
+        };
     }
     export interface env {
         [key: string]: string;
