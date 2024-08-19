@@ -69,14 +69,18 @@ export class Utilities {
      * @param prefix the prefix to add to the flattened keys
      * @returns the flattened object
      */
-    public static flattenObject<obj extends any>(object: obj, prefix: string = ''): Utilities.flatten.Object<obj> {
+    public static flattenObject<T extends object>(object: T, prefix = '', depth = 10): Utilities.flatten.Object<T, 10> {
         const result: any = {};
         for (const key in object) {
-            const value = object[key]
-            const newKey = prefix ? `${prefix}.${key}` : key;
-            if (value && typeof value === 'object')
-            Object.assign(result, Utilities.flattenObject(object[key], newKey));
-            else result[newKey] = value;
+            if (Object.prototype.hasOwnProperty.call(object, key)) {
+                const newKey = prefix ? `${prefix}.${key}` : key;
+                const value = object[key];
+                if (typeof value === 'object' && value !== null && depth > 0) {
+                    Object.assign(result, Utilities.flattenObject(value as any, newKey, depth - 1));
+                } else {
+                    result[newKey] = value;
+                }
+            }
         }
         return result;
     }
@@ -108,21 +112,13 @@ export class Utilities {
 
 export namespace Utilities {
     export namespace flatten {
-        type Flatten<T> = {
+        type Doc<N extends number> = N extends 0 ? 0 : N extends 1 ? 0 : N extends 2 ? 1 : N extends 3 ? 2 : 3;
+        export type Object<T extends object, Depth extends number = 10> = {
             [K in keyof T]: T[K] extends object
-                ? `${K & string}.${Flatten<T[K]>}`
-                : K & string
-        }[keyof T];
-        export type Object<T> = {
-            [P in Flatten<T>]: P extends `${infer K}.${infer Rest}`
-                ? K extends keyof T
-                    ? Rest extends Flatten<T[K]>
-                        ? Object<T[K]>[Rest]
-                        : never
-                    : never
-                : P extends keyof T
-                    ? T[P]
-                    : never;
+                ? Depth extends 0
+                    ? T[K]
+                    : Object<T[K], Doc<Depth>>
+                : T[K];
         };
     }
     export interface env {
