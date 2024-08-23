@@ -69,14 +69,17 @@ export class Utilities {
      * @param prefix the prefix to add to the flattened keys
      * @returns the flattened object
      */
-    public static flattenObject<T extends object>(object: T, prefix = '', depth = 10): Utilities.flatten.Object<T, 10> {
+    public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D): Utilities.flatten.Object<T, D> {
+        return this.flattenCore(object, depth);
+    }
+    protected static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
         const result: any = {};
         for (const key in object) {
             if (Object.prototype.hasOwnProperty.call(object, key)) {
                 const newKey = prefix ? `${prefix}.${key}` : key;
                 const value = object[key];
                 if (typeof value === 'object' && value !== null && depth > 0) {
-                    Object.assign(result, Utilities.flattenObject(value as any, newKey, depth - 1));
+                    Object.assign(result, Utilities.flattenCore(value as any, (depth - 1), newKey));
                 } else {
                     result[newKey] = value;
                 }
@@ -112,13 +115,39 @@ export class Utilities {
 
 export namespace Utilities {
     export namespace flatten {
-        type Doc<N extends number> = N extends 0 ? 0 : N extends 1 ? 0 : N extends 2 ? 1 : N extends 3 ? 2 : 3;
-        export type Object<T extends object, Depth extends number = 10> = {
-            [K in keyof T]: T[K] extends object
-                ? Depth extends 0
-                    ? T[K]
-                    : Object<T[K], Doc<Depth>>
-                : T[K];
+        type NumListAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+        type strToNum<str extends string> = str extends `${infer num extends number}` ? num : never;
+
+        export type Inc<Number extends number | string> = (
+            `${Number}` extends `${infer surPlus}${NumListAdd[number]}`
+            ? `${Number}` extends `${surPlus}${infer unit extends number}`
+                ? unit extends Exclude<NumListAdd[number], 9>
+                    ? strToNum<`${surPlus}${NumListAdd[unit]}`>
+                    : strToNum<`${
+                        surPlus extends `${infer Num extends number}` ? '' : '1'
+                    }${
+                        surPlus extends '' ? '' : Inc<surPlus>
+                    }${NumListAdd[unit]}`>
+                : number
+            : number
+        );
+        type ResourceKeys<T, depth extends number = 5, index extends number = 1> = {
+            [K in keyof T]: depth extends index ? K & string
+            : T[K] extends object
+                ? `${K & string}.${ResourceKeys<T[K], depth, Inc<index>>}`
+                : K & string
+        }[keyof T];
+        type RecurseObject<T, Keys extends string> = (
+            Keys extends `${infer K}.${infer Rest}`
+            ? K extends keyof T
+                ? RecurseObject<T[K], Rest>
+                : never
+            : Keys extends keyof T
+                ? T[Keys]
+                : never
+        );
+        export type Object<T, depth extends number = 5, index extends number = 1> = {
+            [P in ResourceKeys<T, depth, index>]: RecurseObject<T, P>;
         };
     }
     export interface env {
