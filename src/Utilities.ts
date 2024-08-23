@@ -69,7 +69,7 @@ export class Utilities {
      * @param prefix the prefix to add to the flattened keys
      * @returns the flattened object
      */
-    public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D): Utilities.flatten.Object<T, D> {
+    public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D = 10 as D): Utilities.flatten.Object<T, D> {
         return this.flattenCore(object, depth);
     }
     protected static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
