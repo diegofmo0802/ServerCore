@@ -78,7 +78,7 @@ export class Utilities {
             if (Object.prototype.hasOwnProperty.call(object, key)) {
                 const newKey = prefix ? `${prefix}.${key}` : key;
                 const value = object[key];
-                if (typeof value === 'object' && value !== null && depth > 0) {
+                if (typeof value === 'object' && !Array.isArray(value) && value !== null && depth > 0) {
                     Object.assign(result, Utilities.flattenCore(value as any, (depth - 1), newKey));
                 } else {
                     result[newKey] = value;
@@ -115,6 +115,9 @@ export class Utilities {
 
 export namespace Utilities {
     export namespace flatten {
+        type Document = {
+            [key: string]: any;
+        };
         type NumListAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
         type strToNum<str extends string> = str extends `${infer num extends number}` ? num : never;
 
@@ -131,11 +134,22 @@ export namespace Utilities {
                 : number
             : number
         );
+        type ResourceIndexes<Length extends number, Current extends number[] = []> = (
+            Current['length'] extends Length
+            ? Current[number]
+            : ResourceIndexes<Length, [...Current, Current['length']]>
+        );
         type ResourceKeys<T, depth extends number = 5, index extends number = 1> = {
-            [K in keyof T]: depth extends index ? K & string
-            : T[K] extends object
-                ? `${K & string}.${ResourceKeys<T[K], depth, Inc<index>>}`
-                : K & string
+            [K in keyof T]-?:
+            depth extends index
+            ? K & string
+            : Exclude<T[K], undefined> extends infer U
+                ? U extends any[]
+                    ? K & string
+                    : U extends object
+                        ? `${K & string}.${ResourceKeys<U, depth, Inc<index>>}`
+                        : K & string
+                : "fail_in_flatten_inference"
         }[keyof T];
         type RecurseObject<T, Keys extends string> = (
             Keys extends `${infer K}.${infer Rest}`
@@ -147,7 +161,11 @@ export namespace Utilities {
                 : never
         );
         export type Object<T, depth extends number = 5, index extends number = 1> = {
-            [P in ResourceKeys<T, depth, index>]: RecurseObject<T, P>;
+            [P in ResourceKeys<T, depth, index>as undefined extends RecurseObject<T, P> ? never : P]:
+            RecurseObject<T, P>;
+        } & {
+            [P in ResourceKeys<T, depth, index>as undefined extends RecurseObject<T, P> ? P : never]?:
+            RecurseObject<T, P>;
         };
     }
     export interface env {

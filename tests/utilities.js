@@ -14,9 +14,11 @@ const toFlatten = {
     },
     e: {
         f: "e.f"
-    }
+    },
+    arr: [1,2,3,4]
 }
 
 const flattened = Utilities.flattenObject(toFlatten, 9);
+flattened['']
 console.log("before flatten", toFlatten);
 console.log("after flatten", flattened);
