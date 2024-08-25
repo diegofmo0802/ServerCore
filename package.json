@@ -5,6 +5,7 @@
   "type": "module",
   "main": "build/ServerCore.js",
   "scripts": {
+    "dev": "npm run compile && tsc --watch",
     "test": "node tests/test.js",
     "compile": "rm build/* -R && tsc",
     "dev.publish": "npm run compile && npm publish --tag Dev"
