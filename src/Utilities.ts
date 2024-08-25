@@ -75,14 +75,12 @@ export class Utilities {
     protected static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
         const result: any = {};
         for (const key in object) {
-            if (Object.prototype.hasOwnProperty.call(object, key)) {
-                const newKey = prefix ? `${prefix}.${key}` : key;
-                const value = object[key];
-                if (typeof value === 'object' && !Array.isArray(value) && value !== null && depth > 0) {
-                    Object.assign(result, Utilities.flattenCore(value as any, (depth - 1), newKey));
-                } else {
-                    result[newKey] = value;
-                }
+            const newKey = prefix ? `${prefix}.${key}` : key;
+            const value = object[key];
+            if (typeof value === 'object' && !Array.isArray(value) && value !== null && depth > 0) {
+                Object.assign(result, Utilities.flattenCore(value as any, (depth - 1), newKey));
+            } else {
+                result[newKey] = value;
             }
         }
         return result;
