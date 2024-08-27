@@ -69,7 +69,7 @@ export class Utilities {
      * @param prefix the prefix to add to the flattened keys
      * @returns the flattened object
      */
-    public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D = 10 as D): Utilities.flatten.Object<T, D> {
+    public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D = 10 as D): Utilities.Flatten.Object<T, D> {
         return this.flattenCore(object, depth);
     }
     protected static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
@@ -112,13 +112,15 @@ export class Utilities {
 };
 
 export namespace Utilities {
-    export namespace flatten {
-        type Document = {
-            [key: string]: any;
-        };
+    export namespace Types {
         type NumListAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
         type strToNum<str extends string> = str extends `${infer num extends number}` ? num : never;
 
+        /**
+         * add one to a number
+         * @template Number the number to add one to
+         * @returns the number added one
+         */
         export type Inc<Number extends number | string> = (
             `${Number}` extends `${infer surPlus}${NumListAdd[number]}`
             ? `${Number}` extends `${surPlus}${infer unit extends number}`
@@ -132,12 +134,49 @@ export namespace Utilities {
                 : number
             : number
         );
+
+        /**
+         * union to intersection
+         * @template U the union to convert
+         * @returns the intersection of the union
+        */
+        export type UnionToIntersection<U extends object> = (
+            (U extends any ? (arg: U) => void : never) extends (arg: infer I) => void
+            ? I extends object
+                ? { [K in keyof I]: I[K] extends object ? UnionToIntersection<I[K]> : I[K] }
+                : I
+            : never
+        );
+
+        /**
+         * convert the object property with undefined to optional
+         * @template T the object to convert
+         * @returns the converted object
+         */
+        export type undefinedToPartial<T extends object> = {
+            [K in keyof T as undefined extends T[K] ? never : K]: T[K];
+        } & {
+            [K in keyof T as undefined extends T[K] ? K : never]?: Exclude<T[K], undefined>;
+        };
+
+        export type Document = {
+            [key: string]: any;
+        };
+    }
+    export namespace Flatten {
         type ResourceIndexes<Length extends number, Current extends number[] = []> = (
             Current['length'] extends Length
             ? Current[number]
             : ResourceIndexes<Length, [...Current, Current['length']]>
         );
-        type ResourceKeys<T, depth extends number = 5, index extends number = 1> = {
+        /**
+         * flatten an object into a single level and return an union of all the keys
+         * @template T the object to flatten
+         * @template depth the depth to flatten
+         * @template index the current index
+         * @returns the flattened object keys as a union
+         */
+        type ResourceKeys<T extends Types.Document, depth extends number = 5, index extends number = 1> = {
             [K in keyof T]-?:
             depth extends index
             ? K & string
@@ -145,26 +184,45 @@ export namespace Utilities {
                 ? U extends any[]
                     ? K & string
                     : U extends object
-                        ? `${K & string}.${ResourceKeys<U, depth, Inc<index>>}`
+                        ? `${K & string}.${ResourceKeys<U, depth, Types.Inc<index>>}`
                         : K & string
                 : "fail_in_flatten_inference"
         }[keyof T];
-        type RecurseObject<T, Keys extends string> = (
+        /**
+         * flatten an object into a single level and return an union of all the keys
+         * @template T the object to flatten
+         * @template depth the depth to flatten
+         * @template index the current index
+         * @returns the flattened object keys as a union
+         */
+        type RecurseObject<T extends Types.Document, Keys extends string> = (
             Keys extends `${infer K}.${infer Rest}`
             ? K extends keyof T
-                ? RecurseObject<T[K], Rest>
+                ? undefined extends T[K]
+                    ? RecurseObject<Exclude<T[K], undefined>, Rest> | undefined
+                    : RecurseObject<T[K], Rest>
                 : never
-            : Keys extends keyof T
-                ? T[Keys]
-                : never
+            : undefined extends T
+                ? Keys extends keyof Exclude<T, undefined>
+                    ? Exclude<T, undefined>[Keys] | undefined
+                    : never
+                : Keys extends keyof T
+                    ? T[Keys]
+                    : never
         );
-        export type Object<T, depth extends number = 5, index extends number = 1> = {
-            [P in ResourceKeys<T, depth, index>as undefined extends RecurseObject<T, P> ? never : P]:
-            RecurseObject<T, P>;
-        } & {
-            [P in ResourceKeys<T, depth, index>as undefined extends RecurseObject<T, P> ? P : never]?:
-            RecurseObject<T, P>;
-        };
+        /**
+         * flatten an object into a single level
+         * @template T the object to flatten
+         * @template depth the depth to flatten
+         * @template index the current index
+         * @returns the flattened object
+         */
+        export type Object<T extends Types.Document, depth extends number = 5, index extends number = 1> = Types.undefinedToPartial<{
+            [P in ResourceKeys<T, depth, index>]: RecurseObject<T, P>;
+        }>;
+        type test = Object<{
+            a?: {b:{c:{d:"XD"}}}
+        }, 20>;
     }
     export interface env {
         [key: string]: string;
