@@ -86,6 +86,31 @@ export class Utilities {
         return result;
     }
     /**
+     * unFlatten an object
+     * @template Result the type of the unFlattened object
+     * @param obj the object to unFlatten
+     * @returns the unFlattened object
+     */
+    public static unFlattenObject<Result extends any = any>(obj: any): Result {
+        const result: any = {};
+        for (const key in obj) {
+            const value = obj[key];
+            const [first, ...rest] = key.split('.');
+            if (rest.length === 0) result[first] = value;
+            else {
+                const last = rest.pop() as string;
+                const subObj: any = result[first] ?? {};
+                let current: any = subObj;
+                rest.forEach((key) => {
+                    current = current[key] ?? (current[key] = {});
+                });
+                current[last] = value;
+                result[first] = subObj;
+            }
+        }
+        return result;
+    }
+    /**
      * sleep for the given number of milliseconds
      * @param ms the number of milliseconds to sleep
      * @returns a promise that resolves after the given number of milliseconds
@@ -223,6 +248,38 @@ export namespace Utilities {
         type test = Object<{
             a?: {b:{c:{d:"XD"}}}
         }, 20>;
+    }
+    export namespace UnFlatten {
+        /**
+         * split a string by a delimiter
+         * @template S the string to split
+         * @template Delimiter the delimiter to split by
+         * @returns the split string
+         */
+        type Split<S extends string, Delimiter extends string> = (
+            S extends `${infer T}${Delimiter}${infer U}` 
+            ? [T, ...Split<U, Delimiter>] 
+            : [S]
+        );
+        /**
+         * build a nested object from a string
+         * @template Path the path to build
+         * @template Value the value to build
+         * @returns the nested object
+         */
+        type BuildNestedObject<Path extends string[], Value> = (
+            Path extends [infer Head extends string, ...infer Tail extends string[]]
+            ? Types.undefinedToPartial<{ [K in Head]: BuildNestedObject<Tail, Value> }>
+            : Value
+        );
+        /**
+         * unFlatten an object into a single level
+         * @template T the object to unFlatten
+         * @returns the unFlattened object
+         */
+        export type Object<T extends Types.Document> = Types.UnionToIntersection<Types.undefinedToPartial<({
+            [K in keyof T]-?: BuildNestedObject<Split<Extract<K, string>, ".">, T[K]>
+        }[keyof T])>>;
     }
     export interface env {
         [key: string]: string;
