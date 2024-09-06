@@ -40,6 +40,8 @@
 **Beta**
 - JsonWT se convirtió en JwtManager
 
+(En curso...)
+
 ## 3.6
 
 **Añadido**
