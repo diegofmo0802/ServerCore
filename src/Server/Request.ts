@@ -23,7 +23,7 @@ export class Request {
 	/**Contiene los datos POST que se enviaron. */
 	public post: Promise<Request.POST>;
 	/**Contiene la Sesión del dispositivo donde se realizo la petición.*/
-	private session: Session;
+	public session: Session;
 	/**Contiene la petición que recibió el servidor. */
 	private httpRequest: HTTP.IncomingMessage;
 	/**Contiene la url de la petición. */
