@@ -1,3 +1,23 @@
+# Importante
+
+> [!IMPORTANT]
+> La futura versión **3.7.0** será omitida hasta la versión **4.0.0**.
+> La razón de esta decisión fue que hubo cambios que afectan la compatibilidad
+> entre las versiones **3.6.5** y **3.7.0**:
+>
+> Se está planteando que las funcionalidades **beta.mail** y **beta.jwt** se muevan a módulos separados.
+> Esta decisión dependerá de qué tan grandes se vuelvan dichas funcionalidades. Por el momento, y para la futura versión **4.0.0**,
+> seguirán estando en el lugar habitual, aunque con ciertos cambios que afectan la compatibilidad con las funciones beta
+> incorporadas en la versión **3.6.5**.
+>
+> Recuerda que puedes acceder a la versión de desarrollo descargando la rama **dev** del repositorio o por medio de npm:
+> ```bash
+> npm i mysaml.servercore@Dev
+> ```
+>
+> Como último punto, se planea cambiar el nombre del módulo en npm. Se darán detalles cuando se decida cuál será, y se agregará como dependencia a la última versión de **ServerCore** que sea desplegada en npm.
+
+
 # ServerCore
 
 Hola! soy [diegofmo0802](https://diegofmo0802.github.io).<br/>
