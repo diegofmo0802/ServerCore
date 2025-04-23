@@ -50,6 +50,15 @@ export class Request {
 		this.queryParams = this.getQueryParams(url);
 		this.post = this.getPostData(httpRequest);
 	}
+	/** 
+	 * Trata de inferir el boundary desde la primer linea del cuerpo de la peticion
+	 * @param data - El contenido de la peticion
+	 */
+	private inferBoundary(data: Buffer): string | null {
+		const result = data.toString('latin1').match(/^--([^\r\n]+)/);
+		if (result == null) return null;
+		return result[1];
+	}
 	/**
 	 * Obtiene los datos y archivos enviados por POST.
 	 * @param httpRequest La petición que recibió el servidor.
@@ -105,7 +114,8 @@ export class Request {
 						case 'multipart/form-data': {
 							const vars: Request.POST.VarList = {};
 							const files: Request.POST.FileList = {};
-							const separator = '--' + options.join(';').replace(/.*boundary=(.*)/gi, (result, separator) => separator);
+							const boundary = options.join(';').replace(/.*boundary=(.*)/gi, (result, boundary: string) => boundary);
+							const separator = '--' + (boundary !== '' ? boundary : this.inferBoundary(data) ?? '');
 							const fragments = data.toString('latin1').trim().split(separator);
 							fragments.forEach((fragment) => {
 								const info  =
