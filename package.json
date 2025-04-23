@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run compile && tsc --watch",
     "test": "node tests/test.js",
-    "compile": "rm build/* -R && tsc",
+    "compile": "rm -rf build && tsc",
     "dev.publish": "npm run compile && npm publish --tag Dev"
   },
   "author": {
