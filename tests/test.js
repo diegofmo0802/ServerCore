@@ -37,7 +37,7 @@ server.addFile('/favicon.ico', 'Global/Source/Logo_SM_960.png');
 
 /* | PRUEBAS DE REGLAS FILE usando AUTH | */
 server.addFile('/FileWA', 'changes.md',
-    (Request) => Request.queryParams.has('Auth') && Request.queryParams.get('Auth') == 'AuthYes'
+    (Request) => (Request.searchParams.Auth != null && Request.searchParams.Auth == 'AuthYes')
 )
 
 /* | CREANDO REGLAS CON EL CONSTRUCTOR Rule | */
