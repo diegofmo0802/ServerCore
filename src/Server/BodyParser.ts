@@ -130,14 +130,14 @@ export class BodyParser {
 	 * @returns Parsed multipart info or `null` if parsing fails.
 	 */
     private getMultiPartInfo(data: string): BodyParser.MultiPart.Info | null {
-        const info = BodyParser.FORMDATA_VAR_INFO_REGEX.exec(data);
+        const info = BodyParser.FORMDATA_VAR_INFO_REGEX.exec(data.trim());
         if (info == null) return null;
         const [ varName = "", fileName = null, mimeType = null, content = "" ] = info.splice(1);
         return {
-            varName: Buffer.from(varName, 'binary').toString(),
-            content: Buffer.from(content, 'binary'),
-            fileName: fileName !== null ? Buffer.from(fileName, 'binary').toString() : null,
-            mimeType: mimeType !== null ? Buffer.from(mimeType, 'binary').toString() : null
+            varName: Buffer.from(varName.trim(), 'binary').toString(),
+            content: Buffer.from(content.trim(), 'binary'),
+            fileName: fileName !== null ? Buffer.from(fileName.trim(), 'binary').toString() : null,
+            mimeType: mimeType !== null ? Buffer.from(mimeType.trim(), 'binary').toString() : null
         };
     }
 	/** 
