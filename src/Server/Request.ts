@@ -1,6 +1,6 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description Añade la forma de Petición de `Saml/Server-core`.
+ * @description Adds the Request form of `Saml/Server-core`.
  * @license Apache-2.0
  */
 
@@ -10,29 +10,29 @@ import Cookie from './Cookie.js';
 import Session from './Session.js';
 
 export class Request {
-	/**Contiene los encabezados de la petición. */
+	/** Contains the request headers. */
 	public headers: Request.Headers;
-	/**Contiene las cookies de la petición. */
+	/** Contains the request cookies. */
 	public cookies: Cookie;
-	/**Contiene los datos POST que se enviaron. */
+	/** Contains the POST data sent. */
 	public queryParams: Request.GET;
-	/**Contiene la dirección IP de quien realizo la petición. */
+	/** Contains the IP address of the requester. */
 	public ip?: string | string[];
-	/**Contiene el método de la petición. */
+	/** Contains the request method. */
 	public method: Request.Method;
-	/**Contiene los datos POST que se enviaron. */
+	/** Contains the POST data sent. */
 	public post: Promise<Request.POST>;
-	/**Contiene la Sesión del dispositivo donde se realizo la petición.*/
+	/** Contains the session of the device that made the request. */
 	public session: Session;
-	/**Contiene la petición que recibió el servidor. */
+	/** Contains the HTTP request received by the server. */
 	private httpRequest: HTTP.IncomingMessage;
-	/**Contiene la url de la petición. */
+	/** Contains the request URL. */
 	public url: string;
-	/**@type Los parámetros de la UrlRule */
+	/** The UrlRule parameters */
 	public ruleParams: Request.RuleParams = {};
 	/**
-	 * Crea la forma de petición de `Saml/Servidor`.
-	 * @param httpRequest La petición que recibió el servidor.
+	 * Creates the request form for `Saml/Server`.
+	 * @param httpRequest - The HTTP request received by the server.
 	 */
 	public constructor(httpRequest: HTTP.IncomingMessage) {
         const forwardedIP = httpRequest.headers['x-forwarded-for'];
@@ -51,8 +51,8 @@ export class Request {
 		this.post = this.getPostData(httpRequest);
 	}
 	/** 
-	 * Trata de inferir el boundary desde la primer linea del cuerpo de la peticion
-	 * @param data - El contenido de la peticion
+	 * Tries to infer the boundary from the first line of the request body.
+	 * @param data - The request content.
 	 */
 	private inferBoundary(data: Buffer): string | null {
 		const result = data.toString('latin1').match(/^--([^\r\n]+)/);
@@ -60,8 +60,8 @@ export class Request {
 		return result[1];
 	}
 	/**
-	 * Obtiene los datos y archivos enviados por POST.
-	 * @param httpRequest La petición que recibió el servidor.
+	 * Retrieves the data and files sent via POST.
+	 * @param httpRequest - The HTTP request received by the server.
 	 */
 	private getPostData(httpRequest: HTTP.IncomingMessage): Promise<Request.POST> {
 		return new Promise((resolve, reject) => {
@@ -125,17 +125,10 @@ export class Request {
 									const [varName, fileName, mimeType, content] = info.splice(1);
 									if (fileName) {
 										try {
-											//let Carpeta = `.Guardado/${this.Sesión.SS_UUID || UUID()}`;
-											//let Ruta = `${Carpeta}/${Date.now()}_${UUID()}__${Archivo}`;
-											//if (!FS.existsSync('.Guardado_Temp')) FS.mkdirSync('.Guardado_Temp');
-											//if (!FS.existsSync(Carpeta)) FS.mkdirSync(Carpeta);
 											const data = Buffer.from(content.trim(), 'binary');
-											//let Stream = FS.createWriteStream(Ruta);
-											//Stream.write(Contenido.trim(), 'binary');
 											files[Buffer.from(varName, 'binary').toString()] = {
 												content: data,
 												name: Buffer.from(fileName, 'binary').toString(),
-												//Ruta: Ruta,
 												size: data.byteLength,
 												mimeType: Buffer.from(mimeType, 'binary').toString()
 											};
@@ -176,8 +169,8 @@ export class Request {
 		});
 	}
 	/**
-	 * Define que método se uso para realizar la petición.
-	 * @param method El método con el que se realizo la petición.
+	 * Defines which method was used to make the request.
+	 * @param method - The method used for the request.
 	 */
 	private getMethod(method: string): Request.Method {
 		return method == 'POST'
@@ -187,8 +180,8 @@ export class Request {
 			: 'GET';
 	}
 	/**
-	 * Obtiene los datos enviados por medio de URL QUERY.
-	 * @param Url La url recibida de la petición http.
+	 * Retrieves the data sent via URL QUERY.
+	 * @param Url - The URL received from the HTTP request.
 	 */
 	private getQueryParams(Url: string): Map<string, string> {
 		let UrlObject = new URI.URL(`http://x.x${Url}`);
