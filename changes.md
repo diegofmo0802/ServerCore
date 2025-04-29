@@ -33,7 +33,9 @@
 - el objeto POST.content ya no sera un Map cuando corresponde si no un objeto Request.POST.VarList
 - el objeto POST.files siempre tendrá el tipo Request.POST.FileList
 **Request**
-- el atributo GET pasa a ser queryParams
+- el atributo GET pasa a ser searchParams
+- el procesamiento del body de las peticiones se delego al archivo BodyParser.ts
+- el tipo de search param deja de ser un Map a ser objeto { [key: string]: string | undefined }
 **WebSocket**
 - la lógica detrás de la recepción de webSocket fue separada hacia Chunk.ts
 - Chunk.ts fue optimizado
