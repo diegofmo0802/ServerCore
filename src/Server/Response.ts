@@ -68,6 +68,16 @@ export class Response {
 		return headers;
 	}
 	/**
+	 * Sends response headers.
+	 * @param code - The HTTP status code.
+	 * @param headers - The headers to send.
+	 */
+	private sendHeaders(code: number, headers: Request.Headers): void {
+		const cookieSetters = this.request.cookies.getSetters();
+		if (cookieSetters.length > 0) headers['set-cookie'] = cookieSetters;
+		this.httpResponse.writeHead(code, headers);
+	}
+	/**
 	 * Sends data as a response.
 	 * @param data - The data to be sent.
 	 * @param encode - The encoding used for the response.
@@ -149,16 +159,6 @@ export class Response {
         } catch(error) {
             this.sendError(500, error instanceof Error ? error.message : '[Response Error] - File/Directory does not exist.');
         }
-	}
-	/**
-	 * Sends response headers.
-	 * @param code - The HTTP status code.
-	 * @param headers - The headers to send.
-	 */
-	private sendHeaders(code: number, headers: Request.Headers): void {
-		const cookieSetters = this.request.cookies.getSetters();
-		if (cookieSetters.length > 0) headers['set-cookie'] = cookieSetters;
-		this.httpResponse.writeHead(code, headers);
 	}
 	/**
 	 * Sends a `.HSaml` template as a response.
