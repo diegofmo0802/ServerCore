@@ -17,7 +17,7 @@
                     <input id="Carpeta_Cambiar"type="button" value="Cambiar Ruta"/>
                 </div>
                 <ul class="Lista">
-                    $(Carpeta,, name) {
+                    $(folder,, name) {
                         <li>
                             <a class="Elemento" href="${Url}%name%">%name%</a>
                         </li>

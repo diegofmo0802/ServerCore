@@ -5,13 +5,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/Saml:Global/Style/Template/Template.css">
-        <title>[SV-C] - ${Código}</title>
+        <title>[SV-C] - ${status}</title>
     </head>
     <body>
         <div id="Error" class="Centrar-X Centrar-Y">
             <div class="Información">
-                <h1 class="Código">Error: ${Código}</h1>
-                <p class="Mensaje">${Mensaje}</p>
+                <h1 class="Código">Error: ${status}</h1>
+                <p class="Mensaje">${message}</p>
                 <div class="Centrar-X Centrar-Y">
                     <div class="Carga">
                         <div class="C_Fondo"></div>
