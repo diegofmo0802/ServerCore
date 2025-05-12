@@ -1,6 +1,6 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description Añade la forma de Respuesta a `Saml/Server-core`.
+ * @description Adds the response format to `Saml/Server-core`.
  * @license Apache-2.0
  */
 
@@ -14,17 +14,17 @@ import Utilities from '../Utilities.js';
 import Template from '../Template.js';
 
 export class Response {
-	/**Contiene la petición que recibió el servidor. */
+	/** Contains the request received by the server. */
 	public request: Request;
-	/**Contiene el listado de plantillas de respuesta del servidor. */
+	/** Contains the list of server response templates. */
 	private templates: Server.Templates;
-	/**Contiene la respuesta que dará el servidor. */
+	/** Contains the response to be sent by the server. */
 	public httpResponse: HTTP.ServerResponse;
 	/**
-	 * Crea la forma de Respuesta de `Saml/Servidor`.
-	 * @param request La petición que recibió el servidor.
-	 * @param httpResponse La respuesta que dará el servidor.
-	 * @param templates El listado de plantillas de respuesta del servidor.
+	 * Creates the `Saml/Server` response format.
+	 * @param request - The request received by the server.
+	 * @param httpResponse - The response to be sent by the server.
+	 * @param templates - The list of server response templates.
 	 */
 	public constructor(request: Request, httpResponse: HTTP.ServerResponse, templates: Server.Templates = {}) {
         this.request = request;
@@ -34,9 +34,9 @@ export class Response {
         this.httpResponse.setHeader('X-Version', '3.7.0-dev.1');
     }
 	/**
-	 * Crea encabezados para los tipos de archivo admitidos.
-	 * - Se añadirán mas tipos permitidos con el tiempo.
-	 * @param extension La extension de archivo.
+	 * Generates headers for supported file types.
+	 * More types will be supported over time.
+	 * @param extension - The file extension.
 	 */
 	public generateHeaders(extension: string): Request.Headers {
 		extension = extension.startsWith('.') ? extension.slice(1) : extension;
@@ -60,50 +60,50 @@ export class Response {
 		const acceptRangeFormats = [
 			'svg', 'png', 'jpg', 'jpeg', 'mp3', 'wav', 'mp4'
 		];
-		const type = contentTypeMap[extension]
-		if  (type) headers['Content-Type'] = type;
+		const type = contentTypeMap[extension];
+		if (type) headers['Content-Type'] = type;
 		if (acceptRangeFormats.includes(extension)) {
             headers['Accept-Ranges'] = 'bytes';
         }
 		return headers;
 	}
 	/**
-	 * Envía un dato como respuesta.
-	 * @param data El dato que se enviara.
-	 * @param encode La Codificación con la que se enviara la respuesta.
+	 * Sends data as a response.
+	 * @param data - The data to be sent.
+	 * @param encode - The encoding used for the response.
 	 */
 	public send(data: string | Buffer, encode?: BufferEncoding): void  {
 		encode = encode ? encode : 'utf-8';
 		this.httpResponse.end(data, encode);
 	}
 	/**
-	 * Envía un Archivo como respuesta.
-	 * @param path El dato que se enviara.
+	 * Sends a file as a response.
+	 * @param path - The file path to send.
+	 * @throws If the file does not exist or is not accessible.
 	 */
 	public async sendFile(path: string): Promise<void>  {
 		path = Utilities.Path.normalize(path);
         try {
             const details = await FS.promises.stat(path);
-            if (!details.isFile()) return this.SendError(500, '[Fallo En Respuesta] - La ruta proporcionada no pertenece a un archivo.');
+            if (!details.isFile()) return this.SendError(500, '[Response Error] - Provided path is not a file.');
             if (!this.request.headers.range) {
                 const stream = FS.createReadStream(path);
 				this.httpResponse.setHeader('Content-Length', details.size);
 				this.sendHeaders(200, this.generateHeaders(PATH.extname(path)));
 				stream.pipe(this.httpResponse);
             } else {
-                const info = /bytes=(\d*)?-?(\d*)?/i
-				.exec(this.request.headers.range);
-                if (!info) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
+                const info = /bytes=(\d*)?-?(\d*)?/i.exec(this.request.headers.range);
+                if (!info) return this.SendError(416, 'Requested range exceeds file size');
 				const [startString, endString] = info.slice(1);
-                if (!startString) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
+                if (!startString) return this.SendError(416, 'Requested range exceeds file size');
                 const start = Number(startString);
-				const maxSize = start + 1024*1000;
+				const maxSize = start + 1024 * 1000;
                 const end = endString
-                ? Number(endString)
-                : maxSize >= details.size
-                    ? details.size - 1
-                    : maxSize;
-				if (start > details.size || end > details.size) return this.SendError(416, 'El rango solicitado excede el tamaño del archivo');
+					? Number(endString)
+					: maxSize >= details.size
+						? details.size - 1
+						: maxSize;
+				if (start > details.size || end > details.size) return this.SendError(416, 'Requested range exceeds file size');
 				const size = end - start;
 				const file = FS.createReadStream(path, { start, end });
 				this.httpResponse.setHeader('Content-Length', size + 1);
@@ -112,14 +112,14 @@ export class Response {
 				file.pipe(this.httpResponse);
             }
         } catch(error) {
-			// console.error(error);
-            this.SendError(500, error instanceof Error ? error.message : '[Fallo En Respuesta] - El archivo no existe.');
+            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - File does not exist.');
         }
 	}
 	/**
-	 * Envía el listado de una carpeta como respuesta.
-	 * @param basePath La regla de enrutamiento.
-	 * @param relativePath La petición que recibió el servidor.
+	 * Sends the listing of a folder as a response.
+	 * @param basePath - The routing rule base path.
+	 * @param relativePath - The relative path received in the request.
+	 * @throws If the folder does not exist or is invalid.
 	 */
 	public async sendFolder(basePath: string, relativePath: string): Promise<void> {
         basePath = basePath.endsWith('/') ? basePath : basePath + '/';
@@ -128,7 +128,7 @@ export class Response {
         try {
             const details = await FS.promises.stat(path);
             if (details.isFile()) return this.sendFile(path);
-            if (!details.isDirectory()) return this.SendError(404, 'El archivo/Directorio no existe.');
+            if (!details.isDirectory()) return this.SendError(404, 'File/Directory does not exist.');
             const folder = await FS.promises.readdir(path);
             if (this.templates.Folder) {
                 this.sendTemplate(this.templates.Folder, {
@@ -142,14 +142,13 @@ export class Response {
                 });
             }
         } catch(error) {
-			// console.error(error);
-            this.SendError(500, error instanceof Error ? error.message : '[Fallo En Respuesta] - El archivo/Directorio no existe.');
+            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - File/Directory does not exist.');
         }
 	}
 	/**
-	 * Envía los encabezados de la respuesta.
-	 * @param code El código de la respuesta que se dará.
-	 * @param headers Los encabezados que se enviaran.
+	 * Sends response headers.
+	 * @param code - The HTTP status code.
+	 * @param headers - The headers to send.
 	 */
 	public sendHeaders(code: number, headers: Request.Headers): void {
 		const cookieSetters = this.request.cookies.getSetters();
@@ -157,9 +156,10 @@ export class Response {
 		this.httpResponse.writeHead(code, headers);
 	}
 	/**
-	 * Envía una plantilla `.HSaml` como respuesta.
-	 * @param path La ruta de la plantilla.
-	 * @param Data Los datos con los que se compilara la plantilla.
+	 * Sends a `.HSaml` template as a response.
+	 * @param path - The template file path.
+	 * @param Data - The data to compile the template with.
+	 * @throws If the template cannot be loaded.
 	 */
 	public async sendTemplate(path: string, Data: object): Promise<void> {
 		path = Utilities.Path.normalize(path);
@@ -168,22 +168,21 @@ export class Response {
             this.sendHeaders(200, this.generateHeaders('html'));
 			this.send(template, 'utf-8');
         } catch(error) {
-			// console.error(error);
-            this.SendError(500, error instanceof Error ? error.message : '[Fallo En Respuesta] - La plantilla no existe.');
+            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - Template does not exist.');
         }
 	}
 	/**
-	 * Envía datos en formato JSON como respuesta.
-	 * @param data El dato que se enviara.
+	 * Sends data in JSON format.
+	 * @param data - The data to send.
 	 */
 	public sendJson(data: any): void {
         this.sendHeaders(200, this.generateHeaders('JSON'));
 		this.send(JSON.stringify(data), 'utf-8');
     }
 	/**
-	 * Envía un error como respuesta.
-	 * @param code El código del error que se enviara.
-	 * @param message El mensaje con los detalles del error.
+	 * Sends an error as a response.
+	 * @param code - The HTTP status code of the error.
+	 * @param message - The error message.
 	 */
 	public async SendError(code: number, message: string): Promise<void> {
         try {
