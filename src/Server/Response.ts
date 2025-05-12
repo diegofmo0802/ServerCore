@@ -72,30 +72,34 @@ export class Response {
 	 * @param data - The data to be sent.
 	 * @param encode - The encoding used for the response.
 	 */
-	public send(data: string | Buffer, encode?: BufferEncoding): void  {
-		encode = encode ? encode : 'utf-8';
-		this.httpResponse.end(data, encode);
+	public send(data: Response.data, options: Response.options = {}): void  {
+		const encode = options.encode || 'utf-8';
+		const headers = options.headers || this.generateHeaders('txt');
+		this.sendHeaders(options.status || 200, headers);
+		if (!(data instanceof FS.ReadStream)) return void this.httpResponse.end(data, encode);
+		data.pipe(this.httpResponse);
 	}
 	/**
 	 * Sends a file as a response.
 	 * @param path - The file path to send.
+	 * @param options - The response options.
 	 * @throws If the file does not exist or is not accessible.
 	 */
-	public async sendFile(path: string): Promise<void>  {
+	public async sendFile(path: string, options: Response.options = {}): Promise<void>  {
 		path = Utilities.Path.normalize(path);
         try {
             const details = await FS.promises.stat(path);
-            if (!details.isFile()) return this.SendError(500, '[Response Error] - Provided path is not a file.');
+            if (!details.isFile()) return this.sendError(500, '[Response Error] - Provided path is not a file.');
             if (!this.request.headers.range) {
                 const stream = FS.createReadStream(path);
-				this.httpResponse.setHeader('Content-Length', details.size);
-				this.sendHeaders(200, this.generateHeaders(PATH.extname(path)));
-				stream.pipe(this.httpResponse);
+				const headers = this.generateHeaders(PATH.extname(path));
+				headers['content-length'] = details.size.toString();
+				this.send(stream, { status: 200, headers });
             } else {
                 const info = /bytes=(\d*)?-?(\d*)?/i.exec(this.request.headers.range);
-                if (!info) return this.SendError(416, 'Requested range exceeds file size');
+                if (!info) return this.sendError(416, 'Requested range exceeds file size');
 				const [startString, endString] = info.slice(1);
-                if (!startString) return this.SendError(416, 'Requested range exceeds file size');
+                if (!startString) return this.sendError(416, 'Requested range exceeds file size');
                 const start = Number(startString);
 				const maxSize = start + 1024 * 1000;
                 const end = endString
@@ -103,16 +107,16 @@ export class Response {
 					: maxSize >= details.size
 						? details.size - 1
 						: maxSize;
-				if (start > details.size || end > details.size) return this.SendError(416, 'Requested range exceeds file size');
-				const size = end - start;
-				const file = FS.createReadStream(path, { start, end });
-				this.httpResponse.setHeader('Content-Length', size + 1);
-				this.httpResponse.setHeader('Content-Range', `bytes ${start}-${end}/${details.size}`);
-				this.sendHeaders(206, this.generateHeaders(PATH.extname(path)));
-				file.pipe(this.httpResponse);
+				if (start > details.size || end > details.size) return this.sendError(416, 'Requested range exceeds file size');
+				const size = end - start + 1;
+				const stream = FS.createReadStream(path, { start, end });
+				const headers = this.generateHeaders(PATH.extname(path));
+				headers['content-length'] = size.toString();
+				headers['content-range'] = `bytes ${start}-${end}/${details.size}`;
+				this.send(stream, { status: 206, headers });
             }
         } catch(error) {
-            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - File does not exist.');
+            this.sendError(500, error instanceof Error ? error.message : '[Response Error] - File does not exist.');
         }
 	}
 	/**
@@ -128,7 +132,7 @@ export class Response {
         try {
             const details = await FS.promises.stat(path);
             if (details.isFile()) return this.sendFile(path);
-            if (!details.isDirectory()) return this.SendError(404, 'File/Directory does not exist.');
+            if (!details.isDirectory()) return this.sendError(404, 'File/Directory does not exist.');
             const folder = await FS.promises.readdir(path);
             if (this.templates.Folder) {
                 this.sendTemplate(this.templates.Folder, {
@@ -142,7 +146,7 @@ export class Response {
                 });
             }
         } catch(error) {
-            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - File/Directory does not exist.');
+            this.sendError(500, error instanceof Error ? error.message : '[Response Error] - File/Directory does not exist.');
         }
 	}
 	/**
@@ -150,7 +154,7 @@ export class Response {
 	 * @param code - The HTTP status code.
 	 * @param headers - The headers to send.
 	 */
-	public sendHeaders(code: number, headers: Request.Headers): void {
+	private sendHeaders(code: number, headers: Request.Headers): void {
 		const cookieSetters = this.request.cookies.getSetters();
 		if (cookieSetters.length > 0) headers['set-cookie'] = cookieSetters;
 		this.httpResponse.writeHead(code, headers);
@@ -158,59 +162,70 @@ export class Response {
 	/**
 	 * Sends a `.HSaml` template as a response.
 	 * @param path - The template file path.
-	 * @param Data - The data to compile the template with.
+	 * @param data - The data to compile the template with.
+	 * @param options - The response options.
 	 * @throws If the template cannot be loaded.
 	 */
-	public async sendTemplate(path: string, Data: object): Promise<void> {
+	public async sendTemplate(path: string, data: object, options: Response.options = {}): Promise<void> {
 		path = Utilities.Path.normalize(path);
         try {
-            const template = await Template.load(path, Data);
-            this.sendHeaders(200, this.generateHeaders('html'));
-			this.send(template, 'utf-8');
+            const template = await Template.load(path, data);
+			const headers = options.headers || this.generateHeaders('html');
+			const status = options.status || 200;
+			this.send(template, { status, headers });
         } catch(error) {
-            this.SendError(500, error instanceof Error ? error.message : '[Response Error] - Template does not exist.');
+            this.sendError(500, error instanceof Error ? error.message : '[Response Error] - Template does not exist.');
         }
 	}
 	/**
 	 * Sends data in JSON format.
 	 * @param data - The data to send.
+	 * @param options - The response options.
 	 */
-	public sendJson(data: any): void {
-        this.sendHeaders(200, this.generateHeaders('JSON'));
-		this.send(JSON.stringify(data), 'utf-8');
+	public sendJson(data: any, options: Response.options = {}): void {
+		const json = JSON.stringify(data);
+		const status = options.status || 200;
+		const headers = options.headers || this.generateHeaders('json');
+		this.send(json, { status, headers });
     }
 	/**
 	 * Sends an error as a response.
-	 * @param code - The HTTP status code of the error.
+	 * @param status - The HTTP status code of the error.
 	 * @param message - The error message.
 	 */
-	public async SendError(code: number, message: string): Promise<void> {
+	public async sendError(status: number, message: string): Promise<void> {
         try {
             if (this.templates.Error) {
                 const template = await Template.load(this.templates.Error, {
-                    Código: code, Mensaje: message
+                    Código: status, Mensaje: message
                 });
-                this.sendHeaders(code, this.generateHeaders('html'));
-                this.send(template);
+				const headers = this.generateHeaders('html');
+                this.send(template, { status: status, headers });
             } else {
                 const template = await Template.load(Utilities.Path.relative("\\global\\Template\\Error.HSaml"), {
-                    Código: code, Mensaje: message
+                    Código: status, Mensaje: message
                 });
-                this.sendHeaders(code, this.generateHeaders('html'));
-                this.send(template);
+				const headers = this.generateHeaders('html');
+                this.send(template, { status: status, headers });
             }
         } catch(error) {
 			console.error(error);
-            this.sendHeaders(code, this.generateHeaders('txt'));
-            this.send(`Error: ${code} -> ${message}`);
+			const headers = this.generateHeaders('txt');
+            this.send(`Error: ${status} -> ${message}`, { status: status, headers });
         }
 	}
 }
 
 export namespace Response {
+	export interface options {
+		status?: number;
+		headers?: Request.Headers; 
+		encode?: BufferEncoding;
+	}
 	export interface contentTypeMap {
 		[key: string]: string | undefined;
 	}
+	export type data = string | Buffer | FS.ReadStream;
     export type Extensions = (
         'HTML' | 'JS' | 'CSS' | 'JSON' | 'XML' | 'TXT' |
         'SVG' | 'PNG' | 'JPG' | 'JPEG' | 'MP3' | 'WAV' | 'MP4'

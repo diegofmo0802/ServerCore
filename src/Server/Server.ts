@@ -148,13 +148,13 @@ export class Server {
 				if (rule.testAuth(request)) {
 					rule.exec(request, response);
 				} else {
-					response.SendError(403, `No tienes permiso para acceder a: ${request.method} -> ${request.url}`);
+					response.sendError(403, `No tienes permiso para acceder a: ${request.method} -> ${request.url}`);
 				}
 				routed = true;
 				break;
 			}
 		}
-		if (!(routed)) response.SendError(400, `Sin enrutador para: ${request.method} -> ${request.url}`);
+		if (!(routed)) response.sendError(400, `Sin enrutador para: ${request.method} -> ${request.url}`);
 	}
 	/**
 	 * Enruta las peticiones de conexión WebSocket.
