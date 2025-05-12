@@ -73,9 +73,10 @@ export class Response {
 	 * @param encode - The encoding used for the response.
 	 */
 	public send(data: Response.data, options: Response.options = {}): void  {
+		const status = options.status ?? 200;
 		const encode = options.encode || 'utf-8';
 		const headers = options.headers || this.generateHeaders('txt');
-		this.sendHeaders(options.status || 200, headers);
+		this.sendHeaders(status, headers);
 		if (!(data instanceof FS.ReadStream)) return void this.httpResponse.end(data, encode);
 		data.pipe(this.httpResponse);
 	}
@@ -170,8 +171,8 @@ export class Response {
 		path = Utilities.Path.normalize(path);
         try {
             const template = await Template.load(path, data);
+			const status = options.status ?? 200;
 			const headers = options.headers || this.generateHeaders('html');
-			const status = options.status || 200;
 			this.send(template, { status, headers });
         } catch(error) {
             this.sendError(500, error instanceof Error ? error.message : '[Response Error] - Template does not exist.');
@@ -184,7 +185,7 @@ export class Response {
 	 */
 	public sendJson(data: any, options: Response.options = {}): void {
 		const json = JSON.stringify(data);
-		const status = options.status || 200;
+		const status = options.status ?? 200;
 		const headers = options.headers || this.generateHeaders('json');
 		this.send(json, { status, headers });
     }
