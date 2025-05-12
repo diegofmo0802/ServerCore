@@ -141,9 +141,10 @@ export class Response {
         relativePath = relativePath.endsWith('/') ? relativePath.slice(0, -1) : relativePath;
 		const path = Utilities.Path.normalize(basePath + relativePath);
         try {
+			if (!await this.fileExist(path)) return void this.sendError(404, 'The requested URL was not fount');
             const details = await FS.promises.stat(path);
             if (details.isFile()) return this.sendFile(path);
-            if (!details.isDirectory()) return this.sendError(404, 'File/Directory does not exist.');
+            if (!details.isDirectory()) return this.sendError(404, 'The requested URL was not fount');
             const folder = await FS.promises.readdir(path);
             if (this.templates.Folder) {
                 this.sendTemplate(this.templates.Folder, {
@@ -214,6 +215,10 @@ export class Response {
 			const headers = this.generateHeaders('txt');
             this.send(`Error: ${status} -> ${message}`, { status: status, headers });
         }
+	}
+	private async fileExist(path: string): Promise<boolean> {
+		try { await FS.promises.stat(path); return true; }
+		catch(error) { return false; }
 	}
 }
 
