@@ -1,6 +1,6 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description Añade una forma sencilla de crear servidores HTTP/S y WS/S.
+ * @description Adds a simple way to create HTTP/S and WS/S servers.
  * @license Apache-2.0
  */
 
@@ -33,10 +33,10 @@ export class Server {
 	private HttpsServer?: HTTP.Server;
 	private rules: Rule[];
 	/**
-	 * Crea un servidor HTTP/S.
-	 * @param port El puerto donde el servidor recibirá peticiones.
-	 * @param host El host donde el servidor recibirá peticiones.
-	 * @param sslOptions La configuración SSL.
+	 * Creates an HTTP/S server.
+	 * @param port - The port the server will listen on.
+	 * @param host - The host the server will bind to.
+	 * @param sslOptions - The SSL configuration.
 	 */
 	public constructor(port?: number, host?: string, sslOptions?: Server.SSLOptions) {
 		this.host = host ? host : '0.0.0.0';
@@ -47,8 +47,8 @@ export class Server {
         this.protocol = sslOptions && sslOptions.pubKey && sslOptions.privKey ? 'HTTPS' : 'HTTP';
 		this.addFolder('/Saml:Global', `${Utilities.Path.moduleDir}\\global`);
 		Debug.log('&B(255,180,220)&C0---------------------------------');
-		Debug.log('&B(255,180,220)&C0- Saml/Servidor by diegofmo0802 -');
-		Debug.log('&B(255,180,220)&C0-       Servidor Iniciado       -');
+		Debug.log('&B(255,180,220)&C0-  ServerCore by diegofmo0802.  -');
+		Debug.log('&B(255,180,220)&C0-        Server started         -');
 		Debug.log('&B(255,180,220)&C0---------------------------------');
 		let [HttpStarted, HttpsStarted] = [false, false];
 		this.HttpServer = HTTP.createServer((Request, Response) => {
@@ -58,7 +58,7 @@ export class Server {
 		}).listen(this.HttpPort, host, () => {
 			this.protocol = this.protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
 			Debug.log('&B(255,180,220)&C0-&R Host', this.host ? this.host : 'localhost');
-			Debug.log('&B(255,180,220)&C0-&R Puerto HTTP', this.HttpPort);
+			Debug.log('&B(255,180,220)&C0-&R HTTP Port', this.HttpPort);
 			if (!(sslOptions && sslOptions.pubKey && sslOptions.privKey) || HttpsStarted)
             Debug.log('&B(255,180,220)&C0---------------------------------');
 		});
@@ -70,96 +70,95 @@ export class Server {
 				this.upgradeManager(Request, Socket);
 			}).listen(this.HttpsPort, host, () => {
 				this.protocol = this.protocol == 'HTTP' ? 'HTTP/S' : 'HTTPS';
-				Debug.log('&B(255,180,220)&C0-&R Puerto HTTPS', this.HttpsPort);
+				Debug.log('&B(255,180,220)&C0-&R HTTPS Port', this.HttpsPort);
 				if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
 			});
 		}).catch((Error) => {
-			Debug.log('&C(255,0,0)[Server - Core]: Error con los certificados: ', Error);
+			Debug.log('&C(255,0,0)[Server - Core]: Certificate error: ', Error);
 			if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
 		});
 	}
 	/**
-	 * Añade una/varias regla/s de enrutamiento para el servidor.
-	 * @param rules La regla/s que desea añadir.
+	 * Adds one or more routing rules to the server.
+	 * @param rules - The rule(s) to be added.
 	 */
 	public addRules(...rules: Server.Rule[]): Server {
 		this.rules = this.rules.concat(rules);
 		return this;
 	}
 	/**
-	 * Añade una regla de enrutamiento de acción.
-	 * @param method El Método HTTP al que deseas que se responda.
-	 * @param urlRule La url donde escuchara la acción.
-	 * @param action La acción que se ejecutara.
-	 * @param auth La función de comprobación de autorización.
+	 * Adds an action routing rule.
+	 * @param method - The HTTP method to respond to.
+	 * @param urlRule - The URL path for the action.
+	 * @param action - The action to be executed.
+	 * @param auth - The optional authorization check function.
 	 */
 	public addAction(method: Server.Request.Method, urlRule: string, action: Rule.ActionExec, auth?: Rule.AuthExec): Server {
 		this.addRules(new Rule('Action', method, urlRule, action, auth));
 		return this;
 	}
 	/**
-	 * Añade una regla de enrutamiento de archivo.
-	 * @param urlRule La url donde escuchara la acción.
-	 * @param source La Ruta del archivo que desea enviar.
-	 * @param auth La función de comprobación de autorización.
+	 * Adds a file routing rule.
+	 * @param urlRule - The URL path to listen on.
+	 * @param source - The path to the file to be served.
+	 * @param auth - The optional authorization check function.
 	 */
 	public addFile(urlRule: string, source: string, auth?: Rule.AuthExec): Server{
 		this.addRules(new Rule('File', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
-	 * Añade una regla de enrutamiento de carpeta.
-	 * @param urlRule La url donde escuchara la acción.
-	 * @param source La Ruta del directorio que desea enviar.
-	 * @param auth La función de comprobación de autorización.
+	 * Adds a folder routing rule.
+	 * @param urlRule - The URL path to listen on.
+	 * @param source - The directory path to be served.
+	 * @param auth - The optional authorization check function.
 	 */
 	public addFolder(urlRule: string, source: string, auth?: Rule.AuthExec): Server {
 		this.addRules(new Rule('Folder', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
-	 * Añade una regla de enrutamiento de WebSocket.
-	 * @param urlRule La url donde escuchara la petición de conexión.
-	 * @param action La acción que se ejecutara.
-	 * @param auth La función de comprobación de autorización.
+	 * Adds a WebSocket routing rule.
+	 * @param urlRule - The URL path to listen on.
+	 * @param action - The action to be executed on connection.
+	 * @param auth - The optional authorization check function.
 	 */
 	public addWebSocket(urlRule: string, action: Rule.WebSocketExec, auth?: Rule.AuthExec): Server {
 		this.addRules(new Rule('WebSocket', 'ALL', urlRule, action, auth));
 		return this;
 	}
 	/**
-	 * Define la plantillas `.HSaml` predeterminadas del servidor.
-	 * @param Template El nombre de la plantilla.
-	 * @param Rule La ruta de la plantilla `.HSaml`.
+	 * Defines default `.HSaml` templates for the server.
+	 * @param name - The name of the template.
+	 * @param path - The path to the `.HSaml` template file.
 	 */
 	public setTemplate(name: keyof Server.Templates, path: string): Server {
 		this.templates[name] = path;
 		return this;
 	}
 	/**
-	 * Enruta las peticiones hechas al servidor para que sean procesadas.
-	 * @param request La petición que recibió el servidor.
-	 * @param response La respuesta que dará el servidor.
+	 * Routes incoming HTTP requests to be processed.
+	 * @param request - The received HTTP request.
+	 * @param response - The server response handler.
+	 * @throws If no routing rule matches the request.
 	 */
 	private routeRequest(request: Server.Request, response: Server.Response): void {
 		let routed = false;
 		for (const rule of this.rules) {
 			if (rule.test(request)) {
-				if (rule.testAuth(request)) {
-					rule.exec(request, response);
-				} else {
-					response.sendError(403, `No tienes permiso para acceder a: ${request.method} -> ${request.url}`);
-				}
+				if (rule.testAuth(request)) rule.exec(request, response);
+				else response.sendError(403, `You don't have permission to access: ${request.method} -> ${request.url}`);
 				routed = true;
 				break;
 			}
 		}
-		if (!(routed)) response.sendError(400, `Sin enrutador para: ${request.method} -> ${request.url}`);
+		if (!(routed)) response.sendError(400, `No router for: ${request.method} -> ${request.url}`);
 	}
 	/**
-	 * Enruta las peticiones de conexión WebSocket.
-	 * @param request La petición que recibió el servidor.
-	 * @param webSocket La conexión con el cliente.
+	 * Routes WebSocket connection requests.
+	 * @param request - The received HTTP request.
+	 * @param webSocket - The WebSocket connection with the client.
+	 * @throws If no WebSocket routing rule matches.
 	 */
 	private routeWebSocket(request: Server.Request, webSocket: Server.WebSocket): void {
 		let routed = false;
@@ -177,57 +176,49 @@ export class Server {
 				break;
 			}
 		}
-		// if (!(routed)) console.log("[WebSocket]: no routed");
-		if (!(routed)) webSocket.send(`HTTP/1.1 400 Bad request\r\nSin enrutador para: ${request.method} -> ${request.url}\r\n\r\n`);
+		if (!(routed)) webSocket.send(`HTTP/1.1 400 Bad request\r\nNo router for: ${request.method} -> ${request.url}\r\n\r\n`);
 	}
 	/**
-	 * Se ejecutara cuando el servidor reciba una petición.
-	 * @param HttpRequest La petición que recibió el servidor.
-	 * @param HttpResponse La conexión con el cliente.
+	 * Triggered when the server receives an HTTP request.
+	 * @param HttpRequest - The incoming HTTP request.
+	 * @param HttpResponse - The server response stream.
 	 */
 	private requestManager(HttpRequest: HTTP.IncomingMessage, HttpResponse: HTTP.ServerResponse): void {
 		const Request = new Server.Request(HttpRequest);
 		const Response = new Server.Response(Request, HttpResponse, this.templates);
-		Debugs.Requests.log(
-			'[Petición]:',
-			Request.ip,
-			Request.method,
-			Request.url, Request.cookies.get('Session')
-		);
+		const sessionID = Request.cookies.get('Session');
+		Debugs.Requests.log( '[Request]:', Request.ip, Request.method, Request.url, sessionID );
 		this.routeRequest(Request, Response);
 	};
 	/**
-	 * Se ejecutara cuando el servidor reciba una petición.
-	 * @param HttpRequest La petición que recibió el servidor.
-	 * @param Socket La respuesta que dará el servidor.
+	 * Will be executed when the server receives an upgrade request.
+	 * @param HttpRequest The request received by the server.
+	 * @param Socket The socket to respond with (WebSocket upgrade).
 	 */
 	private upgradeManager(HttpRequest: HTTP.IncomingMessage, Socket: Duplex): void {
-		let Request = new Server.Request(HttpRequest);
-		let WebSocket = new Server.WebSocket(Socket);
-		Debugs.UpgradeRequests.log(
-			'[WebSocket]:',
-			Request.ip,
-			Request.method,
-			Request.url, Request.cookies.get('Session')
-		);
+		const Request = new Server.Request(HttpRequest);
+		const WebSocket = new Server.WebSocket(Socket);
+		const sessionID = Request.cookies.get('Session');
+		Debugs.UpgradeRequests.log( '[WebSocket]:', Request.ip, Request.method, Request.url, sessionID );
 		this.routeWebSocket(Request, WebSocket);
 	}
 	/**
-	 * Carga la llave y certificado SSL y devuelve su contenido en strings
-	 * @param pathCert La ruta de el certificado SSL.
-	 * @param pathKey La ruta de la llave SSL.
+	 * Loads the SSL key and certificate and returns their content as strings.
+	 * @param pathCert Path to the SSL certificate.
+	 * @param pathKey Path to the SSL key.
+	 * @returns An object containing the certificate and key as Buffers.
 	 */
 	public static async loadCertificates(pathCert: string, pathKey: string): Promise<Server.Certificates> {
-        pathCert = Utilities.Path.normalize(pathCert);
+    	pathCert = Utilities.Path.normalize(pathCert);
         pathKey = Utilities.Path.normalize(pathKey);
         const certInfo = await FS.promises.stat(pathCert);
         const keyInfo = await FS.promises.stat(pathKey);
-        if (!(certInfo.isFile())) return Promise.reject('La ruta del Certificado no pertenece a un archivo');
-        if (!(keyInfo.isFile())) return Promise.reject('La ruta de la llave no pertenece a un archivo');
+        if (!(certInfo.isFile())) return Promise.reject('The certificate path is not a file');
+        if (!(keyInfo.isFile())) return Promise.reject('The key path is not a file');
         const cert = await FS.promises.readFile(pathCert);
         const key = await FS.promises.readFile(pathKey);
         return { cert, key };
-  }
+  	}
 }
 
 export namespace Server {
