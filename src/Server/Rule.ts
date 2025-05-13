@@ -1,6 +1,6 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description Contiene lo necesario para las reglas de enrutamiento de ServerCore.
+ * @description Contains routing rule logic for ServerCore.
  * @license Apache-2.0
  */
 
@@ -9,25 +9,25 @@ import Response from './Response.js';
 import WebSocket from './WebSocket/WebSocket.js';
 
 export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
-    /**El tipo de la regla de enrutamiento */
+    /** The type of the routing rule */
     public type: T;
-    /**El método que aceptara la regla de enrutamiento */
+    /** The HTTP method accepted by the routing rule */
     public method: Request.Method;
-    /**La UrlRule con la que se creo la regla de enrutamiento */
+    /** The UrlRule with which the routing rule was created */
     public urlRule: string;
-    /**La función de Autenticación */
+    /** The authentication function */
     public authExec: Rule.AuthExec;
-    /**La expresión regular de la regla de enrutamiento */
+    /** The regular expression for the routing rule */
     public expression: RegExp;
-    /**La contenido de ejecución la regla de enrutamiento */
+    /** The executable content for the routing rule */
     public content: Rule.Type[T];
     /**
-     * Crea una regla de enrutamiento para ServerCore.
-     * @param type El tipo de regla.
-     * @param method El método de la petición de la regla.
-     * @param urlRule Es la regla que adoptara la clase Rule.
-     * @param content El contenido de ejecución de la regla.
-     * @param authExec La función de autenticación.
+     * Creates a routing rule for ServerCore.
+     * @param type - The rule type.
+     * @param method - The HTTP method of the rule.
+     * @param urlRule - The URL rule adopted by this Rule instance.
+     * @param content - The executable content of the rule.
+     * @param authExec - The authentication function.
      */
     public constructor(type: T, method: Request.Method, urlRule: string, content: Rule.Type[T], authExec?: Rule.AuthExec) {
         if (!urlRule.startsWith('/')) urlRule = '/' + urlRule;
@@ -40,11 +40,11 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         this.authExec = authExec ?? (() => true);
     }
     /**
-     * Ejecuta el contenido de la regla.
-     * @param request El Request que coincidió con la regla.
-     * @param client El cliente que hizo la petición.
+     * Executes the rule's content.
+     * @param request - The Request that matched the rule.
+     * @param client - The client that made the request.
      */
-    public exec(request: Request, client: Rule.ClientType<T>): void  {
+    public exec(request: Request, client: Rule.ClientType<T>): void {
         request.ruleParams = this.getParams(request.url);
         if (this.testAuth(request)) switch (this.type) {
             case 'Action':    (this as Rule<'Action'>).content(request, (client as Rule.ClientType<'Action'>)); break;
@@ -54,10 +54,10 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         }
     }
     /**
-     * Comprueba si una url coincide con esta ruta.
-     * también establece los Request.RuleParams.
-     * @param request La petición recibida.
-     * @param isWebSocket Define si se revisará un WebSocket.
+     * Checks whether a URL matches this route.
+     * Also sets the Request.ruleParams.
+     * @param request - The incoming request.
+     * @param isWebSocket - Whether to check for a WebSocket route.
      */
     public test(request: Request, isWebSocket: boolean = false): boolean {
         let result = false;
@@ -68,30 +68,29 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         } else {
             result = this.method == request.method || this.method == 'ALL'
             ? this.expression.test(request.url)
-            : false
+            : false;
         }
         return result;
     }
     /**
-     * Comprueba si una url coincide con esta ruta.
-     * @param request La petición recibida.
-     * @param isWebSocket Define si se revisará un WebSocket.
+     * Validates whether the request passes authentication.
+     * @param request - The incoming request.
      */
     public testAuth(request: Request): boolean {
         return !this.authExec || this.authExec(request);
     }
     /**
-     * Obtiene los RuleParams de la regla de enrutamiento si esta tiene.
-     * @param path La url a resolver.
+     * Retrieves the ruleParams from the routing rule if available.
+     * @param path - The URL to resolve.
      */
     public getParams(path: string): Rule.ruleParams {
         const math = this.expression.exec(path);
         if (!math) return {};
-        return {...math.groups};
+        return { ...math.groups };
     }
     /**
-     * Extrae la Url parcial usando la expresión de la regla.
-     * @param url La url de donde se extraerá la url parcial.
+     * Extracts the surplus URL using the rule's expression.
+     * @param url - The full URL to extract from.
      */
     public getSurplus(url: string): string {
         if (this.type == 'Folder') {
@@ -100,30 +99,30 @@ export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
         } else return url.replace(this.expression, '');
     }
     /**
-     * Crea una expresión regular para poder comprobar con ella las rutas.
-     * @param urlRule La UrlRule Con la que se formara la RegExp.
+     * Creates a regular expression for route matching.
+     * @param urlRule - The UrlRule used to form the RegExp.
+     * @throws Invalid URL rule format
      */
-    private getExpression(urlRule: string): RegExp  {
+    private getExpression(urlRule: string): RegExp {
         const validators = {
             param: /^\$(?<param>.+)$/,
             scape: /\\(?![\$\[\]\*\+\?\.\(\)\{\}\^\|\-])|(?<!\\)[\$\[\]\*\+\?\.\(\)\{\}\^\|\-]/gi,
         };
         const zones = urlRule.split('/').slice(1);
         let regExpString = '^';
-        for (let index = 0; index < zones.length; index ++) {
+        for (let index = 0; index < zones.length; index++) {
             const zone = zones[index];
             regExpString += '\/';
             if (validators.param.test(zone)) {
                 const match = validators.param.exec(zone);
                 if (match && match.groups) {
-                    const param = match.groups['param']
-                        .replace(validators.scape, '');
+                    const param = match.groups['param'].replace(validators.scape, '');
                     regExpString += `(?<${param}>[^\/]+?)`;
                 }
             } else if (zone == '*') {
-                regExpString += index < (zones.length -1)
-                ? '(?:[^\/]+)?'
-                : '(?:.+)?';
+                regExpString += index < (zones.length - 1)
+                    ? '(?:[^\/]+)?'
+                    : '(?:.+)?';
             } else regExpString += zone;
         }
         regExpString += `\/?${this.type == 'Folder' ? '.+?' : ''}$`;
