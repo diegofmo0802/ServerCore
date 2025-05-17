@@ -6,7 +6,8 @@
 
 import PATH from 'path';
 import URL from 'url';
-import FS from 'fs';
+import { promises as FS } from 'fs';
+import Debug from './Debug';
 
 export class Path {
     public moduleDir: string;
@@ -40,6 +41,14 @@ export class Path {
 export class Utilities {
     public static Path: Path = new Path;
     /**
+     * check if a file exists
+     * @param path the path to the file
+     * @returns a promise that resolves to true if the file exists, false otherwise
+     */
+    public static async fileExists(path: string): Promise<boolean> {
+        return FS.access(path).then(() => true).catch(() => false);
+    }
+    /**
      * load the environment variables from the given path
      * @param path the path to the environment variables file
      * @param setEnv whether to set the environment variables
@@ -47,11 +56,15 @@ export class Utilities {
      * @throws an error if the environment variables file does not exist
      * @throws an error if the environment variables file is not a file
      */
-    public static loadEnv(path: string, setEnv: boolean = true): Utilities.env {
-        console.log(`loading environment variables from [${path}]`);
+    public static async loadEnv(path: string, setEnv: boolean = true): Promise<Utilities.env> {
+        Debug.log(`loading environment variables from &C6[${path}]`);
         const result: Utilities.env = {};
-        if (!FS.existsSync(path)) throw new Error(`the environment variables file [${path}] does not exist`);
-        const env = FS.readFileSync(path, 'utf-8');
+        if (!await this.fileExists(path)) {
+            await FS.mkdir(PATH.dirname(path), { recursive: true });
+            await FS.writeFile(path, '');
+            Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
+        }
+        const env = await FS.readFile(path, 'utf-8');
         const lines = env.split('\n');
         for (const line of lines) {
             const [key, ...value] = line.split('=');
@@ -60,7 +73,7 @@ export class Utilities {
             result[key] = value.join('=').trim();
             if (setEnv) process.env[key] = value.join('=').trim();
         }
-        console.log(`environment variables loaded from [${path}]`);
+        Debug.log(`environment variables loaded from &C6[${path}]`);
         return result;
     }
     /**
