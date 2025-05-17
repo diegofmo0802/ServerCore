@@ -7,7 +7,8 @@
 import PATH from 'path';
 import URL from 'url';
 import { promises as FS } from 'fs';
-import Debug from './Debug';
+
+import Debug from './Debug.js';
 
 export class Path {
     public moduleDir: string;
