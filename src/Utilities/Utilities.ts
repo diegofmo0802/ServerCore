@@ -8,39 +8,10 @@ import PATH from 'path';
 import URL from 'url';
 import { promises as FS } from 'fs';
 
-import Debug from './Debug.js';
-
-export class Path {
-    public moduleDir: string;
-    public moduleMain: string;
-    public constructor() {
-        this.moduleDir = PATH.dirname(PATH.dirname(URL.fileURLToPath(import.meta.url)));
-        this.moduleMain = PATH.join(this.moduleDir, 'build/ServerCore.js');
-    }
-    /**
-     * clean a path.
-     * - replaces all `\` with `/`
-     * @param path the path to clean
-     * @returns the cleaned path
-     */
-    public normalize(path: string): string {
-        path = path.replace(/[\\/]/gi, PATH.sep);
-        return path;
-    }
-    /**
-     * convert a relative path to a full path.
-     * @param path the relative path.
-     * @returns the full path.
-     */
-    public relative(path: string): string {
-        path = this.normalize(path);
-        path =  PATH.join(this.moduleDir, path);
-        return PATH.normalize(path);
-    }
-}
+import Debug from '../Debug.js';
+import _Path from './Path.js';
 
 export class Utilities {
-    public static Path: Path = new Path;
     /**
      * check if a file exists
      * @param path the path to the file
@@ -174,6 +145,7 @@ export class Utilities {
 };
 
 export namespace Utilities {
+    export import Path = _Path;
     export namespace Types {
         type NumListAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
         type strToNum<str extends string> = str extends `${infer num extends number}` ? num : never;
@@ -322,6 +294,4 @@ export namespace Utilities {
         [key: string]: string;
     }
 }
-
-
 export default Utilities;

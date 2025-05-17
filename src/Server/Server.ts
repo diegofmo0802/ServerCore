@@ -9,7 +9,7 @@ import FS from 'fs';
 import HTTPS from 'https';
 import { Duplex } from 'stream';
 
-import Utilities from '../Utilities.js';
+import Utilities from '../Utilities/Utilities.js';
 import Debug from '../Debug.js';
 import Config from '../Config.js';
 

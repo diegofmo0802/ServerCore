@@ -10,7 +10,7 @@ import PATH from 'path';
 
 import Request from './Request.js';
 import Server from './Server.js';
-import Utilities from '../Utilities.js';
+import Utilities from '../Utilities/Utilities.js';
 import Template from '../Template.js';
 
 export class Response {
