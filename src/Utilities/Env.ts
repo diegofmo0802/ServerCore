@@ -59,10 +59,19 @@ export class Env {
     /**
      * Get the value of an environment variable
      * @param key - The environment variable key
+     * @param options - Options to get the environment variable
+     * @param options.default - The default value to return if the environment variable is not set
+     * @param options.warning - Whether to show a warning if the environment variable is not set
      * @returns The value of the environment variable or undefined if not set
      */
-    public static get(key: string): string | undefined {
-        return process.env[key];
+    public static get(key: string, options: Env.getOptionsGranted): string;
+    public static get(key: string, options: Env.getOptions): string | undefined
+    public static get(key: string, options: Env.getOptions = {}): string | undefined {
+        const value = process.env[key];
+        if (value) return value;
+        const { default: defaultVal, warning = false } = options;
+        if (warning) Debug.log(`&B3[warn]:&R &C6${key} &C3is not defined${defaultVal ? `, &C2using: &C6${defaultVal}` : ''}`);
+        return defaultVal;
     }
     /**
      * Set an environment variable
@@ -104,5 +113,10 @@ export namespace Env {
         setEnv?: boolean;
         defaultEnv?: EnvList;
     }
+    export interface getOptions {
+        default?: string;
+        warning?: boolean;
+    }
+    export type getOptionsGranted = getOptions & { default: string };
 }
 export default Env;
