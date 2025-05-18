@@ -1,6 +1,5 @@
-\[Act\]/
-\[Versiones\]/
-.Debug/
-StartAgent.sh
-jsconfig.json
-debug.log
+node_modules/
+build/
+.**/*
+**/*.log
+**/*.env

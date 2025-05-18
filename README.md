@@ -108,10 +108,10 @@ Para crear un servidor HTTP puedes hacerlo de diferentes maneras:
 >   esto se corregirá y se pondrá como característica opcional en futuras versiones.
 
 ```js
-const Server = new ServerCore(80, null, {
-  Public: 'Cert/MiDominio.pem',    //El archivo con la clave publica       (Obligatorio)
-  Private: 'Cert/MiDominio.key',   //El archivo con la  clave privada      (Obligatorio)
-  Port: 443                        //El puerto donde se abrirá el servidor (Opcional)
+const server = new ServerCore(80, null, {
+  pubKey: 'Cert/MiDominio.pem',    //El archivo con la clave publica       (Obligatorio)
+  privKey: 'Cert/MiDominio.key',   //El archivo con la  clave privada      (Obligatorio)
+  port: 443                        //El puerto donde se abrirá el servidor (Opcional)
 });
 ```
 
@@ -147,21 +147,21 @@ Actualmente la RuleUrl acepta 2 características
    y se puede acceder a ellas desde `Request.RuleParams`
    **Ejemplo**:
    ```js
-   Server.AddAction('ALL', '/User/$UserID/Post/$PostID', (Rq, Rs) => {
-        Rs.SendJSON({
-            Url: Rq.Url,
-            RuleParams: Rq.RuleParams
-        });
-        /* Esto devolverá lo siguiente si la ruta fuera /User/111111/Post/222222
-           {
-              "Url": "/User/111111/Post/222222"
-              "RuleParams": {
-                  "UserID": "111111",
-                  "PostID": "222222"
-              }
-           }
-        */
+   server.addAction('ALL', '/User/$UserID/Post/$PostID', (request, response) => {
+    response.sendJson({
+      url: request.url,
+      ruleParams: request.ruleParams
     });
+    /* Esto devolverá lo siguiente si la ruta fuera /User/111111/Post/222222
+      {
+         "Url": "/User/111111/Post/222222"
+         "RuleParams": {
+             "UserID": "111111",
+             "PostID": "222222"
+         }
+      }
+    */
+  });
    ```
 **AuthExec**
 Es una función que recibe como parámetro la petición del http
@@ -169,8 +169,8 @@ esta debe retornar un valor booleano, true para decir que la petición esta aute
 **Ejemplo**:
 ```js
 // si la petición se hace con el QueryParam Auth y es igual a AuthYes se confirmara la autenticidad de la petición
-Server.AddFile('/FileWA', 'changes.md', (Request) => {
-  return Request.GET.has('Auth') && Request.GET.get('Auth') == 'AuthYes'
+server.addFile('/FileWA', 'changes.md', (Request) => {
+    return Request.queryParams.has('Auth') && Request.queryParams.get('Auth') == 'AuthYes'
 });
 ```
 
@@ -197,19 +197,19 @@ Para añadir este tipo de regla usa:
   UrlRule, Source, AuthExec.
     AuthExec es opcional.
 */
-Server.AddFile('/MyFolder', 'Test');
+server.addFolder('/MyFolder', 'Test');
 
 
 // Usando el constructor de la clase Rule:
 // De esta manera tienes mayor control sobre la creación de la regla.
-.AddRules(
-  /*
-    este constructor acepta 5 parámetros para crearse correctamente:
-    Tipo, Método, UrlRule, Content, AuthExec.
-    AuthExec es opcional.
-  */
-  new ServerCore.Rule('File', 'GET', '/MyFolder/', 'Test/', () => true),
-);
+server.addRules(
+    /*
+      este constructor acepta 5 parámetros para crearse correctamente:
+      Tipo, Método, UrlRule, Content, AuthExec.
+      AuthExec es opcional.
+    */
+    new ServerCore.Rule('Folder', 'GET', '/MyFolder/', 'Test/', () => true),
+  );
 
 ```
 
@@ -224,12 +224,12 @@ Comparte un archivo especifico
   UrlRule, Source, AuthExec.
     AuthExec es opcional.
 */
-Server.AddFolder('/MyFile', 'changes.md');
+server.addFile('/MyFile', 'changes.md');
 
 
 // Usando el constructor de la clase Rule:
 // De esta manera tienes mayor control sobre la creación de la regla.
-.AddRules(
+server.addRules(
   /*
     este constructor acepta 5 parámetros para crearse correctamente:
     Tipo, Método, UrlRule, Content, AuthExec.
@@ -250,11 +250,11 @@ Te permite tener total control sobre esas peticiones:
   Método, UrlRule, Action, AuthExec.
     AuthExec es opcional.
 */
-Server.AddAction('GET', '/', (Request, Response) => {
-    if (Request.Cookies.has('User_ID')) {
-      Response.Send("El User_ID que estas usando es:" + Request.Cookies.get('User_ID'));
+server.addAction('GET', '/', (request, response) => {
+    if (request.cookies.has('User_ID')) {
+      response.send("El User_ID que estas usando es:" + request.cookies.get('User_ID'));
     } else {
-      Response.SendFile('./ErrorUsuario.html');
+      response.sendFile('./ErrorUsuario.html');
     }
   }
 );
@@ -268,20 +268,23 @@ Server.AddRules(
     Tipo, Método, UrlRule, Content, AuthExec.
     AuthExec es opcional.
   */
-  new ServerCore.Rule('Action', 'GET', '/', (Request, Response) => {
-      if (Request.Cookies.has('User_ID')) {
-        Response.Send("El User_ID que estas usando es:" + Request.Cookies.get('User_ID'));
-      } else {
-        Response.SendFile('./ErrorUsuario.html');
-      }
+  new ServerCore.Rule('Action', 'GET', '/', (request, response) => {
+    if (request.cookies.has('User_ID')) {
+      response.send("El User_ID que estas usando es:" + request.cookies.get('User_ID'));
+    } else {
+      response.sendFile('./ErrorUsuario.html');
     }
-  )
+  })
 );
 ```
 
 ### WebSocket
 
 Esto te permite gestionar una conexión WebSocket completa:
+> [!NOTE]
+> Las url de los web sockets van por medio distinto al de las peticiones de File, Folder y Action por ende
+> no tendrán conflictos si son similares o iguales a ellas
+
 
 ```js
 // Usando AddWebSocket
@@ -291,20 +294,20 @@ Esto te permite gestionar una conexión WebSocket completa:
     AuthExec es opcional.
 */
 const Conexiones = new Set();
-Server.AddWebSocket('/Test/WS-Chat', (Request, WebSocket) => {
+server.addWebSocket('/Test/WS-Chat', (request, socket) => {
   console.log('[WS] CM: Conexión nueva')
   Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
-  Conexiones.add(WebSocket);
-  WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
-  WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
-  WebSocket.on('Message', (Info, Datos) => {
+  Conexiones.add(socket);
+  socket.on('finish', () => Conexiones.delete(socket));
+  socket.on('error', (error) => console.log('[WS-Error]:', error));
+  socket.on('message', (data, info) => {
     //console.log(Info.OPCode);
-    if (Info.OPCode == 1) {
-      console.log('[WS] MSS:', Datos.toString());
+    if (info.opCode == 1) {
+      console.log('[WS] MSS:', data.toString());
       Conexiones.forEach((Usuario) => {
-        if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
+        if (Usuario !== socket) Usuario.Send(data.toString());
       });
-    } else if (Info.OPCode == 8) {
+    } else if (info.opCode == 8) {
       Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
     }
   });
@@ -321,20 +324,20 @@ Server.AddRules(
     AuthExec es opcional.
     A pesar de recibir el método este no se tomara en cuenta para las conexiones web socket.
   */
-  new ServerCore.Rule('WebSocket', 'GET', '/Test/WS-Chat', (Request, WebSocket) => {
+  new ServerCore.Rule('WebSocket', 'GET', '/Test/WS-Chat', (request, socket) => {
     console.log('[WS] CM: Conexión nueva')
     Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
-    Conexiones.add(WebSocket);
-    WebSocket.on('Finish', () => Conexiones.delete(WebSocket));
-    WebSocket.on('Error', (Error) => console.log('[WS-Error]:', Error));
-    WebSocket.on('Message', (Info, Datos) => {
+    Conexiones.add(socket);
+    socket.on('finish', () => Conexiones.delete(socket));
+    socket.on('error', (error) => console.log('[WS-Error]:', error));
+    socket.on('message', (data, info) => {
       //console.log(Info.OPCode);
-      if (Info.OPCode == 1) {
-        console.log('[WS] MSS:', Datos.toString());
+      if (info.opCode == 1) {
+        console.log('[WS] MSS:', data.toString());
         Conexiones.forEach((Usuario) => {
-          if (Usuario !== WebSocket) Usuario.Send(Datos.toString());
+          if (Usuario !== socket) Usuario.Send(data.toString());
         });
-      } else if (Info.OPCode == 8) {
+      } else if (info.opCode == 8) {
         Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
       }
     });

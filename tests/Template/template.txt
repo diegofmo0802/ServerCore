@@ -1,0 +1,13 @@
+<h1>${tittle}<h1>
+<table>
+    <tr>
+        <th>user</th>
+        <th>isInvited</th>
+    </tr>
+    $(users, user, isInvited) {
+        <tr>
+            <td>%user%</td>
+            <td>%isInvited%</td>
+        </tr>
+    }
+</table>

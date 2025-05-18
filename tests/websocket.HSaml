@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>[Saml · WebSocket]</title>
+    </head>
+    <body>
+        <h1>[Saml · WebSocket]</h1>
+        <input  id="username" type="text" placeholder="Username"/>
+        <button id="Connect">Conectar</button>
+        <button id="Disconnect">Desconectar</button>
+        <br/>
+        <input  id="InMessage" type="text" placeholder="Message/Command"/>
+        <button id="Send">Enviar</button>
+        <div id="Log"></div>
+        <script>
+            window.host = "${Host}";
+            const BtnConnect    = document.querySelector('#Connect');
+            const BtnDisconnect = document.querySelector('#Disconnect');
+            const BtnSend       = document.querySelector('#Send');
+
+            const inUsername = document.querySelector('#username');
+            const InMessage  = document.querySelector('#InMessage');
+            const OutLog    =  document.querySelector('#Log');
+
+            let Connected = false;
+            /** @type {WebSocket} */
+            let Connection = null;
+
+            /** @param {string} Message */
+            const Log = (Message, Prefix = 'WS') => {
+                console.log(`[${Prefix}]:`, Message);
+                let Element = document.createElement('p');
+                Element.innerText = `[${Prefix}]: ` + Message;
+                if (OutLog.firstChild) {
+                    OutLog.insertBefore(Element, OutLog.firstChild);
+                } else {
+                    OutLog.appendChild(Element);
+                }
+            }
+
+            const Connect = () => {
+                if (Connected) {
+                    Log('Ya estas conectado');
+                } else {
+                    const username = inUsername.value;
+                    Log('Conectando...');
+                    Connection = new WebSocket(`${Host}/${username}`);
+                    Connection.onerror = () => {
+                        Log('fallo en la conexión', 'ER');
+                    }
+                    Connection.onclose = () => {
+                        Connected = false;
+                        Connection = null;
+                    }
+                    Connection.onopen = () => {
+                        Connected = true;
+                        Log('Conectado');
+                    }
+                    Connection.onmessage = (Ev) => {
+                        Log(Ev.data, '<');
+                        console.log(Ev.data);
+                    };
+                }
+            }
+            const Disconnect = () => {
+                Connection.close();
+            }
+            const Send = () => {
+                if (Connected) {
+                    let Message = InMessage.value;
+                    InMessage.value = '';
+                    Connection.send(Message);
+                    Log(Message, '>');
+                } else {
+                    Log('Debes conectarte primero');
+                }
+            }
+
+            BtnConnect.addEventListener('click', () => Connect());
+            BtnDisconnect.addEventListener('click', () => Disconnect());
+            BtnSend.addEventListener('click', () => Send());
+        </script>
+    </body>
+</html>

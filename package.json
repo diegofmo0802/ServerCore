@@ -1,11 +1,14 @@
 {
   "name": "saml.servercore",
-  "version": "3.6.5",
+  "version": "3.7.0",
   "description": "a module for http/s and ws/s servers",
   "type": "module",
-  "main": "ServerCore.js",
+  "main": "build/ServerCore.js",
   "scripts": {
-    "test": "node Test/Test.js"
+    "dev": "npm run compile && tsc --watch",
+    "test": "node tests/test.js",
+    "compile": "rm -rf build && tsc",
+    "dev.publish": "npm run compile && npm publish --tag Dev"
   },
   "author": {
     "name": "diegofmo0802",
@@ -18,32 +21,27 @@
     "url": "https://github.com/diegofmo0802/ServerCore"
   },
   "files": [
-    "Config/",
-    "ConsoleUI/",
-    "Debug/",
-    "Global/",
-    "JsonWT/",
-    "Mail/",
-    "Server/",
-    "Template/",
-    "Utilities/",
+    "build/",
+    "examples/",
+    "global/",
+    "tests/",
+    ".gitignore",
     "changes.md",
     "LICENSE",
     "Notes.md",
-    "README.md",
-    "ServerCore.js",
-    "ServerCore.d.ts"
+    "README.md"
   ],
   "keywords": [
-    "diegofmo0802",
-    "servercore",
+    "server",
     "core",
-    "framework",
-    "web",
     "http",
     "https",
     "ws",
     "wss",
-    "server"
-  ]
+    "socket"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.14.12",
+    "typescript": "^5.5.4"
+  }
 }
