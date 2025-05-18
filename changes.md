@@ -1,17 +1,7 @@
-# Version 3
-**Desarrollados sin añadir y en espera de pruebas**
-- Mail: acceso desde (saml.servercore/Beta/Mail.js)
-- JwtManager: acceso desde (saml.servercore/Beta/JwtManager.js)
+# Version 4
 
-## 3.7
-> [!IMPORTANT]
-> **ServerCore** ha sido movido al lenguaje TypeScript
-> es posible que surjan errores que no existían anteriormente
-> si sufre algún error que no pueda corregir puedes decírnoslo
-> trataremos de ayudarte a resolver el inconveniente
-
-### 3.7.0
-#### Cambios
+## 4.0.0
+### Cambios
 - El proyecto fue movido al lenguaje TypeScript
 - Las propiedades y métodos ahora comienzan por minúscula (Load -> load ...);
 
@@ -43,6 +33,18 @@
 - JsonWT se convirtió en JwtManager
 
 (En curso...)
+
+# Version 3
+**Desarrollados sin añadir y en espera de pruebas**
+- Mail: acceso desde (saml.servercore/Beta/Mail.js)
+- JwtManager: acceso desde (saml.servercore/Beta/JwtManager.js)
+
+## 3.7
+> [!IMPORTANT]
+> **ServerCore** ha sido movido al lenguaje TypeScript
+> es posible que surjan errores que no existían anteriormente
+> si sufre algún error que no pueda corregir puedes decírnoslo
+> trataremos de ayudarte a resolver el inconveniente
 
 ## 3.6
 
