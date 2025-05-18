@@ -3,29 +3,21 @@
  * @description add useful functions to the server core. 
  * @license Apache-2.0
  */
-
-import PATH from 'path';
-import URL from 'url';
-import { promises as FS } from 'fs';
-
-import Debug from '../Debug.js';
 import _Path from './Path.js';
 import _Env from './Env.js';
 
 export class Utilities {
     /**
-     * deep compare two objects
-     * @param obj1 the first object to compare
-     * @param obj2 the second object to compare
-     * @returns true if the objects are equal, false otherwise
+     * Deeply compares two objects.
+     * @param obj1 - The first object to compare
+     * @param obj2 - The second object to compare
+     * @returns True if the objects are equal, false otherwise
      */
     public static deepEqual(obj1: any, obj2: any): boolean {
         if (obj1 === obj2) return true;
         if (
-            typeof obj1 !==
-            typeof obj2 !==
-            obj1 === null ||
-            obj2 === null
+            typeof obj1 !== typeof obj2 ||
+            obj1 === null || obj2 === null
         ) return false;
         const keys1 = Object.keys(obj1);
         const keys2 = Object.keys(obj2);
@@ -37,10 +29,10 @@ export class Utilities {
         return true;
     }
     /**
-     * flatten an object into a single level
-     * @param object the object to flatten
-     * @param prefix the prefix to add to the flattened keys
-     * @returns the flattened object
+     * Flattens an object into a single-level object.
+     * @param object - The object to flatten
+     * @param depth - Maximum depth to flatten (default: 10)
+     * @returns The flattened object
      */
     public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D = 10 as D): Utilities.Flatten.Object<T, D> {
         return this.flattenCore(object, depth);
@@ -51,7 +43,7 @@ export class Utilities {
             const newKey = prefix ? `${prefix}.${key}` : key;
             const value = object[key];
             if (typeof value === 'object' && !Array.isArray(value) && value !== null && depth > 0) {
-                Object.assign(result, Utilities.flattenCore(value as any, (depth - 1), newKey));
+                Object.assign(result, Utilities.flattenCore(value, depth - 1, newKey));
             } else {
                 result[newKey] = value;
             }
@@ -59,10 +51,10 @@ export class Utilities {
         return result;
     }
     /**
-     * unFlatten an object
-     * @template Result the type of the unFlattened object
-     * @param obj the object to unFlatten
-     * @returns the unFlattened object
+     * Reconstructs a nested object from a flattened one.
+     * @template Result - The type of the unflattened object
+     * @param obj - The object to unflatten
+     * @returns The unflattened object
      */
     public static unFlattenObject<Result extends any = any>(obj: any): Result {
         const result: any = {};
@@ -74,8 +66,8 @@ export class Utilities {
                 const last = rest.pop() as string;
                 const subObj: any = result[first] ?? {};
                 let current: any = subObj;
-                rest.forEach((key) => {
-                    current = current[key] ?? (current[key] = {});
+                rest.forEach((k) => {
+                    current = current[k] ?? (current[k] = {});
                 });
                 current[last] = value;
                 result[first] = subObj;
@@ -84,30 +76,30 @@ export class Utilities {
         return result;
     }
     /**
-     * sleep for the given number of milliseconds
-     * @param ms the number of milliseconds to sleep
-     * @returns a promise that resolves after the given number of milliseconds
+     * Delays execution for the specified number of milliseconds.
+     * @param ms - The number of milliseconds to wait
+     * @returns A promise that resolves after the given time
      */
     public static sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     /**
-     * encode to base64url
-     * @param data the data to encode
-     * @returns the encoded data
+     * Encodes a string to base64url format.
+     * @param data - The string to encode
+     * @returns The base64url-encoded string
      */
     public static base64UrlEncode(data: string): string {
         return Buffer.from(data).toString('base64url');
     }
     /**
-     * decode from base64url
-     * @param data the data to decode
-     * @returns the decoded data
+     * Decodes a base64url-encoded string.
+     * @param data - The base64url-encoded string to decode
+     * @returns The decoded string
      */
     public static base64UrlDecode(data: string): string {
         return Buffer.from(data, 'base64url').toString('utf8');
     }
-};
+}
 
 export namespace Utilities {
     export import Path = _Path;
