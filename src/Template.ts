@@ -1,6 +1,6 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description add the HSaml template engine to the server core.
+ * @description Add the HSaml template engine to the server core.
  * @license Apache-2.0
  */
 
@@ -8,7 +8,7 @@ import FS from 'fs';
 import Utilities from './Utilities/Utilities.js';
 
 export class Template {
-	/** regular expressions for compile the template */
+	/** Regular expressions used to compile the template */
 	private static expressions = {
 		variable: /\$\{(.+?)\}/ig,
 		object: {
@@ -17,12 +17,12 @@ export class Template {
 		}
 	};
 	/**
-	 * load and compile a template
-	 * @param path the path to the template
-	 * @param data the data to compile the template
-	 * @returns the compiled template
-	 * @throws an error if the path is not a template file
-	 * @throws an error if the template file does not exist
+	 * Load and compile a template.
+	 * @param path - The path to the template file.
+	 * @param data - The data used to compile the template.
+	 * @returns The compiled template.
+	 * @throws Error if the path is not a file.
+	 * @throws Error if the file does not exist.
 	 */
 	public static async load(path: string, data: Template.dataObject): Promise<string> {
 		path = Utilities.Path.normalize(path);
@@ -31,12 +31,13 @@ export class Template {
 		const template = await FS.promises.readFile(path);
 		return this.compile(template.toString('utf-8'), data);
 	}
+
 	/**
-	 * compile a template
-	 * @param Content the content of the template
-	 * @param data the data to compile the template
-	 * @returns the compiled template
-	 * @private
+	 * Compile a template.
+	 * @param Content - The content of the template.
+	 * @param data - The data used to compile the template.
+	 * @returns The compiled template.
+	 * @throws Error if key and value names are equal in object blocks.
 	 */
 	private static compile(Content: string, data: Template.dataObject): string {
 		Content = Content.replace(this.expressions.variable, (text, name) => {
@@ -64,11 +65,10 @@ export namespace Template {
 
 export default Template;
 /*
-variables:     ${name}
-Objetos/Arrays: $(name, keyName, valueName) { the key is $keyName and value $valueName } 
-Objetos/Arrays: $(name) { the key is %key% and value %value% } 
-Objetos/Arrays: $(name, customKeyName, customValueName) {
+Variables:      ${name}
+Objects/Arrays: $(name, keyName, valueName) { the key is $keyName and value $valueName }
+Objects/Arrays: $(name) { the key is %key% and value %value% }
+Objects/Arrays: $(name, customKeyName, customValueName) {
 	the key is %customKeyName% and value %customValueName%
-} 
-
+}
 */
