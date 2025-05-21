@@ -1,196 +1,225 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description add the debug system to the server core.
+ * @description Add the debug system to the server core.
  * @license Apache-2.0
  */
 
 import fs, { WriteStream } from 'fs';
 import ConsoleUI from './ConsoleUI.js';
+import Utilities from './Utilities/Utilities.js';
 
 export class Debug {
-	private static debugs: Debug.debugMap = new Map;
-	public static showAll: boolean = false;
-	private id: string;
-	private show: boolean;
-	private save: boolean;
+	private static debugs: Debug.debugMap = new Map();
+    public static showAll: boolean = false;
+    private id: string;
+    public show: boolean;
+    private _save: boolean;
+    private filePath: string;
+    private rootPath: string;
 	private startDate: Debug.Date;
-	private path: string | null;
-	private rootPath: string;
-	private stream: WriteStream | null;
-	/**
-	 * create or get a debug instance
-	 * @param id the id of the debug instance
-	 * @param path the path to the debug file
-	 * @param show whether to show the debug in the console
-	 * @param save whether to save the debug in a file
-	 * @returns the debug instance
-	 */
-    public static getInstance(id: string = '_debug', path: string = '.debug', show: boolean = true, save: boolean = true) {
-		const d = Debug.debugs.get(id) ?? new Debug(id, path, show, save);
-		return d;
-	}
-	/**
-	 * create a new debug instance
-	 * @param id the id of the debug instance
-	 * @param path the path to the debug file
-	 * @param show whether to show the debug in the console
-	 * @param save whether to save the debug in a file
-	 * @private
-	 */
-	private constructor(id: string = '_default', path: string = '.debug', show: boolean = true, save: boolean = true) {
-		path = path.startsWith('/') ? path.slice(1) : path;
-		path = path.endsWith('/') ? path.slice(0, -1) : path;
-		this.id = id;
-		this.rootPath = path
-		this.show = show;
-		this.save = save;
-		this.startDate = Debug.getDate();
-        this.path = save ? this.getFilePath() : null;
-        this.stream = save ? this.getStream() : null;
-		Debug.debugs.set(id, this);
-	}
-	/**
-	 * define if the logs will be shown in the console.
-	 * @param show the state to set.
-	 */
-	public setShow(show: boolean): void { this.show = show; }
-	/**
-	 * define if the logs will be saved in a file.
-	 * @param InFile the state to set.
-	 */
-	public setSave(InFile: boolean): void {
-		this.save = InFile;
-		if (this.save) {
-            this.path = this.getFilePath();
-            this.stream = this.getStream();
-        } else if(this.stream) {
+    private stream: WriteStream | null;
+    /**
+     * Create or retrieve a debug instance.
+     * @param id - Debug instance ID
+	 * @param options - Debug instance options
+     * @returns The debug instance
+     */
+    public static getInstance(id: string = '_debug', options: Debug.options = {}): Debug {
+        const debug = Debug.debugs.get(id)
+		if (!debug) return new Debug(id, options);
+		debug.save = options.save ?? debug.save;
+		debug.show = options.show ?? debug.show;
+		return debug;
+    }
+    /**
+     * Create a new debug instance.
+     * @param id - Debug instance ID
+	 * @param options - Debug instance options
+     */
+    private constructor(id: string = '_default', options: Debug.options = {}) {
+        const { path = '.debug', show = false, save = true } = options;
+		const now = Debug.getDate();
+		const rootPath = Debug.cleanPath(path);
+		const filePath = Debug.getFilePath(id, rootPath, now);
+        this.id = id;
+        this.show = show;
+        this._save = save;
+        this.rootPath = rootPath;
+        this.filePath = filePath;
+		this.startDate = now;
+        this.stream = save ? Debug.generateStream(filePath) : null;
+        Debug.debugs.set(id, this);
+    }
+	public get save(): boolean { return this._save; }
+    public set save(value: boolean) {
+        this._save = value;
+        if (value) this.stream = Debug.generateStream(this.filePath);
+        else if (this.stream) {
             this.stream.destroy();
             this.stream = null;
         }
-	}
-	/**
-	 * get the path to the debug file.
-	 * @returns the path to the debug file.
-	 * @private
-	 */
-    private getFilePath(): string {
-        if (this.path) return this.path;
-		const file = `[${this.id}] - ${this.startDate.hour}.${this.startDate.minute}.${this.startDate.second}.${this.startDate.miliSecond}.DSaml`;
-		const folder = `${this.rootPath}/[${this.startDate.day}.${this.startDate.month}.${this.startDate.year}]`;
-		const path = `${folder}/${file}`;
-        return path;
     }
 	/**
-	 * get the stream to the debug file.
-	 * @returns the stream to the debug file.
-	 * @private
+	 * Get the stream to the debug file.
+	 * @returns The stream to the debug file
 	 */
 	private getStream(): WriteStream {
-        if (this.stream && ! this.stream.destroyed) return this.stream;
-        const path = this.getFilePath();
-		const folder = path.slice(0, path.lastIndexOf('/'));
-		if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
-		const date = Debug.getDate();
-		const stream = fs.createWriteStream(path, 'utf8');
-		stream.write('/*+----------------------------+*/\n');
-		stream.write('/*| Saml/Debug by diegofmo0802 |*/\n');
-		stream.write('/*|     Use Saml ReadDebug     |*/\n');
-		stream.write('/*+----------------------------+*/\n');
-		stream.write(`/*the name of the DebugFile is the DateTime of initialize Debug with ID ${this.id}*/\n`);
-		stream.write(`/*the initialize stream DateTime is ${date.DDMMYYYY} << ${date.HHMMSSms}*/\n`);
-		if (this.save) {
-			const Prefix = Debug.getPrefix();
-			console.log(ConsoleUI.formatText(`&B(255,0,0)&C(255,255,0)${Prefix}&R Debug: [${this.id}] --| Guardado en |-> ${this.path}`));
+		if (!this.stream)  {
+			const id = this.id;
+			const date = this.startDate;
+			const stream = Debug.generateStream(this.filePath);
+			stream.write([
+				'/*+----------------------------+*/',
+				'/*| Saml/Debug by diegofmo0802 |*/',
+				'/*|     Use Saml ReadDebug     |*/',
+				'/*+----------------------------+*/',
+				`/*the name of the DebugFile is the DateTime of initialize Debug with ID ${id}*/`,
+				`/*the initialize stream DateTime is ${date.DateFormat} << ${date.TimeFormat}*/`
+			].join('\n'));
+			this.stream = stream;
 		}
+		return this.stream;
+	}
+    /**
+     * Log data to the console and/or the debug file.
+     * @param data - Data to log
+     */
+    public log(...data: any[]): void {
+        const prefix = Debug.getPrefix();
+        if (this._save) this.saveLog(prefix, ...data);
+        if (this.show || Debug.showAll) this.showLog(prefix, ...data);
+    }
+	/**
+	 * Save data to the debug file.
+	 * @param prefix - Prefix to log
+	 * @param data - Data to log 
+	 */
+	private showLog(prefix: string, ...data: any[]): void {
+		const decoratedPrefix = Debug.decoratePrefix(prefix);
+		const toShow = data.map((Datum) => typeof Datum === 'string' ?
+			ConsoleUI.formatText(Datum) : Datum
+		);
+		console.log(decoratedPrefix, ...toShow);
+	}
+	/**
+	 * Save data to the debug file.
+	 * @param prefix - Prefix to log
+	 * @param data - Data to log
+	 */
+	private saveLog(prefix: string, ...data: any[]): void {
+		const stream = this.getStream();
+		const toSave = data.map((Datum) => typeof Datum === 'string' ?
+			ConsoleUI.cleanFormat(Datum) : Datum
+		);
+		stream.write(`${prefix} -> ${JSON.stringify(toSave)}\n`);
+	}
+    /**
+     * Log data using the default debug instance.
+     * @param Data - Data to log
+     */
+    public static log(...Data: any): void {
+        const debug = this.getInstance();
+        debug.log(...Data);
+    }
+	/**
+	 * Clean a path.
+	 * @param path - Path to clean
+	 * @returns Cleaned path
+	 */
+	private static cleanPath(path: string): string {
+		path = Utilities.Path.normalize(path);
+		path = path.startsWith('/') ? path.slice(1) : path;
+		path = path.endsWith('/') ? path.slice(0, -1) : path;
+		return path;
+	}
+    /**
+     * Get the path to the debug file.
+	 * @param id - Debug instance ID
+	 * @param folderPath - Path to the debug folder
+	 * @param date - Date of the debug instance
+     * @returns The path to the debug file
+     */
+    private static getFilePath(id: string, folderPath: string, date: Debug.Date): string {
+        const file = `[${id}] - ${date.hour}.${date.minute}.${date.second}.${date.millisecond}.DSaml`;
+        const folder = `${folderPath}/[${date.day}.${date.month}.${date.year}]`;
+        const path = `${folder}/${file}`;
+        return path;
+    }
+    /**
+     * Generate a stream to the debug file.
+	 * @param id - Debug instance ID
+	 * @param filePath - Path to the debug file
+	 * @param date - Date of the debug instance
+     * @returns The stream to the debug file
+     */
+    private static generateStream(filePath: string): WriteStream {
+        const folder = filePath.slice(0, filePath.lastIndexOf('/'));
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+        const stream = fs.createWriteStream(filePath, 'utf8');
         return stream;
     }
 	/**
-	 * log data to the console and the debug file.
-	 * @param data the data to log.
+	 * Decorate a prefix with color codes.
+	 * @param prefix - Prefix to decorate
+	 * @returns Decorated prefix
 	 */
-	public log(...data: any[]): void {
-		const prefix = Debug.getPrefix();
-		if (this.save) {
-			const stream = this.getStream();
-            const toSave = data.map((Datum) => typeof Datum === 'string' ?
-                ConsoleUI.cleanFormat(Datum) : Datum
-            );
-			stream.write(`${prefix} -> ${JSON.stringify(toSave)}\n`);
-		}
-		if (this.show || Debug.showAll) {
-            const decoratedPrefix = ConsoleUI.formatText(`&B(255,0,0)&C(255,255,0)${prefix}&R`);
-            const toShow = data.map((Datum) => typeof Datum === 'string' ?
-                ConsoleUI.formatText(Datum) : Datum
-            );
-            console.log(decoratedPrefix, ...toShow);
-        }
+	private static decoratePrefix(prefix: string): string {
+		return ConsoleUI.formatText(`&B(255,0,0)&C(255,255,0)${prefix}&R`);
+	}
+    /**
+     * Generate a datetime prefix for log entries.
+     * @returns Formatted datetime prefix
+     */
+    private static getPrefix(): string {
+        const now = Debug.getDate();
+        const prefix = `[${now.hour}:${now.minute}:${now.second}:${now.millisecond}]`;
+        return prefix;
     }
-	
-	/**
-	 * log data to the console and the debug file.
-	 * @param data the data to log.
-	 */
-	public static log(...Data: any): void  {
-		const debug = this.getInstance();
-		debug.log(...Data);
-	}
-	/**
-	 * generate a data time stamp
-	 * @returns the data time stamp
-	 * @private
-	 */
-	private static getPrefix(): string  {
-		const now = Debug.getDate();
-		const prefix = `[${now.hour}:${now.minute}:${now.second}:${now.miliSecond}]`;
-		return prefix;
-	}
-	/**
-	 * get the current date
-	 * @returns the current date
-	 * @private
-	 */
-	private static getDate(): Debug.Date {
-		const now = new Date;
-		const [day, month, year, hour, minute, second, miliSecond] = [
-			now.getDate()        .toString().padStart(2, '0'),
-			(now.getMonth() + 1) .toString().padStart(2, '0'),
-			now.getFullYear()    .toString().padStart(4, '0'),
-			now.getHours()       .toString().padStart(2, '0'),
-			now.getMinutes()     .toString().padStart(2, '0'),
-			now.getSeconds()     .toString().padStart(2, '0'),
-			now.getMilliseconds().toString().padStart(3, '0')
-		];
-		const dmyFormat = `${day}-${month}-${year}`;
-		const hhmmssmsFormat = `${hour}.${minute}.${second}.${miliSecond}`;
-		return {
-			day: day,
-			month: month,
-			year: year,
-			hour: hour,
-			minute: minute,
-			second: second,
-			miliSecond: miliSecond,
-			DDMMYYYY: dmyFormat,
-			HHMMSSms: hhmmssmsFormat,
-			Date: now
+    /**
+     * Get the current date and time in formatted parts.
+     * @returns Object containing date parts and full formats
+     */
+    private static getDate(): Debug.Date {
+        const now   = new Date();
+		const day   = now.getDate().toString().padStart(2, '0');
+		const month = (now.getMonth() + 1).toString().padStart(2, '0');
+		const year  = now.getFullYear().toString().padStart(4, '0');
+
+		const hour   = now.getHours().toString().padStart(2, '0');
+		const minute = now.getMinutes().toString().padStart(2, '0');
+		const second = now.getSeconds().toString().padStart(2, '0');
+		const millisecond = now.getMilliseconds().toString().padStart(3, '0');
+
+		const DateFormat = `${day}-${month}-${year}`;
+		const TimeFormat = `${hour}.${minute}.${second}.${millisecond}`;
+		const result: Debug.Date = {
+			day, month, year,
+			hour, minute, second, millisecond,
+			DateFormat, TimeFormat, now
 		};
-	}
+        return result;
+    }
 }
 
 export namespace Debug {
-	export type debugMap = Map<string, Debug>;
-	export interface Date {
-		day: string,
-		month: string,
-		year: string,
-		hour: string,
-		minute: string,
-		second: string,
-		miliSecond: string,
-		DDMMYYYY: string,
-		HHMMSSms: string,
-		Date: globalThis.Date
-	};
+    export type debugMap = Map<string, Debug>;
+	export interface options {
+		path?: string;
+		show?: boolean;
+		save?: boolean;
+	}
+    export interface Date {
+        day: string;
+        month: string;
+        year: string;
+        hour: string;
+        minute: string;
+        second: string;
+        millisecond: string;
+        DateFormat: string;
+        TimeFormat: string;
+        now: globalThis.Date;
+    }
 }
 
 export default Debug;
