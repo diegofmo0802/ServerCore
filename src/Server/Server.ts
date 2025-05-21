@@ -238,10 +238,6 @@ export namespace Server {
 		privKey: string,
 		port?: number
     };
-    export type Templates = {
-        Error?: string,
-        Folder?: string
-    };
     export type Protocol = 'HTTP' | 'HTTPS' | 'HTTP/S';
 	export type Rules = Array<Rule>;
 }
