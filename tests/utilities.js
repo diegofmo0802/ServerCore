@@ -1,5 +1,5 @@
 //@ts-check
-import Utilities from "../build/Utilities.js";
+import Utilities from "../build/Utilities/Utilities.js";
 
 try {
     const toFlatten = {

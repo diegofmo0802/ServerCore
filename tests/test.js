@@ -7,19 +7,13 @@ import "./utilities.js";
 
 /* | HABILITAR VISTA EN CONSOLA DE LOS DEBUGS DE SERVER CORE | */
 const config = Config.getInstance();
-config.setShowDebug({
-    Mail: true,
-    Requests: true,
-    Server: true,
-    UpgradeRequests: true
-});
-
+config.showAll = true;
 /* | CREANDO UN DEBUG PARA LA SALIDA DE LOS TESTS | */
 const $Test = Debug.getInstance('Test');
 
 /* | CARGANDO VARIABLES DE ENTORNO DE PRUEBA | */
 
-Utilities.loadEnv('tests/test.env');
+await Utilities.Env.load('tests/test.env');
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT ?
