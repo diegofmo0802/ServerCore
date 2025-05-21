@@ -13,7 +13,7 @@ import FS from 'fs';
 import CRYPTO from 'crypto';
 
 const config = Config.getInstance();
-const $Mail = config.debugs.Mail;
+const $Mail = config.debugs.mail;
 
 export class Mail {
     private host: string;

@@ -11,27 +11,27 @@ import { Duplex } from 'stream';
 
 import Utilities from '../Utilities/Utilities.js';
 import Debug from '../Debug.js';
-import Config from '../Config.js';
-
-const { debugs: Debugs } = Config.getInstance();
-
+import _Config from '../Config.js';
 import _Request from "./Request.js";
 import _Response from "./Response.js";
 import _Session from "./Session.js";
 import _Cookie from "./Cookie.js";
 import _WebSocket from "./WebSocket/WebSocket.js";
 import _Rule from './Rule.js';
-import Rule from './Rule.js';
+
+const config = _Config.getInstance();
+const $request = config.debugs.requests;
+const $webSocket = config.debugs.webSocket;
 
 export class Server {
 	private host: string;
-	private templates: Server.Templates;
 	private protocol: Server.Protocol;
 	private HttpPort: number;
 	private HttpsPort: number;
 	private HttpServer: HTTP.Server;
 	private HttpsServer?: HTTP.Server;
-	private rules: Rule[];
+	private rules: Server.Rule[];
+	public config: Server.Config;
 	/**
 	 * Creates an HTTP/S server.
 	 * @param port - The port the server will listen on.
@@ -39,13 +39,13 @@ export class Server {
 	 * @param sslOptions - The SSL configuration.
 	 */
 	public constructor(port?: number, host?: string, sslOptions?: Server.SSLOptions) {
-		this.host = host ? host : '0.0.0.0';
-		this.templates = {};
-		this.HttpPort = port ? port : 80;
-		this.HttpsPort = sslOptions && sslOptions.port ? sslOptions.port : 443;
+		this.config = config;
+		this.host = host ?? '0.0.0.0';
+		this.HttpPort = port ?? 80;
+		this.HttpsPort = sslOptions?.port ?? 443;
 		this.rules = [];
         this.protocol = sslOptions && sslOptions.pubKey && sslOptions.privKey ? 'HTTPS' : 'HTTP';
-		this.addFolder('/Saml:Global', `${Utilities.Path.moduleDir}\\global`);
+		this.addFolder('/Saml:Global', Utilities.Path.normalize(`${Utilities.Path.moduleDir}/global`));
 		Debug.log('&B(255,180,220)&C0---------------------------------');
 		Debug.log('&B(255,180,220)&C0-  ServerCore by diegofmo0802.  -');
 		Debug.log('&B(255,180,220)&C0-        Server started         -');
@@ -93,8 +93,8 @@ export class Server {
 	 * @param action - The action to be executed.
 	 * @param auth - The optional authorization check function.
 	 */
-	public addAction(method: Server.Request.Method, urlRule: string, action: Rule.ActionExec, auth?: Rule.AuthExec): Server {
-		this.addRules(new Rule('Action', method, urlRule, action, auth));
+	public addAction(method: Server.Request.Method, urlRule: string, action: Server.Rule.ActionExec, auth?: Server.Rule.AuthExec): Server {
+		this.addRules(new Server.Rule('Action', method, urlRule, action, auth));
 		return this;
 	}
 	/**
@@ -103,8 +103,8 @@ export class Server {
 	 * @param source - The path to the file to be served.
 	 * @param auth - The optional authorization check function.
 	 */
-	public addFile(urlRule: string, source: string, auth?: Rule.AuthExec): Server{
-		this.addRules(new Rule('File', 'GET', urlRule, source, auth));
+	public addFile(urlRule: string, source: string, auth?: Server.Rule.AuthExec): Server{
+		this.addRules(new Server.Rule('File', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
@@ -113,8 +113,8 @@ export class Server {
 	 * @param source - The directory path to be served.
 	 * @param auth - The optional authorization check function.
 	 */
-	public addFolder(urlRule: string, source: string, auth?: Rule.AuthExec): Server {
-		this.addRules(new Rule('Folder', 'GET', urlRule, source, auth));
+	public addFolder(urlRule: string, source: string, auth?: Server.Rule.AuthExec): Server {
+		this.addRules(new Server.Rule('Folder', 'GET', urlRule, source, auth));
 		return this;
 	}
 	/**
@@ -123,8 +123,8 @@ export class Server {
 	 * @param action - The action to be executed on connection.
 	 * @param auth - The optional authorization check function.
 	 */
-	public addWebSocket(urlRule: string, action: Rule.WebSocketExec, auth?: Rule.AuthExec): Server {
-		this.addRules(new Rule('WebSocket', 'ALL', urlRule, action, auth));
+	public addWebSocket(urlRule: string, action: Server.Rule.WebSocketExec, auth?: Server.Rule.AuthExec): Server {
+		this.addRules(new Server.Rule('WebSocket', 'ALL', urlRule, action, auth));
 		return this;
 	}
 	/**
@@ -132,8 +132,8 @@ export class Server {
 	 * @param name - The name of the template.
 	 * @param path - The path to the `.HSaml` template file.
 	 */
-	public setTemplate(name: keyof Server.Templates, path: string): Server {
-		this.templates[name] = path;
+	public setTemplate(name: keyof Server.Config.Templates, path: string): Server {
+		this.config.templates[name] = path;
 		return this;
 	}
 	/**
@@ -184,11 +184,11 @@ export class Server {
 	 * @param HttpResponse - The server response stream.
 	 */
 	private requestManager(HttpRequest: HTTP.IncomingMessage, HttpResponse: HTTP.ServerResponse): void {
-		const Request = new Server.Request(HttpRequest);
-		const Response = new Server.Response(Request, HttpResponse, this.templates);
-		const sessionID = Request.cookies.get('Session');
-		Debugs.Requests.log( '[Request]:', Request.ip, Request.method, Request.url, sessionID );
-		this.routeRequest(Request, Response);
+		const request = new Server.Request(HttpRequest);
+		const response = new Server.Response(request, HttpResponse, this.config.templates);
+		const sessionID = request.cookies.get('Session');
+		$request.log('[Request]:', request.ip, request.method, request.url, sessionID);
+		this.routeRequest(request, response);
 	};
 	/**
 	 * Will be executed when the server receives an upgrade request.
@@ -196,11 +196,11 @@ export class Server {
 	 * @param Socket The socket to respond with (WebSocket upgrade).
 	 */
 	private upgradeManager(HttpRequest: HTTP.IncomingMessage, Socket: Duplex): void {
-		const Request = new Server.Request(HttpRequest);
-		const WebSocket = new Server.WebSocket(Socket);
-		const sessionID = Request.cookies.get('Session');
-		Debugs.UpgradeRequests.log( '[WebSocket]:', Request.ip, Request.method, Request.url, sessionID );
-		this.routeWebSocket(Request, WebSocket);
+		const request = new Server.Request(HttpRequest);
+		const webSocket = new Server.WebSocket(Socket);
+		const sessionID = request.cookies.get('Session');
+		$webSocket.log('[WebSocket]:', request.ip, request.method, request.url, sessionID);
+		this.routeWebSocket(request, webSocket);
 	}
 	/**
 	 * Loads the SSL key and certificate and returns their content as strings.
@@ -222,6 +222,7 @@ export class Server {
 }
 
 export namespace Server {
+	export import Config = _Config;
     export import Cookie = _Cookie
     export import Request = _Request
     export import Response = _Response

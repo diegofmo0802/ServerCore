@@ -9,15 +9,15 @@ import FS from 'fs';
 import PATH from 'path';
 
 import Request from './Request.js';
-import Server from './Server.js';
 import Utilities from '../Utilities/Utilities.js';
 import Template from '../Template.js';
+import Config from '../Config.js';
 
 export class Response {
 	/** Contains the request received by the server. */
 	public request: Request;
 	/** Contains the list of server response templates. */
-	private templates: Server.Templates;
+	private templates: Config.Templates;
 	/** Contains the response to be sent by the server. */
 	public httpResponse: HTTP.ServerResponse;
 	/**
@@ -26,9 +26,9 @@ export class Response {
 	 * @param httpResponse - The response to be sent by the server.
 	 * @param templates - The list of server response templates.
 	 */
-	public constructor(request: Request, httpResponse: HTTP.ServerResponse, templates: Server.Templates = {}) {
+	public constructor(request: Request, httpResponse: HTTP.ServerResponse, templates: Config.Templates = {}) {
         this.request = request;
-        this.templates = templates ? templates : {};
+        this.templates = templates;
         this.httpResponse = httpResponse;
         this.httpResponse.setHeader('X-Powered-By', 'MySaml ServerCore');
         this.httpResponse.setHeader('X-Version', '3.7.0-dev.18');
