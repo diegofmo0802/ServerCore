@@ -5,15 +5,14 @@
  * @license Apache-2.0
  */
 
-import Config from '../Config.js';
+import Debug from '../Debug.js';
 
 import TLS from 'tls';
 import NET from 'net';
 import FS from 'fs';
 import CRYPTO from 'crypto';
 
-const config = Config.getInstance();
-const $Mail = config.debugs.mail;
+export const $Mail = Debug.getInstance('beta.mail', { path: '.debug/beta' });
 
 export class Mail {
     private host: string;
