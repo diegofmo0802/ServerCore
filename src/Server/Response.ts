@@ -146,13 +146,13 @@ export class Response {
             if (details.isFile()) return this.sendFile(path);
             if (!details.isDirectory()) return this.sendError(404, 'The requested URL was not fount');
             const folder = await FS.promises.readdir(path);
-            if (this.templates.Folder) {
-                this.sendTemplate(this.templates.Folder, {
+            if (this.templates.folder) {
+                this.sendTemplate(this.templates.folder, {
                     Url: this.request.url,
                     folder
                 });
             } else {
-                this.sendTemplate(Utilities.Path.relative('\\global\\Template\\Folder.HSaml'), {
+                this.sendTemplate(Utilities.Path.relative('./global/Template/Folder.HSaml'), {
                     Url: this.request.url,
                     folder
                 });
@@ -197,14 +197,14 @@ export class Response {
 	 */
 	public async sendError(status: number, message: string): Promise<void> {
         try {
-            if (this.templates.Error) {
-                const template = await Template.load(this.templates.Error, {
+            if (this.templates.error) {
+                const template = await Template.load(this.templates.error, {
                     status, message
                 });
 				const headers = this.generateHeaders('html');
                 this.send(template, { status: status, headers });
             } else {
-                const template = await Template.load(Utilities.Path.relative("\\global\\Template\\Error.HSaml"), {
+                const template = await Template.load(Utilities.Path.relative('./global/Template/Error.HSaml'), {
                     status, message
                 });
 				const headers = this.generateHeaders('html');
