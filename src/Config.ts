@@ -5,43 +5,52 @@
  */
 
 import Debug from "./Debug.js";
+import LoggerManager from "./LoggerManager/LoggerManager.js";
 import Utilities from "./Utilities/Utilities.js";
 
-export class Config {
-    private static instance: Config;
-    public debugs: Config.Debugs
+export class Config implements Config.Main {
     public templates: Config.Templates;
-    public static getInstance(): Config {
-        return this.instance ?? new Config();
+    public host: string;
+    public port: number;
+    public logger: LoggerManager;
+    public ssl: Config.SSLOptions | null;
+    public static instance: Config;
+    public constructor(options: Config.options = {}) {
+        this.host = options.host ?? 'localhost';
+        this.port = options.port ?? 80;
+        this.ssl = options.ssl ?? null;
+        this.logger = options.logger ?? LoggerManager.getInstance();
+        this.templates = options.templates ?? Config.defaultTemplates();
     }
-    private constructor() {
-        Config.instance = this;
-        const mail = Debug.getInstance('mail', { path: '.debug/mail' });
-        const server = Debug.getInstance('server', { path: '.debug/server' });
-        const requests = Debug.getInstance('server.requests', { path: '.debug/requests' });
-        const webSocket = Debug.getInstance('server.webSockets', { path: '.debug/webSockets' });
-        this.debugs = { mail, server, requests, webSocket: webSocket };
-        this.templates = {
+    public get showAll(): boolean { return Debug.showAll; }
+    public set showAll(value: boolean) { Debug.showAll = value; }
+    public static defaultTemplates(): Config.Templates {
+        return {
             folder: Utilities.Path.relative('./global/Template/Folder.HSaml'),
             error: Utilities.Path.relative('./global/Template/Error.HSaml')
         };
     }
-    public get showAll(): boolean { return Debug.showAll; }
-    public set showAll(value: boolean) { Debug.showAll = value; }
 }
 
 export namespace Config {
-    export interface Debugs {
-		requests: Debug;
-		mail: Debug;
-		webSocket: Debug;
-		server: Debug;
-    }
     export interface Templates {
         folder?: string;
         error?: string;
         [key: string]: string | undefined;
     }
+	export type SSLOptions = {
+        pubKey: string,
+		privKey: string,
+		port?: number
+    };
+    export interface Main {
+        host: string;
+        port: number;
+        ssl: SSLOptions | null;
+        logger: LoggerManager;
+        templates: Templates;
+    }
+    export type options = Partial<Main>;
 }
 
 export default Config;
