@@ -1,158 +1,156 @@
 # Version 4
 
 ## 4.0.0
-### Cambios
-- El proyecto fue movido al lenguaje TypeScript
-- Las propiedades y métodos ahora comienzan por minúscula (Load -> load ...);
+### Changes
+- The project was migrated to TypeScript.
+- Properties and methods now start with a lowercase letter (Load -> load ...).
 
 **Template**
-- El método `load` ahora funciona con async/await en lugar de retornar una promesa directamente;
-- En la carga de objetos/arrays $(name) {$key:$value}
-  ahora se puede usar $(name) {%key%: %value%}
-  o puedes usar $(name, customKeyName, customValueName) {%customKeyName%:%customValueName%}
-**Utilities**
-- Se agrego la función loadEnv, flattenObject, sleep
-- Se modifico la función flattenObject, ahora mantiene valores nulos y undefined y proporciona mejor tipado
-**Debug**
-- Ahora solo se puede usar desde el método `getInstance` (esta sujeto a posibles cambios)
-**Config**
-- se convirtió en un singleton
-**Response**
-- el método send fue limitado a recibir string|buffer
-- los métodos sendFile, sendFolder y sendTemplate ahora funcionan con async/await
-- el objeto POST.content ya no sera un Map cuando corresponde si no un objeto Request.POST.VarList
-- el objeto POST.files siempre tendrá el tipo Request.POST.FileList
-**Request**
-- el atributo GET pasa a ser searchParams
-- el procesamiento del body de las peticiones se delego al archivo BodyParser.ts
-- el tipo de search param deja de ser un Map a ser objeto { [key: string]: string | undefined }
-**WebSocket**
-- la lógica detrás de la recepción de webSocket fue separada hacia Chunk.ts
-- Chunk.ts fue optimizado
-**Beta**
-- JsonWT se convirtió en JwtManager
+- The `load` method now works with async/await instead of directly returning a promise.
+- When loading objects/arrays $(name) {$key:$value}, you can now use $(name) {%key%: %value%} or $(name, customKeyName, customValueName) {%customKeyName%:%customValueName%}.
 
-(En curso...)
+**Utilities**
+- Added the functions `loadEnv`, `flattenObject`, and `sleep`.
+- Modified the `flattenObject` function to retain null and undefined values and provide better typing.
+
+**Debug**
+- Can now only be used from the `getInstance` method (subject to possible changes).
+
+**Config**
+- Converted to a singleton.
+
+**Response**
+- The `send` method is now limited to receiving `string|buffer`.
+- The `sendFile`, `sendFolder`, and `sendTemplate` methods now work with async/await.
+- The `POST.content` object will no longer be a `Map` when appropriate, but a `Request.POST.VarList` object.
+- The `POST.files` object will always have the type `Request.POST.FileList`.
+
+**Request**
+- The `GET` attribute is now `searchParams`.
+- Request body processing has been delegated to `BodyParser.ts`.
+- The type of search param is no longer a `Map`, but an object `{ [key: string]: string | undefined }`.
+
+**WebSocket**
+- The logic behind WebSocket reception was separated into `Chunk.ts`.
+- `Chunk.ts` was optimized.
+
+**Beta**
+- `JsonWT` was converted to `JwtManager`.
+
+(Ongoing...)
 
 # Version 3
-**Desarrollados sin añadir y en espera de pruebas**
-- Mail: acceso desde (saml.servercore/Beta/Mail.js)
-- JwtManager: acceso desde (saml.servercore/Beta/JwtManager.js)
+**Developed but not yet added and awaiting testing**
+- Mail: accessible from (saml.servercore/Beta/Mail.js)
+- JwtManager: accessible from (saml.servercore/Beta/JwtManager.js)
 
 ## 3.7
 > [!IMPORTANT]
-> **ServerCore** ha sido movido al lenguaje TypeScript
-> es posible que surjan errores que no existían anteriormente
-> si sufre algún error que no pueda corregir puedes decírnoslo
-> trataremos de ayudarte a resolver el inconveniente
+> **ServerCore** has been migrated to TypeScript.
+> Errors that did not exist previously may arise.
+> If you encounter any unfixable errors, please let us know.
+> We will try to help you resolve the issue.
 
 ## 3.6
 
-**Añadido**
-- Server: Al crear reglas de enrutamiento puedes poner una verificación de autenticación.
-- Utilities: Se agrego a Patch la función Relative que convierte una ruta relativa a completa (Relativa desde el ModuleDir).
-- Server: Se añadió soporte para recibir [Form-urlencoded, Form-data, Text, Json]
-- Config: Ahora se puede configurar el modulo para la depuración
+**Added**
+- Server: Authentication verification can now be added when creating routing rules.
+- Utilities: Added the `Relative` function to `Patch` which converts a relative path to an absolute path (relative from `ModuleDir`).
+- Server: Added support for receiving [Form-urlencoded, Form-data, Text, Json].
+- Config: The module can now be configured for debugging.
 
-**Modificado**
-- Server: Se modifico el sistema de reglas de enrutamiento
-  - Al crear una regla puedes usar $ para crear un parámetro Url
-    - EJ: Server.AddAction("/App/User/$UserID/Post/$PostID", (rq, rs) => {}) // Guardara UserID en PostID en rq.Params.PostID y rq.Params.UserID  .
-  - Al crear una regla puedes usar * para que responda a todas las sub rutas.
-    - EJ: Server.AddAction("/App/Logo/*, (rq, rs) => {}) // Responderá a /App/Logo y todas las sub rutas.
+**Modified**
+- Server: The routing rule system has been modified.
+  - When creating a rule, you can use `$` to create a URL parameter.
+    - Example: `Server.AddAction("/App/User/$UserID/Post/$PostID", (rq, rs) => {})` // Will save `UserID` and `PostID` in `rq.Params.UserID` and `rq.Params.PostID`.
+  - When creating a rule, you can use `*` to respond to all sub-paths.
+    - Example: `Server.AddAction("/App/Logo/*", (rq, rs) => {})` // Will respond to `/App/Logo` and all sub-paths.
 
 ### 3.6.1
-  **Correcciones**
-  - El package json no incluía la nueva carpeta Config, por lo que no se publico en npm.
+  **Fixed**
+  - The package.json did not include the new Config folder, so it was not published to npm.
 
 ### 3.6.2
-  **Correcciones**
-  - El modulo no funcionaba correctamente por la mala importación del archivo Utilities.js en Template.js
+  **Fixed**
+  - The module did not work correctly due to incorrect import of the `Utilities.js` file in `Template.js`.
 
 ### 3.6.3
-  **Correcciones**
-  - Las UrlRules no funcionaban correctamente al capturar parámetros $ o al usar * entre // ej /algo/*/algo-mas.
+  **Fixed**
+  - `UrlRules` did not work correctly when capturing `$` parameters or using `*` between `//` (e.g., `/something/*/something-else`).
 
 ### 3.6.4
-  **Correcciones**
-  - Cuando la request no tenia encabezado Mime-Type nunca se disparaba la promesa de Request.POST
+  **Fixed**
+  - When the request did not have a Mime-Type header, the `Request.POST` promise was never triggered.
 
 ### 3.6.5
-  **Correcciones**
-  - fix: Server.addWebSocket recibía como Auth un tipo ActionExec en lugar de AuthExec
-
+  **Fixed**
+  - Server.addWebSocket received an `ActionExec` type for Auth instead of `AuthExec`.
 
 ## 3.5
 
-**La version 3.4.2 sera considerada la 3.5 ya que trajo con sigo nuevas funciones
+**Version 3.4.2 will be considered 3.5 as it introduced new features.**
 
 ### 3.5.3
-  **Correcciones**
-  - Las carpetas no cargaban de forma adecuada ni su contenido
-  - La regla Folder que exponía el contenido global de saml esta en funcionamiento /Saml:Global
+  **Fixed**
+  - Folders and their contents did not load correctly.
+  - The Folder rule exposing the global saml content (`/Saml:Global`) is now working.
 
 ### 3.5.2
-  **Correcciones**
-  - Cookie: La función 'Del' no eliminaba correctamente las cookies.
+  **Fixed**
+  - Cookie: The 'Del' function did not correctly delete cookies.
 
 ### 3.5.1
-
-**Correcciones**
-  - El anterior uso de SS_UUID ahora es SessionID, el no haber hecho este cambio antes hizo que no apareciese el SessionID en los log de las peticiones HTTP y WebSocket
+  **Fixed**
+  - The previous use of `SS_UUID` is now `SessionID`. Not making this change earlier caused the `SessionID` not to appear in HTTP and WebSocket request logs.
 
 ## 3.4
 
 ### 3.4.3
 
 ### 3.4.2
-**Correcciones**
-  - Mail: error de tipos para la función SendMail.
-  - Mail: error de importación de Debug.
-  - JsonWT: error de coincidencias entre los tipos y los return de GetContent (Head y body eran objetos y no Maps).
-**Añadido**
-  - Mail: Se añadió como exportación Beta.
-  - JsonWT: Se añadió como exportación Beta.
-  - Utilities: Se creó para añadir variables o códigos útiles, tales como la ruta principal del modulo 
-    aunque esta cambie.
-**Eliminado**
-  - Tools: El comando CSV-To-JSON
-**Cambios**
-  - Server: El orden de los parámetros de AddFile, AddAction y AddWebSocket.
-  - Session: El atributo `path` por defecto de la cookie SS_UUID se cambió a `/` para ajustarse al
-    cambio realizado en el sub modulo cookie
-  - Session: La cookie SS_UUID se renombró a Session
-  - Debug: La ruta por defecto de cambio a `.Debug/Default`
-  - Mail: Se eliminaron los console.log y se remitieron a Debug
-**Resumen**
-para importar lo añadido como beta se puede usar
-```js
-import { Beta } from 'saml.servercore';
-const Mail = Beta.Mail;
-const JsonWT = Beta.JsonWT;
-```
+**Fixed**
+  - Mail: Type error for the `SendMail` function.
+  - Mail: Debug import error.
+  - JsonWT: Mismatch error between types and `GetContent` returns (Head and body were objects, not Maps).
+**Added**
+  - Mail: Added as Beta export.
+  - JsonWT: Added as Beta export.
+  - Utilities: Created to add useful variables or code, such as the main module path even if it changes.
+**Removed**
+  - Tools: The CSV-To-JSON command.
+**Changes**
+  - Server: The order of parameters for `AddFile`, `AddAction`, and `AddWebSocket`.
+  - Session: The default `path` attribute of the `SS_UUID` cookie was changed to `/` to align with the change made in the cookie submodule.
+  - Session: The `SS_UUID` cookie was renamed to `Session`.
+  - Debug: The default path was changed to `.Debug/Default`.
+  - Mail: `console.log` statements were removed and reported to Debug.
+**Summary**
+To import the added Beta features, you can use:
+
+
+js import { Beta } from 'saml.servercore'; const Mail = Beta.Mail; const JsonWT = Beta.JsonWT;
 
 ### 3.4.1
-**Desarrollado sin añadir**
-  - Mail: permite enviar correos electrónicos a través de un servidor smtp/s
+**Developed but not yet added**:
+  - Mail: Allows sending emails through an smtp/s server.
 
 ### 3.4.0
-  **Añadidos**
-  - Nuevas opciones para creación de cookies con Cookie.Set: Domain, SameSite y MaxAge.
-  **Cambios**
-  - El estado por defecto de la opción Path en Cookie.Set: de (/) a (la ruta donde se envió el set-cookie).
+  **Added**
+  - New options for creating cookies with `Cookie.Set`: `Domain`, `SameSite`, and `MaxAge`.
+  **Changes**
+  - The default state of the `Path` option in `Cookie.Set`: from (/) to (the path where the set-cookie was sent).
 
 ## 3.3 << changes.md
 
 ### 3.3.4
-  **Correcciones**
-  - Definición de tipos de JsonWT: de (ObjectToMar) a (ObjectToMap).
-  - Definición de tipos de Cookie: de (SetOptions.Patch) a (SetOptions.Path).
+  **Fixed**
+  - JsonWT type definition: from (ObjectToMar) to (ObjectToMap).
+  - Cookie type definition: from (SetOptions.Patch) to (SetOptions.Path).
 
 ### 3.3.3
-  - Se corrigieron errores en el objeto Cookie
-    - Al crearse una nueva cookie en una subRuta esta era establecida con Path en dicha subRuta
-      ahora se tomara '/' a menos que se indique otra cosa.
-  - Se corrigieron errores de tipo en Server.d.ts en cuanto a la implementación de
+  - Fixed errors in the Cookie object.
+    - When a new cookie was created in a subpath, it was set with Path in that subpath; now '/' will be used unless otherwise indicated.
+  - Fixed type errors in Server.d.ts regarding the implementation of:
     - Request
     - Response
     - Cookie
@@ -160,31 +158,27 @@ const JsonWT = Beta.JsonWT;
     - WebSocket
 
 ### 3.3.2
-  - Se corrigió un error en JsonWT, este se ocasionaba una excepción que finalizaba la ejecución de Saml.ServerCore en lugar de enviar false para indicar que el json no era valido
+  - Fixed an error in JsonWT. This caused an exception that terminated the execution of Saml.ServerCore instead of returning false to indicate that the json was not valid.
 
 ### 3.3.1
-  - Se corrigió el tipo de Request.POST
-    <br>Esta variable es de tipo Promise<Request.POST>
-    per intellisense la detectaba como Request.POST por un fallo en las definiciones en d.ts
+  - Fixed the type of Request.POST.
+    <br>This variable is of type Promise<Request.POST> but intellisense detected it as Request.POST due to a failure in the d.ts definitions.
 
 ### 3.3.0
-**Añadido**
-- A partir de ahora se documentaran los cambios realizados
-- Se agrego Server.AddAction()
-- Se agrego Server.AddFile() 
-- Se agrego Server.AddFolder()
-- Se agrego Server.AddWebSocket()
+**Added**
+- From now on, changes made will be documented.
+- Added Server.AddAction().
+- Added Server.AddFile().
+- Added Server.AddFolder().
+- Added Server.AddWebSocket().
 
-**Resumen**
-se añadieron como una alternativa a Server.AddRules
-esto con el fin de simplificar la forma de añadir reglas de enrutamiento nuevas
-ya que el uso de estas funciones disminuyen la cantidad de parámetros a pasar en un objeto,
-esto debido a que cada una se especializa en añadir un tipo de regla de enrutamiento en concreto.
+**Summary**
+These were added as an alternative to Server.AddRules to simplify how new routing rules are added, as using these functions reduces the number of parameters to pass in an object because each specializes in adding a specific type of routing rule.
 
-**Desarrollados sin añadir**:
+**Developed but not yet added**:
 
-- Capacidad de trabajo con JWT
-  Crear, verificar y decodificar Json Web Tokens con los algoritmos
+- JWT work capacity
+  Create, verify, and decode Json Web Tokens with the following algorithms:
   ||256|384|512|
   |--|---|---|---|
   |**HS**|✅|✅|✅|
