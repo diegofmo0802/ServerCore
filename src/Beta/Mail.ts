@@ -12,7 +12,7 @@ import NET from 'net';
 import FS from 'fs';
 import CRYPTO from 'crypto';
 
-export const $Mail = Debug.getInstance('beta.mail', { path: '.debug/beta' });
+export const $Mail = Debug.getInstance('beta.mail', { path: '.debug-beta' });
 
 export class Mail {
     private host: string;
