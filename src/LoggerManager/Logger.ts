@@ -19,14 +19,10 @@ export class Logger {
     public set save(value: boolean) { this.debug.save = value; }
     public get show(): boolean { return this.debug.show; }
     public set show(value: boolean) { this.debug.show = value; }
-    public custom(prefix: string | null, ...data: any[]) {
-        if (prefix) this.debug.log(prefix, ...data);
-        else this.debug.log(...data);
-    }
-    public log (...data: any[]) { this.custom(`&C2[${this.prefix}&C2]:${this.format}`, ...data); }
-    public warn (...data: any[]) { this.custom(`&C3[${this.prefix}&C3]:${this.format}`, ...data); }
-    public info (...data: any[]) { this.custom(`&C6[${this.prefix}&C6]:${this.format}`, ...data); }
-    public error (...data: any[]) { this.custom(`&C1[${this.prefix}&C1]:${this.format}`, ...data); }
+    public log (...data: any[]) { this.debug.log(`&C2[${this.prefix}&C2]:${this.format}`, ...data); }
+    public warn (...data: any[]) { this.debug.warn(`&C3[${this.prefix}&C3]:${this.format}`, ...data); }
+    public info (...data: any[]) { this.debug.info(`&C6[${this.prefix}&C6]:${this.format}`, ...data); }
+    public error (...data: any[]) { this.debug.error(`&C1[${this.prefix}&C1]:${this.format}`, ...data); }
 }
 export namespace Logger {
     export interface Options {
