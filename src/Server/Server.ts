@@ -10,7 +10,7 @@ import HTTPS from 'https';
 import { Duplex } from 'stream';
 
 import Utilities from '../Utilities/Utilities.js';
-import Debug from '../Debug.js';
+import LoggerManager from '../LoggerManager/LoggerManager.js';
 import _Config from '../Config.js';
 import _Request from "./Request.js";
 import _Response from "./Response.js";
@@ -19,17 +19,12 @@ import _Cookie from "./Cookie.js";
 import _WebSocket from "./WebSocket/WebSocket.js";
 import _Rule from './Rule.js';
 
-const config = _Config.getInstance();
-const $request = config.debugs.requests;
-const $webSocket = config.debugs.webSocket;
+const $logger = LoggerManager.getInstance();
 
 export class Server {
-	private host: string;
-	private protocol: Server.Protocol;
-	private HttpPort: number;
-	private HttpsPort: number;
-	private HttpServer: HTTP.Server;
-	private HttpsServer?: HTTP.Server;
+	private protocol: Server.Protocol | null;
+	private HttpServer: HTTP.Server | null;
+	private HttpsServer: HTTP.Server | null;
 	private rules: Server.Rule[];
 	public config: Server.Config;
 	/**
@@ -38,45 +33,117 @@ export class Server {
 	 * @param host - The host the server will bind to.
 	 * @param sslOptions - The SSL configuration.
 	 */
-	public constructor(port?: number, host?: string, sslOptions?: Server.SSLOptions) {
-		this.config = config;
-		this.host = host ?? '0.0.0.0';
-		this.HttpPort = port ?? 80;
-		this.HttpsPort = sslOptions?.port ?? 443;
+	public constructor(options?: Server.Config.options | Server.Config) {
+		this.config = options instanceof Server.Config ? options : new Server.Config(options);
 		this.rules = [];
-        this.protocol = sslOptions && sslOptions.pubKey && sslOptions.privKey ? 'HTTPS' : 'HTTP';
+		this.HttpServer = null;
+		this.HttpsServer = null;
+		this.protocol = null;
 		this.addFolder('/Saml:Global', Utilities.Path.normalize(`${Utilities.Path.moduleDir}/global`));
-		Debug.log('&B(255,180,220)&C0---------------------------------');
-		Debug.log('&B(255,180,220)&C0-  ServerCore by diegofmo0802.  -');
-		Debug.log('&B(255,180,220)&C0-        Server started         -');
-		Debug.log('&B(255,180,220)&C0---------------------------------');
-		let [HttpStarted, HttpsStarted] = [false, false];
-		this.HttpServer = HTTP.createServer((Request, Response) => {
-			this.requestManager(Request, Response);
-		}).on('upgrade', (Request, Socket) => {
-			this.upgradeManager(Request, Socket);
-		}).listen(this.HttpPort, host, () => {
-			this.protocol = this.protocol == 'HTTPS' ? 'HTTP/S' : 'HTTP';
-			Debug.log('&B(255,180,220)&C0-&R Host', this.host ? this.host : 'localhost');
-			Debug.log('&B(255,180,220)&C0-&R HTTP Port', this.HttpPort);
-			if (!(sslOptions && sslOptions.pubKey && sslOptions.privKey) || HttpsStarted)
-            Debug.log('&B(255,180,220)&C0---------------------------------');
+	}
+	/**
+	 * Starts the server.
+	 */
+	public async start(): Promise<void> {
+		const { port, host, ssl: sslOptions } = this.config;
+		this.protocol = sslOptions ? 'HTTP/S' : 'HTTP';
+		$logger.info('&C(255,180,220)╭─────────────────────────────────────────────');
+		$logger.info('&C(255,180,220)│ &C1ServerCore by diegofmo0802');
+		$logger.info('&C(255,180,220)│ &C1Server starting...');
+		$logger.info('&C(255,180,220)├─────────────────────────────────────────────');
+		try {
+			this.HttpServer = await this.initHTTP(port, host);
+			$logger.info(`&C(255,180,220)│ &C3Protocol: &R${this.protocol}`);
+			$logger.info(`&C(255,180,220)│ &C3Host: &R${host}`);
+			$logger.info(`&C(255,180,220)│ &C3HTTP Port: &R${port}`);
+			$logger.info(`&C(255,180,220)│ &C3HTTP URL: &C6http://${host}:${port}`);
+			try { if (sslOptions) {
+				this.HttpsServer = await this.initHTTPS(host, sslOptions);
+				$logger.info(`&C(255,180,220)│ &C3HTTPS Port: &R${sslOptions.port ?? 443}`);
+				$logger.info(`&C(255,180,220)│ &C3HTTPS URL: &C6https://${host}:${sslOptions.port ?? 443}`);
+			} } catch(error) {
+				throw Error('Certificate error ' + (error instanceof Error ? error.message : error), { cause: error });
+			}
+			$logger.info('&C(255,180,220)╰─────────────────────────────────────────────');
+		} catch(error) {
+			$logger.error(`&C(255,180,220)│ &C1✖ Error starting server: &R&C6${error instanceof Error ? error.message : error}`);
+			$logger.info('&C(255,180,220)╰─────────────────────────────────────────────');
+			this.stop();
+		}
+	}
+	/**
+	 * Stops the server.
+	 */
+	public async stop(): Promise<void> {
+		try {
+			$logger.info('&C6╭─────────────────────────────');
+			$logger.info('&C6│ &C1Stopping server...');
+			if (this.HttpServer) {
+				await this.stopHTTP();
+				$logger.info('&C6│   &C3✔ HTTP server stopped');
+			}
+			if (this.HttpsServer) {
+				await this.stopHTTPS();
+				$logger.info('&C6│   &C3✔ HTTPS server stopped');
+			}
+			$logger.info('&C6│ &C2✔ All servers stopped successfully');
+			$logger.info('&C6╰─────────────────────────────');
+		} catch(error) {
+			$logger.error('&C1✖ Error stopping server: &R&C6' + (error instanceof Error ? error.message : error));
+			
+			$logger.info('&C2╰─────────────────────────────');
+		}
+	}
+	/**
+	 * Stops the HTTP server.
+	 */
+	private async stopHTTP(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			if (this.HttpServer) this.HttpServer.close((error) => error ? reject(error) : resolve());
+			else resolve();
 		});
-		if (!sslOptions || !sslOptions.pubKey || !sslOptions.privKey) return;
-		Server.loadCertificates(sslOptions.pubKey, sslOptions.privKey).then((Certificates) => {
-			this.HttpsServer = HTTPS.createServer(Certificates, (Request, Response) => {
-				this.requestManager(Request, Response);
-			}).on('upgrade', (Request, Socket) => {
-				this.upgradeManager(Request, Socket);
-			}).listen(this.HttpsPort, host, () => {
-				this.protocol = this.protocol == 'HTTP' ? 'HTTP/S' : 'HTTPS';
-				Debug.log('&B(255,180,220)&C0-&R HTTPS Port', this.HttpsPort);
-				if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
-			});
-		}).catch((Error) => {
-			Debug.log('&C(255,0,0)[Server - Core]: Certificate error: ', Error);
-			if (HttpStarted) Debug.log('&B(255,180,220)&C0---------------------------------');
+	}
+	/**
+	 * Stops the HTTPS server.
+	 */
+	private async stopHTTPS(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			if (this.HttpsServer) this.HttpsServer.close((error) => error ? reject(error) : resolve());
+			else resolve();
 		});
+	}
+	/**
+	 * Restarts the server.
+	 */
+	public async restart(): Promise<void> {
+		await this.stop();
+		await this.start();
+	}
+	/**
+	 * Initializes the HTTP server.
+	 * @param port - The port the HTTP server will listen on.
+	 * @param host - The host the HTTP server will bind to.
+	 * @returns A promise that resolves with the created HTTP server.
+	 */
+	private async initHTTP(port: number, host: string): Promise<HTTP.Server> {
+		const http = HTTP.createServer();
+		http.on('request', this.requestManager.bind(this));
+		http.on('upgrade', this.upgradeManager.bind(this));
+		return new Promise((resolve) => http.listen(port, host, () => resolve(http)));
+	}
+	/**
+	 * Initializes the HTTPS server.
+	 * @param host - The host the HTTPS server will bind to.
+	 * @param sslOptions - The SSL configuration.
+	 * @returns A promise that resolves with the created HTTPS server.
+	 */
+	private async initHTTPS(host: string, sslOptions: Server.SSLOptions): Promise<HTTP.Server> {
+		const port = sslOptions.port ?? 443;
+		const cert = await Server.loadCertificates(sslOptions.pubKey, sslOptions.privKey);
+		const https = HTTPS.createServer(cert);
+		https.on('request', this.requestManager.bind(this));
+		https.on('upgrade', this.upgradeManager.bind(this));
+		return new Promise((resolve) => https.listen(port, host, () => resolve(https)));
 	}
 	/**
 	 * Adds one or more routing rules to the server.
@@ -146,8 +213,14 @@ export class Server {
 		let routed = false;
 		for (const rule of this.rules) {
 			if (rule.test(request)) {
-				if (rule.testAuth(request)) rule.exec(request, response);
-				else response.sendError(403, `You don't have permission to access: ${request.method} -> ${request.url}`);
+				if (rule.testAuth(request)) {
+					try { rule.exec(request, response); }
+					catch(error) {
+						$logger.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
+						$logger.error('&C1Route:', request.method, request.url);
+						response.sendError(500, 'Internal Server Error');
+					}
+				} else response.sendError(403, `You don't have permission to access: ${request.method} -> ${request.url}`);
 				routed = true;
 				break;
 			}
@@ -167,7 +240,13 @@ export class Server {
 				if (rule.testAuth(request)) {
 					const AcceptKey = (request.headers['sec-websocket-key'] ?? '').trim();
 					webSocket.acceptConnection(AcceptKey, request.cookies);
-					rule.exec(request, webSocket);
+					try { rule.exec(request, webSocket); }
+					catch(error) {
+						$logger.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
+						$logger.error('&C1Route:', request.method, request.url);
+						webSocket.send('HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\n\r\n');
+						webSocket.end();
+					}
 				} else {
 					webSocket.send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
 					webSocket.end();
@@ -187,7 +266,7 @@ export class Server {
 		const request = new Server.Request(HttpRequest);
 		const response = new Server.Response(request, HttpResponse, this.config.templates);
 		const sessionID = request.cookies.get('Session');
-		$request.log('[Request]:', request.ip, request.method, request.url, sessionID);
+		$logger.request.log(request.ip, request.method, request.url, sessionID);
 		this.routeRequest(request, response);
 	};
 	/**
@@ -199,7 +278,7 @@ export class Server {
 		const request = new Server.Request(HttpRequest);
 		const webSocket = new Server.WebSocket(Socket);
 		const sessionID = request.cookies.get('Session');
-		$webSocket.log('[WebSocket]:', request.ip, request.method, request.url, sessionID);
+		$logger.webSocket.log(request.ip, request.method, request.url, sessionID);
 		this.routeWebSocket(request, webSocket);
 	}
 	/**
