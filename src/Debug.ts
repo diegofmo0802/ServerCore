@@ -47,13 +47,13 @@ export class Debug {
         this.rootPath = rootPath;
         this.filePath = filePath;
 		this.startDate = now;
-        this.stream = save ? Debug.generateStream(filePath) : null;
+        this.stream =  null;
         Debug.debugs.set(id, this);
     }
 	public get save(): boolean { return this._save; }
     public set save(value: boolean) {
         this._save = value;
-        if (value) this.stream = Debug.generateStream(this.filePath);
+        if (value) this.stream = this.getStream();
         else if (this.stream) {
             this.stream.destroy();
             this.stream = null;
@@ -68,15 +68,18 @@ export class Debug {
 			const id = this.id;
 			const date = this.startDate;
 			const stream = Debug.generateStream(this.filePath);
-			stream.write([
-				'/*+----------------------------+*/',
-				'/*| Saml/Debug by diegofmo0802 |*/',
-				'/*|     Use Saml ReadDebug     |*/',
-				'/*+----------------------------+*/',
-				`/*the name of the DebugFile is the DateTime of initialize Debug with ID ${id}*/`,
-				`/*the initialize stream DateTime is ${date.DateFormat} << ${date.TimeFormat}*/`
+            stream.write([
+				'/* +----------------------------+* /',
+				'/* | Saml/Debug by diegofmo0802 |* /',
+				'/* |     Use Saml ReadDebug     |* /',
+				'/* +----------------------------+* /',
+				`/* the name of the DebugFile is the DateTime of initialize Debug with ID ${id} */`,
+				`/* the initialize stream DateTime is ${date.DateFormat} << ${date.TimeFormat} */`,
+                '', ''
 			].join('\n'));
 			this.stream = stream;
+            const file = Utilities.Path.relative(this.filePath);
+            this.log(`&C2&PStream created to the debug file: &C6&S${file}`);
 		}
 		return this.stream;
 	}
@@ -84,34 +87,60 @@ export class Debug {
      * Log data to the console and/or the debug file.
      * @param data - Data to log
      */
-    public log(...data: any[]): void {
-        const prefix = Debug.getPrefix();
-        if (this._save) this.saveLog(prefix, ...data);
-        if (this.show || Debug.showAll) this.showLog(prefix, ...data);
+    public log(...data: any[]): void { this.customLog('&C2[LOG]', ...data); }
+    /**
+     * Log data to the console and/or the debug file.
+     * @param data - Data to log
+     */
+    public info(...data: any[]): void { this.customLog('&C6[INF]', ...data); }
+    /**
+     * Log data to the console and/or the debug file.
+     * @param data - Data to log
+     */
+    public warn(...data: any[]): void { this.customLog('&C3[WRN]', ...data); }
+    /**
+     * Log data to the console and/or the debug file.
+     * @param data - Data to log
+     */
+    public error(...data: any[]): void { this.customLog('&C1[ERR]', ...data); }
+    /**
+     * Log data to the console and/or the debug file with a specific prefix.
+     * @param data - Data to log
+     */
+    public customLog(prefix: string, ...data: any[]): void {
+        const timestamp = Debug.getTimestamp();
+        if (this._save) this.saveLog(timestamp, prefix, ...data);
+        if (this.show || Debug.showAll) this.showLog(timestamp, prefix, ...data);
     }
 	/**
 	 * Save data to the debug file.
-	 * @param prefix - Prefix to log
+     * @param timestamp - Timestamp of the log
+	 * @param prefix - Prefix of the log
 	 * @param data - Data to log 
 	 */
-	private showLog(prefix: string, ...data: any[]): void {
-		const decoratedPrefix = Debug.decoratePrefix(prefix);
+	private showLog(timestamp: string, prefix: string, ...data: any[]): void {
+        timestamp = Debug.decorateTimestamp(timestamp);
+        timestamp = ConsoleUI.formatText(timestamp);
+        prefix = ConsoleUI.formatText(prefix);
 		const toShow = data.map((Datum) => typeof Datum === 'string' ?
 			ConsoleUI.formatText(Datum) : Datum
 		);
-		console.log(decoratedPrefix, ...toShow);
+		console.log(`${timestamp} ${prefix} ->`, ...toShow);
 	}
 	/**
 	 * Save data to the debug file.
-	 * @param prefix - Prefix to log
+     * @param timestamp - Timestamp of the log
+	 * @param prefix - Prefix of the log
 	 * @param data - Data to log
 	 */
-	private saveLog(prefix: string, ...data: any[]): void {
+	private saveLog(timestamp: string, prefix: string, ...data: any[]): void {
+        timestamp = ConsoleUI.cleanFormat(timestamp);
+        prefix = ConsoleUI.cleanFormat(prefix);
 		const stream = this.getStream();
 		const toSave = data.map((Datum) => typeof Datum === 'string' ?
 			ConsoleUI.cleanFormat(Datum) : Datum
 		);
-		stream.write(`${prefix} -> ${JSON.stringify(toSave)}\n`);
+		stream.write(`${timestamp} ${prefix} -> ${JSON.stringify(toSave)}\n`);
 	}
     /**
      * Log data using the default debug instance.
@@ -120,6 +149,30 @@ export class Debug {
     public static log(...Data: any): void {
         const debug = this.getInstance();
         debug.log(...Data);
+    }
+    /**
+     * Log data using the default debug instance.
+     * @param Data - Data to log
+     */
+    public static info(...Data: any): void {
+        const debug = this.getInstance();
+        debug.info(...Data);
+    }
+    /**
+     * Log data using the default debug instance.
+     * @param Data - Data to log
+     */
+    public static warn(...Data: any): void {
+        const debug = this.getInstance();
+        debug.warn(...Data);
+    }
+    /**
+     * Log data using the default debug instance.
+     * @param Data - Data to log
+     */
+    public static error(...Data: any): void {
+        const debug = this.getInstance();
+        debug.error(...Data);
     }
 	/**
 	 * Clean a path.
@@ -159,18 +212,18 @@ export class Debug {
         return stream;
     }
 	/**
-	 * Decorate a prefix with color codes.
-	 * @param prefix - Prefix to decorate
-	 * @returns Decorated prefix
+	 * Decorate a timestamp with color codes.
+	 * @param timestamp - timestamp to decorate
+	 * @returns Decorated timestamp
 	 */
-	private static decoratePrefix(prefix: string): string {
-		return ConsoleUI.formatText(`&B(255,0,0)&C(255,255,0)${prefix}&R`);
+	private static decorateTimestamp(timestamp: string): string {
+		return ConsoleUI.formatText(`&C(255,255,255)${timestamp}&R`);
 	}
     /**
-     * Generate a datetime prefix for log entries.
-     * @returns Formatted datetime prefix
+     * Generate a datetime timestamp.
+     * @returns Formatted datetime timestamp
      */
-    private static getPrefix(): string {
+    private static getTimestamp(): string {
         const now = Debug.getDate();
         const prefix = `[${now.hour}:${now.minute}:${now.second}:${now.millisecond}]`;
         return prefix;
