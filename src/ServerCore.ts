@@ -10,7 +10,7 @@ import Config from "./Config.js";
 import Debug from "./Debug.js";
 import Logger from "./LoggerManager/Logger.js";
 import Template from "./Template.js";
-import Server from "./Server/Server.js";
+import ServerCore from "./Server/Server.js";
 import Utilities from "./Utilities/Utilities.js";
 
 // Imports the beta utilities of the ServerCore module.
@@ -21,7 +21,6 @@ import Mail from "./Beta/Mail.js";
 export const Beta = { JwtManager, Mail };
 
 // Exports the main utilities of the ServerCore module.
-export const ServerCore = Server;
 export {
 	Debug, Logger,
 	Utilities, Template,
