@@ -37,7 +37,7 @@ export class Debug {
 	 * @param options - Debug instance options
      */
     private constructor(id: string = '_default', options: Debug.options = {}) {
-        const { path = '.debug', show = false, save = true } = options;
+        const { path = '.debug', show = true, save = true } = options;
 		const now = Debug.getDate();
 		const rootPath = Debug.cleanPath(path);
 		const filePath = Debug.getFilePath(id, rootPath, now);
