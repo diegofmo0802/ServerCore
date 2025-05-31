@@ -10,7 +10,7 @@ import HTTPS from 'https';
 import { Duplex } from 'stream';
 
 import Utilities from '../Utilities/Utilities.js';
-import LoggerManager from '../LoggerManager/LoggerManager.js';
+import _LoggerManager from '../LoggerManager/LoggerManager.js';
 import _Config from '../Config.js';
 import _Request from "./Request.js";
 import _Response from "./Response.js";
@@ -19,7 +19,7 @@ import _Cookie from "./Cookie.js";
 import _WebSocket from "./WebSocket/WebSocket.js";
 import _Rule from './Rule.js';
 
-const $logger = LoggerManager.getInstance();
+const $logger = _LoggerManager.getInstance();
 
 export class Server {
 	private protocol: Server.Protocol | null;
@@ -27,6 +27,7 @@ export class Server {
 	private HttpsServer: HTTP.Server | null;
 	private rules: Server.Rule[];
 	public config: Server.Config;
+	public logger: Server.LoggerManager;
 	/**
 	 * Creates an HTTP/S server.
 	 * @param port - The port the server will listen on.
@@ -39,6 +40,7 @@ export class Server {
 		this.HttpServer = null;
 		this.HttpsServer = null;
 		this.protocol = null;
+		this.logger = _LoggerManager.getInstance();
 		this.addFolder('/Saml:Global', Utilities.Path.normalize(`${Utilities.Path.moduleDir}/global`));
 	}
 	/**
@@ -308,6 +310,7 @@ export namespace Server {
     export import Session = _Session
     export import WebSocket = _WebSocket
     export import Rule = _Rule;
+	export import LoggerManager = _LoggerManager;
     export interface Certificates {
         cert: Buffer | string,
         key: Buffer | string
