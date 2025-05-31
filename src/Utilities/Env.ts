@@ -1,4 +1,4 @@
-import { promises as FS } from "fs";
+import FS, { promises as FSPromises } from "fs";
 import PATH from "path";
 
 import Debug from "../Debug.js";
@@ -11,7 +11,7 @@ export class Env {
      * @returns A promise that resolves to true if the file exists, false otherwise
      */
     public static async fileExists(path: string): Promise<boolean> {
-        return FS.access(path).then(() => true).catch(() => false);
+        return FSPromises.access(path).then(() => true).catch(() => false);
     }
     /**
      * Load the environment variables from the given path
@@ -25,18 +25,49 @@ export class Env {
         Debug.log(`loading environment variables from &C6[${path}]`);
         const defaultEnv = options.defaultEnv ?? {};
         const setEnv = options.setEnv ?? true;
-        const result: Env.EnvList = { ...defaultEnv };
 
         if (!await this.fileExists(path)) {
-            await FS.mkdir(PATH.dirname(path), { recursive: true });
+            await FSPromises.mkdir(PATH.dirname(path), { recursive: true });
             const env = this.toEnv(defaultEnv);
-            await FS.writeFile(path, env, 'utf-8');
+            await FSPromises.writeFile(path, env, 'utf-8');
             Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
         }
 
-        const env = await FS.readFile(path, 'utf-8');
-        const lines = env.split('\n');
+        const env = await FSPromises.readFile(path, 'utf-8');
+        const result = this.extractEnv(env, defaultEnv);
+        if (setEnv) this.setMany(result);
 
+        Debug.log(`environment variables loaded from &C6[${path}]`);
+        return result;
+    }
+    public static loadSync(path: string, options: Env.LoadOptions = {}): Env.EnvList {
+        Debug.log(`loading environment variables from &C6[${path}]`);
+        const defaultEnv = options.defaultEnv ?? {};
+        const setEnv = options.setEnv ?? true;
+
+        if (!FS.existsSync(path)) {
+            FS.mkdirSync(PATH.dirname(path), { recursive: true });
+            const env = this.toEnv(defaultEnv);
+            FS.writeFileSync(path, env, 'utf-8');
+            Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
+        }
+
+        const env = FS.readFileSync(path, 'utf-8');
+        const result = this.extractEnv(env, defaultEnv);
+        if (setEnv) this.setMany(result);
+
+        Debug.log(`environment variables loaded from &C6[${path}]`);
+        return result;
+    }
+    /**
+     * Extract the environment variables from the given content
+     * @param content - The content to extract the environment variables from
+     * @param defaultEnv - The default environment variables to use if none are found
+     * @returns The extracted environment variables as an object
+     */
+    private static extractEnv(content: string, defaultEnv: Env.EnvList = {}): Env.EnvList {
+        const lines = content.split('\n');
+        const result: Env.EnvList = { ...defaultEnv };
         for (const line of lines) {
             const trimmedLine = line.trim();
             if (!trimmedLine || trimmedLine.startsWith('#')) continue;
@@ -50,10 +81,6 @@ export class Env {
 
             result[key] = value;
         }
-
-        if (setEnv) this.setMany(result);
-
-        Debug.log(`environment variables loaded from &C6[${path}]`);
         return result;
     }
     /**
