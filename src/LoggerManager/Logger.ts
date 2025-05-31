@@ -1,10 +1,6 @@
 import ConsoleUI from "../ConsoleUI.js";
 import Debug from "../Debug.js";
 
-export const $server = Debug.getInstance('.server', {
-    path: '.debug', show: true, save: true
-})
-
 export class Logger {
     private prefix: string;
     private format: string;
