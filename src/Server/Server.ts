@@ -216,8 +216,8 @@ export class Server {
 				if (rule.testAuth(request)) {
 					try { rule.exec(request, response); }
 					catch(error) {
-						$logger.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
-						$logger.error('&C1Route:', request.method, request.url);
+						$logger.request.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
+						$logger.request.error('&C1Route:', request.method, request.url);
 						response.sendError(500, 'Internal Server Error');
 					}
 				} else response.sendError(403, `You don't have permission to access: ${request.method} -> ${request.url}`);
@@ -242,8 +242,8 @@ export class Server {
 					webSocket.acceptConnection(AcceptKey, request.cookies);
 					try { rule.exec(request, webSocket); }
 					catch(error) {
-						$logger.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
-						$logger.error('&C1Route:', request.method, request.url);
+						$logger.webSocket.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
+						$logger.webSocket.error('&C1Route:', request.method, request.url);
 						webSocket.send('HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\n\r\n');
 						webSocket.end();
 					}
