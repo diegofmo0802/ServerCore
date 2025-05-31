@@ -1,13 +1,12 @@
 //@ts-check
 
 import Rule from "../build/Server/Rule.js";
-import ServerCore, { Debug, Config, Utilities } from "../build/ServerCore.js";
+import ServerCore, { Debug, Utilities } from "../build/ServerCore.js";
 import "./debug.js";
 import "./utilities.js";
 
 /* | HABILITAR VISTA EN CONSOLA DE LOS DEBUGS DE SERVER CORE | */
-const config = Config.getInstance();
-config.showAll = true;
+Debug.showAll = true;
 /* | CREANDO UN DEBUG PARA LA SALIDA DE LOS TESTS | */
 const $Test = Debug.getInstance('Test');
 
@@ -23,7 +22,7 @@ Number(process.env.PORT)
 const WEBSOCKET_URL = process.env['REMOTE-WS'] ?? `ws://${HOST ?? 'localhost'}:${PORT}`;
 
 /* | INICIANDO SERVIDOR | */
-const server = new ServerCore(PORT, HOST);
+const server = new ServerCore({ port: 3000 });
 
 /* | PRUEBAS DE REGLAS FILE | */
 server.addFile('/File', 'changes.md')
@@ -126,5 +125,5 @@ server.addWebSocket('/WebSocket/$?username', (request, socket) => {
         $Test.log('[WebSocket-Finish]: client disconnected')
     });
 });
-
+server.start();
 // new Rule('Action', 'POST', '/a/b/c/d/e/$f/*', () => {});
