@@ -12,14 +12,11 @@ export class LoggerManager {
     public response: LoggerManager.Logger;
     public webSocket: LoggerManager.Logger;
     private constructor() {
-        const $server = Debug.getInstance('server', { path: '.debug/server' });
-        const $requests = Debug.getInstance('server.requests', { path: '.debug/requests' });
-        const $responses = Debug.getInstance('server.requests', { path: '.debug/responses' });
-        const $webSocket = Debug.getInstance('server.webSockets', { path: '.debug/webSockets' });
-        this.server = new LoggerManager.Logger({ prefix: 'Server', debug: $server });
-        this.request = new LoggerManager.Logger({ prefix: 'Request', debug: $requests });
-        this.response = new LoggerManager.Logger({ prefix: 'Response', debug: $responses });
-        this.webSocket = new LoggerManager.Logger({ prefix: 'WebSocket', debug: $webSocket })
+        const $debug = Debug.getInstance();
+        this.server = new LoggerManager.Logger({ prefix: 'Server', debug: $debug });
+        this.request = new LoggerManager.Logger({ prefix: 'Request', debug: $debug });
+        this.response = new LoggerManager.Logger({ prefix: 'Response', debug: $debug });
+        this.webSocket = new LoggerManager.Logger({ prefix: 'WebSocket', debug: $debug })
     }
     public log(...data: any[]) { this.server.log(...data); }
     public info(...data: any[]) { this.server.info(...data); }
