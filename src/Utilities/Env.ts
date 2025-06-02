@@ -8,7 +8,7 @@ export class Env {
      * Gets all current environment variables.
      * @returns An object containing key-value pairs of environment variables.
      */
-    public static get variables(): Env.EnvList { return process.env; }
+    public static get data(): Env.EnvList { return process.env; }
     /**
      * Checks if a file exists asynchronously.
      * @param path - The path to the file.
