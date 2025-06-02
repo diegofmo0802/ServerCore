@@ -5,16 +5,16 @@ export class Path {
     public static readonly moduleDir: string = PATH.dirname(PATH.dirname(PATH.dirname(URL.fileURLToPath(import.meta.url))));
     public static readonly moduleMain: string = PATH.join(this.moduleDir, 'build/ServerCore.js');
     /**
-     * Clean a path by replacing all backslashes with the system-specific separator.
+     * Normalizes a path by replacing all backslashes with the system-specific separator.
      * @param path - The path to clean
-     * @returns The cleaned path
+     * @returns The normalized path
      */
     public static normalize(path: string): string {
         path = path.replace(/[\\/]/gi, PATH.sep);
         return path;
     }
     /**
-     * Convert a relative path to an absolute one, relative to the module root.
+     * Converts a relative path to an absolute one, relative to the module root directory.
      * @param path - The relative path
      * @returns The absolute path
      */
