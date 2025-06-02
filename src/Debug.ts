@@ -19,8 +19,8 @@ export class Debug {
 	private startDate: Debug.Date;
     private stream: WriteStream | null;
     /**
-     * Create or retrieve a debug instance.
-     * @param id - Debug instance ID
+     * Retrieves an existing debug instance by its ID or creates a new one if it doesn't exist.
+     * @param id - The unique identifier for the debug instance. Defaults to `'_debug'`.
 	 * @param options - Debug instance options
      * @returns The debug instance
      */
@@ -32,8 +32,8 @@ export class Debug {
 		return debug;
     }
     /**
-     * Create a new debug instance.
-     * @param id - Debug instance ID
+     * Constructs a new Debug instance. This constructor is private and should not be called directly. Use `Debug.getInstance()` instead.
+     * @param id - The unique identifier for the debug instance. Defaults to `'_default'`.
 	 * @param options - Debug instance options
      */
     private constructor(id: string = '_default', options: Debug.options = {}) {
@@ -60,7 +60,7 @@ export class Debug {
         }
     }
 	/**
-	 * Get the stream to the debug file.
+	 * Retrieves or creates the write stream to the debug file associated with this instance.
 	 * @returns The stream to the debug file
 	 */
 	private getStream(): WriteStream {
@@ -84,27 +84,27 @@ export class Debug {
 		return this.stream;
 	}
     /**
-     * Log data to the console and/or the debug file.
-     * @param data - Data to log
+     * Logs data with a '[LOG]' prefix to the console (if enabled) and/or the debug file (if enabled).
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
     public log(...data: any[]): void { this.customLog('&C2[LOG]', ...data); }
     /**
-     * Log data to the console and/or the debug file.
-     * @param data - Data to log
+     * Logs data with an '[INF]' prefix (for informational messages) to the console (if enabled) and/or the debug file (if enabled).
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
     public info(...data: any[]): void { this.customLog('&C6[INF]', ...data); }
     /**
-     * Log data to the console and/or the debug file.
-     * @param data - Data to log
+     * Logs data with a '[WRN]' prefix (for warnings) to the console (if enabled) and/or the debug file (if enabled).
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
     public warn(...data: any[]): void { this.customLog('&C3[WRN]', ...data); }
     /**
-     * Log data to the console and/or the debug file.
-     * @param data - Data to log
+     * Logs data with an '[ERR]' prefix (for errors) to the console (if enabled) and/or the debug file (if enabled).
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
     public error(...data: any[]): void { this.customLog('&C1[ERR]', ...data); }
     /**
-     * Log data to the console and/or the debug file with a specific prefix.
+     * Logs data with a custom prefix to the console (if enabled) and/or the debug file (if enabled).
      * @param data - Data to log
      */
     public customLog(prefix: string, ...data: any[]): void {
@@ -113,10 +113,10 @@ export class Debug {
         if (this.show || Debug.showAll) this.showLog(timestamp, prefix, ...data);
     }
 	/**
-	 * Save data to the debug file.
-     * @param timestamp - Timestamp of the log
-	 * @param prefix - Prefix of the log
-	 * @param data - Data to log 
+	 * Displays the log entry on the console.
+     * @param timestamp - The timestamp of the log entry.
+	 * @param prefix - The prefix for the log entry.
+	 * @param data - The data to be displayed.
 	 */
 	private showLog(timestamp: string, prefix: string, ...data: any[]): void {
         timestamp = Debug.decorateTimestamp(timestamp);
@@ -128,38 +128,38 @@ export class Debug {
 		console.log(`${timestamp} ${prefix} ->`, ...toShow);
 	}
 	/**
-	 * Save data to the debug file.
-     * @param timestamp - Timestamp of the log
-	 * @param prefix - Prefix of the log
-	 * @param data - Data to log
+	 * Saves the log entry to the debug file.
+     * @param timestamp - The timestamp of the log entry.
+	 * @param prefix - The prefix for the log entry.
+	 * @param data - The data to be saved.
 	 */
 	private saveLog(timestamp: string, prefix: string, ...data: any[]): void {
         timestamp = ConsoleUI.cleanFormat(timestamp);
         prefix = ConsoleUI.cleanFormat(prefix);
 		const stream = this.getStream();
-		const toSave = data.map((Datum) => typeof Datum === 'string' ?
-			ConsoleUI.cleanFormat(Datum) : Datum
+		const toSave = data.map((datum) => typeof datum === 'string' ?
+			ConsoleUI.cleanFormat(datum) : datum
 		);
 		stream.write(`${timestamp} ${prefix} -> ${JSON.stringify(toSave)}\n`);
 	}
     /**
-     * Log data using the default debug instance.
-     * @param Data - Data to log
+     * Logs data with a '[LOG]' prefix using the default debug instance.
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public static log(...Data: any): void {
+    public static log(...data: any[]): void {
         const debug = this.getInstance();
-        debug.log(...Data);
+        debug.log(...data);
     }
     /**
-     * Log data using the default debug instance.
-     * @param Data - Data to log
+     * Logs data with an '[INF]' prefix using the default debug instance.
+     * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public static info(...Data: any): void {
+    public static info(...data: any[]): void {
         const debug = this.getInstance();
-        debug.info(...Data);
+        debug.info(...data);
     }
     /**
-     * Log data using the default debug instance.
+     * Logs data with a '[WRN]' prefix using the default debug instance.
      * @param Data - Data to log
      */
     public static warn(...Data: any): void {
@@ -167,7 +167,7 @@ export class Debug {
         debug.warn(...Data);
     }
     /**
-     * Log data using the default debug instance.
+     * Logs data with an '[ERR]' prefix using the default debug instance.
      * @param Data - Data to log
      */
     public static error(...Data: any): void {
