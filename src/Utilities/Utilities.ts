@@ -8,10 +8,10 @@ import _Env from './Env.js';
 
 export class Utilities {
     /**
-     * Deeply compares two objects.
+     * Compares two objects recursively for deep equality.
      * @param obj1 - The first object to compare
      * @param obj2 - The second object to compare
-     * @returns True if the objects are equal, false otherwise
+     * @returns A boolean indicating whether the objects are deeply equal or not.
      */
     public static deepEqual(obj1: any, obj2: any): boolean {
         if (obj1 === obj2) return true;
@@ -29,15 +29,15 @@ export class Utilities {
         return true;
     }
     /**
-     * Flattens an object into a single-level object.
+     * Flattens a nested object into a single-level object with dot notation keys.
      * @param object - The object to flatten
-     * @param depth - Maximum depth to flatten (default: 10)
+     * @param depth - The maximum depth to which the object should be flattened.
      * @returns The flattened object
      */
     public static flattenObject<T extends object, D extends number = 10>(object: T, depth: D = 10 as D): Utilities.Flatten.Object<T, D> {
         return this.flattenCore(object, depth);
     }
-    protected static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
+    private static flattenCore(object: any, depth: number = 10, prefix: string = ''): any {
         const result: any = {};
         for (const key in object) {
             const newKey = prefix ? `${prefix}.${key}` : key;
@@ -51,9 +51,9 @@ export class Utilities {
         return result;
     }
     /**
-     * Reconstructs a nested object from a flattened one.
+     * Reconstructs a nested object from a flattened object with dot notation keys.
      * @template Result - The type of the unflattened object
-     * @param obj - The object to unflatten
+     * @param obj - The flattened object to unflatten.
      * @returns The unflattened object
      */
     public static unFlattenObject<Result extends any = any>(obj: any): Result {
@@ -76,8 +76,8 @@ export class Utilities {
         return result;
     }
     /**
-     * Delays execution for the specified number of milliseconds.
-     * @param ms - The number of milliseconds to wait
+     * Pauses the execution of the program for a specified duration.
+     * @param ms - The number of milliseconds to sleep.
      * @returns A promise that resolves after the given time
      */
     public static sleep(ms: number): Promise<void> {
@@ -85,7 +85,7 @@ export class Utilities {
     }
     /**
      * Encodes a string to base64url format.
-     * @param data - The string to encode
+     * @param data - The string that needs to be encoded.
      * @returns The base64url-encoded string
      */
     public static base64UrlEncode(data: string): string {
@@ -93,7 +93,7 @@ export class Utilities {
     }
     /**
      * Decodes a base64url-encoded string.
-     * @param data - The base64url-encoded string to decode
+     * @param data - The base64url-encoded string that needs to be decoded.
      * @returns The decoded string
      */
     public static base64UrlDecode(data: string): string {
@@ -109,9 +109,9 @@ export namespace Utilities {
         type strToNum<str extends string> = str extends `${infer num extends number}` ? num : never;
 
         /**
-         * add one to a number
+         * Adds one to a number type.
          * @template Number the number to add one to
-         * @returns the number added one
+         * @returns The number incremented by one.
          */
         export type Inc<Number extends number | string> = (
             `${Number}` extends `${infer surPlus}${NumListAdd[number]}`
@@ -128,9 +128,9 @@ export namespace Utilities {
         );
 
         /**
-         * union to intersection
+         * Converts a union of object types into an intersection type.
          * @template U the union to convert
-         * @returns the intersection of the union
+         * @returns The intersection type of the given union.
         */
         export type UnionToIntersection<U extends object> = (
             (U extends any ? (arg: U) => void : never) extends (arg: infer I) => void
@@ -141,9 +141,9 @@ export namespace Utilities {
         );
 
         /**
-         * convert the object property with undefined to optional
+         * Converts properties with `undefined` in an object type to optional properties.
          * @template T the object to convert
-         * @returns the converted object
+         * @returns The object type with properties containing `undefined` marked as optional.
          */
         export type undefinedToPartial<T extends object> = {
             [K in keyof T as undefined extends T[K] ? never : K]: T[K];
@@ -162,11 +162,11 @@ export namespace Utilities {
             : ResourceIndexes<Length, [...Current, Current['length']]>
         );
         /**
-         * flatten an object into a single level and return an union of all the keys
+         * Generates a union of all possible flattened keys for a given object type and depth.
          * @template T the object to flatten
-         * @template depth the depth to flatten
-         * @template index the current index
-         * @returns the flattened object keys as a union
+         * @template depth - The maximum depth to flatten.
+         * @template index - The current recursion index (internal use).
+         * @returns A union type of the flattened keys.
          */
         type ResourceKeys<T extends Types.Document, depth extends number = 5, index extends number = 1> = {
             [K in keyof T]-?:
@@ -181,11 +181,10 @@ export namespace Utilities {
                 : "fail_in_flatten_inference"
         }[keyof T];
         /**
-         * flatten an object into a single level and return an union of all the keys
+         * Recursively retrieves the type of a value based on a flattened key path.
          * @template T the object to flatten
-         * @template depth the depth to flatten
-         * @template index the current index
-         * @returns the flattened object keys as a union
+         * @template Keys - The flattened key path string.
+         * @returns The type of the value at the specified key path, or `never` if the path is invalid.
          */
         type RecurseObject<T extends Types.Document, Keys extends string> = (
             Keys extends `${infer K}.${infer Rest}`
@@ -203,9 +202,9 @@ export namespace Utilities {
                     : never
         );
         /**
-         * flatten an object into a single level
+         * Represents the type of a flattened object up to a specified depth.
          * @template T the object to flatten
-         * @template depth the depth to flatten
+         * @template depth - The maximum depth of flattening.
          * @template index the current index
          * @returns the flattened object
          */
@@ -218,9 +217,9 @@ export namespace Utilities {
     }
     export namespace UnFlatten {
         /**
-         * split a string by a delimiter
-         * @template S the string to split
-         * @template Delimiter the delimiter to split by
+         * Splits a string into a tuple of strings based on a delimiter.
+         * @template S - The string to split.
+         * @template Delimiter - The delimiter to split by.
          * @returns the split string
          */
         type Split<S extends string, Delimiter extends string> = (
@@ -229,9 +228,9 @@ export namespace Utilities {
             : [S]
         );
         /**
-         * build a nested object from a string
-         * @template Path the path to build
-         * @template Value the value to build
+         * Builds a nested object type from a string path and a value type.
+         * @template Path - The path of keys as a string array.
+         * @template Value - The type of the value at the end of the path.
          * @returns the nested object
          */
         type BuildNestedObject<Path extends string[], Value> = (
@@ -240,8 +239,8 @@ export namespace Utilities {
             : Value
         );
         /**
-         * unFlatten an object into a single level
-         * @template T the object to unFlatten
+         * Represents the type of a nested object reconstructed from a flattened object.
+         * @template T - The type of the flattened object.
          * @returns the unFlattened object
          */
         export type Object<T extends Types.Document> = Types.UnionToIntersection<Types.undefinedToPartial<({
