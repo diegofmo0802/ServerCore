@@ -24,6 +24,10 @@ export class Config implements Config.Main {
     }
     public get showAll(): boolean { return Debug.showAll; }
     public set showAll(value: boolean) { Debug.showAll = value; }
+    /**
+     * Get the default templates.
+     * @returns The default templates
+     */
     public static defaultTemplates(): Config.Templates {
         return {
             folder: Utilities.Path.relative('./global/Template/Folder.HSaml'),
