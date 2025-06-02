@@ -40,6 +40,14 @@ export class Env {
         Debug.log(`environment variables loaded from &C6[${path}]`);
         return result;
     }
+    /**
+     * Load the environment variables from the given path synchronously
+     * @param path - The path to the environment variables file
+     * @param options - Options to load the environment variables
+     * @returns The loaded environment variables as an object
+     * @throws Error if the environment variables file does not exist and cannot be created
+     * @throws Error if the environment variables file is not readable
+     */
     public static loadSync(path: string, options: Env.LoadOptions = {}): Env.EnvList {
         Debug.log(`loading environment variables from &C6[${path}]`);
         const defaultEnv = options.defaultEnv ?? {};
