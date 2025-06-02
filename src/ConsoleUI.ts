@@ -114,7 +114,7 @@ export class ConsoleUI {
         const rgbExp = new RegExp(this.rgbString.replace('%prefix%', prefix), 'g');
         return `${text
             .replace(formatExp, (result, format) => this.formats[format as ConsoleUI.formatKey])
-            .replace(rgbExp, (result, type, _fullRgb, R, G, B) => (this.formats[type as ConsoleUI.formatKey]
+            .replace(rgbExp, (result, type, R, G, B) => (this.formats[type as ConsoleUI.formatKey]
                 .replace('R', R)
                 .replace('G', G)
                 .replace('B', B)
