@@ -38,9 +38,9 @@ export class ConsoleUI {
     };
 
     /**
-     * delete text formats and colors.
-     * @param text the text to clean.
-     * @param prefix the prefix.
+     * Delete text formats and colors.
+     * @param text - The text to clean.
+     * @param prefix - The prefix.
      */
     public static cleanFormat(text: string, prefix: string = '&'): string {
         const formatExp = new RegExp(this.formatString.replace('%prefix%', prefix), 'g');
@@ -49,9 +49,9 @@ export class ConsoleUI {
     }
 
     /**
-     * colors the text.
-     * @param text the text to color.
-     * @param prefix the prefix.
+     * Colors the text.
+     * @param text - The text to color.
+     * @param prefix - The prefix.
      * The default prefix is `&`
      * Colors and formats
      * - Formats:
@@ -92,9 +92,9 @@ export class ConsoleUI {
     }
 
     /**
-     * sends a message to the user through the console
-     * @param message the message(s) you want to send to the user
-     * @param newLine whether there is a line break or not
+     * Sends a message to the user through the console
+     * @param message - The message(s) you want to send to the user
+     * @param newLine - Whether there is a line break or not
      */
     public static send(message: string | string[], newLine?: boolean): void {
         if (typeof message === 'string') {
