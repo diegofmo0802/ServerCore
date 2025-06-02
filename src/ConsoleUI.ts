@@ -41,6 +41,7 @@ export class ConsoleUI {
      * Delete text formats and colors.
      * @param text - The text to clean.
      * @param prefix - The prefix.
+     * @returns The cleaned text.
      */
     public static cleanFormat(text: string, prefix: string = '&'): string {
         const formatExp = new RegExp(this.formatString.replace('%prefix%', prefix), 'g');
@@ -49,34 +50,61 @@ export class ConsoleUI {
     }
 
     /**
-     * Colors the text.
+     * Applies formatting and colors to text for console output using specific codes.
+     * This function interprets special codes within the text to apply ANSI escape codes,
+     * enabling rich text formatting and coloring in terminals that support it.
+     *
      * @param text - The text to color.
-     * @param prefix - The prefix.
-     * The default prefix is `&`
-     * Colors and formats
-     * - Formats:
-     * - - `N`: Bold
-     * - - `S`: Underline
-     * - - `P`: Blink
-     * - - `I`: Invert
-     * - - `R`: Reset
-     * - `B`: Used before a color to refer to the background.
-     * - - Example: `&B2Hello` will change the background of the text to green.
-     * - `C`: Used before a color to refer to the text.
-     * - - Example: `&C2Hello` will change the color of the text to green.
-     * - Colors:
-     * - - `(R,G,B)`: an RGB color, replace R, G, and B with their respective values.
-     * - - - No spaces after the `,`
-     * - - - Example: `&B(0,255,0)Hello` will change the background of the text to green.
-     * - - - Example: `&C(0,255,0)Hello` will change the color of the text to green.
-     * - - `0`: Black
-     * - - `1`: White
-     * - - `2`: Green
-     * - - `3`: Cyan
-     * - - `4`: Blue
-     * - - `5`: Magenta
-     * - - `6`: Red
-     * - - `7`: Yellow
+     * @param prefix - The character used to denote a formatting or color code.
+     *                 Defaults to `&`.
+     *
+     * @description
+     * The formatting and coloring system works by identifying sequences starting with the
+     * defined `prefix` followed by a specific code. These codes are then replaced with
+     * the corresponding ANSI escape codes.
+     *
+     * **Available Codes:**
+     *
+     * - **Formats:** Modify the style of the text.
+     *   - `%prefix%N`: **Bold** - Makes the text bold.
+     *   - `%prefix%S`: Underline - Underlines the text.
+     *   - `%prefix%P`: Blink - Makes the text blink. (May not be supported by all terminals)
+     *   - `%prefix%I`: Invert - Swaps the foreground and background colors.
+     *   - `%prefix%R`: Reset - Resets all formatting and colors to the default. This is automatically applied at the end of the formatted text.
+     *
+     * - **Color Types:** Determine whether to apply color to the foreground (text) or background.
+     *   - `%prefix%C`: Followed by a color code, sets the text (foreground) color.
+     *   - `%prefix%B`: Followed by a color code, sets the background color.
+     *
+     * - **Standard Colors:** Used with `%prefix%C` or `%prefix%B`.
+     *   - `0`: Black
+     *   - `1`: Red
+     *   - `2`: Green
+     *   - `3`: Yellow
+     *   - `4`: Blue
+     *   - `5`: Magenta
+     *   - `6`: Cyan
+     *   - `7`: White
+     *
+     * - **RGB Colors:** Allows for a wider range of colors using RGB values (0-255).
+     *   - `%prefix%C(R,G,B)`: Sets the text color using the specified R, G, and B values.
+     *     - Example: `&C(255,0,0)This text is red.`
+     *   - `%prefix%B(R,G,B)`: Sets the background color using the specified R, G, and B values.
+     *     - Example: `&B(0,255,0)This has a green background.`
+     *   - **Note:** Do not include spaces after the commas within the parentheses.
+     *
+     * **Combining Codes:**
+     * Multiple codes can be combined in sequence. For example, `&N&C1Hello` would make "Hello" bold and red.
+     * The order of color and format codes can matter for the final appearance.
+     *
+     * **Examples:**
+     * - `&N&C4Bold Blue Text&R`: Displays "Bold Blue Text" in bold and blue, then resets formatting.
+     * - `&B2Green Background&R`: Displays "Green Background" with a green background, then resets formatting.
+     * - `&C(255,165,0)&SOrange Underlined Text&R`: Displays "Orange Underlined Text" in orange and underlined, then resets.
+     * - `&IInverted Colors&R`: Displays "Inverted Colors" with foreground and background colors swapped, then resets.
+     * - `&N&C1Error: &R&C7File not found.` : Displays "Error:" in bold red and "File not found." in white, then resets.
+     *
+     * @returns The formatted text with ANSI escape codes.
      */
     public static formatText(text: string, prefix: string = '&'): string {
         const formatExp = new RegExp(this.formatString.replace('%prefix%', prefix), 'g');
