@@ -1,47 +1,48 @@
 /**
  * @author diegofmo0802 <diegofmo0802@mysaml.com>
- * @description contains the basic functionalities for module saml tools
+ * @description Provides utilities for console interaction, including text formatting and coloring.
  * @license Apache-2.0
  */
 
 export class ConsoleUI {
     private static formatString = '%prefix%((?:(?:[BC])[0-7])|[NSPIR])';
     private static rgbString = '%prefix%(?:([BC])\\((?:([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}))\\))';
-    private static formats = {
-        // Var - Code          --      Text color
-        C0:   '\x1B[30m',         // Black
-        C1:   '\x1B[31m',         // Red
-        C2:   '\x1B[32m',         // Green
-        C3:   '\x1B[33m',         // Yellow
-        C4:   '\x1B[34m',         // Blue
-        C5:   '\x1B[35m',         // Magenta
-        C6:   '\x1B[36m',         // Cyan
-        C7:   '\x1B[37m',         // White
-        C:    '\x1B[38;2;R;G;Bm', //(R,G,B)
-        // Var - Code          --      Background color
-        B0:   '\x1B[40m',         // Black
-        B1:   '\x1B[41m',         // Red
-        B2:   '\x1B[42m',         // Green
-        B3:   '\x1B[43m',         // Yellow
-        B4:   '\x1B[44m',         // Blue
-        B5:   '\x1B[45m',         // Magenta
-        B6:   '\x1B[46m',         // Cyan
-        B7:   '\x1B[47m',         // White
-        B:    '\x1B[48;2;R;G;Bm', //(R,G,B)
-        // Var - Code          --      Text format
-        N:    '\x1B[1m',          // Bold
-        S:    '\x1B[4m',          // Underline
-        P:    '\x1B[5m',          // Blink
-        I:    '\x1B[7m',          // Invert
-        R:    '\x1B[0m',          // Reset
+    private static readonly formats = {
+        // Var: Code    // Text color
+        C0: '\x1B[30m', // Black
+        C1: '\x1B[31m', // Red
+        C2: '\x1B[32m', // Green
+        C3: '\x1B[33m', // Yellow
+        C4: '\x1B[34m', // Blue
+        C5: '\x1B[35m', // Magenta
+        C6: '\x1B[36m', // Cyan
+        C7: '\x1B[37m', // White
+        C: '\x1B[38;2;R;G;Bm', // (R,G,B)
+        // Var: Code    // Background color
+        B0: '\x1B[40m', // Black background
+        B1: '\x1B[41m', // Red background
+        B2: '\x1B[42m', // Green background
+        B3: '\x1B[43m', // Yellow background
+        B4: '\x1B[44m', // Blue background
+        B5: '\x1B[45m', // Magenta background
+        B6: '\x1B[46m', // Cyan background
+        B7: '\x1B[47m', // White background
+        B: '\x1B[48;2;R;G;Bm', // (R,G,B)
+        // Var: Code     // Text format
+        N:    '\x1B[1m', // Bold
+        S:    '\x1B[4m', // Underline
+        P:    '\x1B[5m', // Blink
+        I:    '\x1B[7m', // Invert
+        R:    '\x1B[0m', // Reset
         none: ''
     };
 
     /**
      * Delete text formats and colors.
-     * @param text - The text to clean.
-     * @param prefix - The prefix.
-     * @returns The cleaned text.
+     * Removes all custom formatting and color codes from a string,
+     * returning a plain text string.
+     * @param text - The input string potentially containing formatting codes.
+     * @param prefix - The custom prefix used for formatting codes (default: '&').
      */
     public static cleanFormat(text: string, prefix: string = '&'): string {
         const formatExp = new RegExp(this.formatString.replace('%prefix%', prefix), 'g');
@@ -51,67 +52,69 @@ export class ConsoleUI {
 
     /**
      * Applies formatting and colors to text for console output using specific codes.
-     * This function interprets special codes within the text to apply ANSI escape codes,
-     * enabling rich text formatting and coloring in terminals that support it.
+     * This method processes a string, replacing custom formatting and color codes with
+     * ANSI escape codes to enable rich text output in terminals that support them.
      *
-     * @param text - The text to color.
+     * @param text - The input string containing formatting codes.
      * @param prefix - The character used to denote a formatting or color code.
      *                 Defaults to `&`.
      *
-     * @description
+     * @returns The formatted string with ANSI escape codes.
+     *
+     * ---
+     *
      * The formatting and coloring system works by identifying sequences starting with the
      * defined `prefix` followed by a specific code. These codes are then replaced with
      * the corresponding ANSI escape codes.
      *
      * **Available Codes:**
      *
-     * - **Formats:** Modify the style of the text.
-     *   - `%prefix%N`: **Bold** - Makes the text bold.
-     *   - `%prefix%S`: Underline - Underlines the text.
-     *   - `%prefix%P`: Blink - Makes the text blink. (May not be supported by all terminals)
-     *   - `%prefix%I`: Invert - Swaps the foreground and background colors.
-     *   - `%prefix%R`: Reset - Resets all formatting and colors to the default. This is automatically applied at the end of the formatted text.
+     * | Code             | Description                                     | Example        |
+     * | ---------------- | ----------------------------------------------- | -------------- |
+     * | `%prefix%N`      | **Bold**                                        | `&NBold Text&R`|
+     * | `%prefix%S`      | Underline                                       | `&SUnderlined&R`|
+     * | `%prefix%P`      | Blink (Support varies)                          | `&PBlinking&R` |
+     * | `%prefix%I`      | Invert (Swap foreground/background)             | `&IInverted&R` |
+     * | `%prefix%R`      | Reset (All formatting)                          | `&RNormal&R`   |
      *
-     * - **Color Types:** Determine whether to apply color to the foreground (text) or background.
-     *   - `%prefix%C`: Followed by a color code, sets the text (foreground) color.
-     *   - `%prefix%B`: Followed by a color code, sets the background color.
+     * | Standard Colors | Description       | Foreground Code | Background Code | Example       |
+     * | --------------- | ----------------- | --------------- | --------------- | ------------- |
+     * | `0`             | Black             | `%prefix%C0`    | `%prefix%B0`    | `&C0Black&R`  |
+     * | `1`             | Red               | `%prefix%C1`    | `%prefix%B1`    | `&B1Red BG&R` |
+     * | `2`             | Green             | `%prefix%C2`    | `%prefix%B2`    | `&C2Green&R`|
+     * | `3`             | Yellow            | `%prefix%C3`    | `%prefix%B3`    | `&B3Yellow BG&R`|
+     * | `4`             | Blue              | `%prefix%C4`    | `%prefix%B4`    | `&C4Blue&R` |
+     * | `5`             | Magenta           | `%prefix%C5`    | `%prefix%B5`    | `&B5Magenta BG&R`|
+     * | `6`             | Cyan              | `%prefix%C6`    | `%prefix%B6`    | `&C6Cyan&R` |
+     * | `7`             | White             | `%prefix%C7`    | `%prefix%B7`    | `&B7White BG&R`|
      *
-     * - **Standard Colors:** Used with `%prefix%C` or `%prefix%B`.
-     *   - `0`: Black
-     *   - `1`: Red
-     *   - `2`: Green
-     *   - `3`: Yellow
-     *   - `4`: Blue
-     *   - `5`: Magenta
-     *   - `6`: Cyan
-     *   - `7`: White
+     * | RGB Colors          | Description                                   | Example (Text) | Example (BG) |
+     * | ------------------- | --------------------------------------------- | -------------- | ------------ |
+     * | `%prefix%C(R,G,B)`  | Foreground color using RGB (0-255 for R,G,B) | `&C(255,0,0)Red` | N/A          |
+     * | `%prefix%B(R,G,B)`  | Background color using RGB (0-255 for R,G,B) | N/A            | `&B(0,0,255)Blue BG` |
      *
-     * - **RGB Colors:** Allows for a wider range of colors using RGB values (0-255).
-     *   - `%prefix%C(R,G,B)`: Sets the text color using the specified R, G, and B values.
-     *     - Example: `&C(255,0,0)This text is red.`
-     *   - `%prefix%B(R,G,B)`: Sets the background color using the specified R, G, and B values.
-     *     - Example: `&B(0,255,0)This has a green background.`
-     *   - **Note:** Do not include spaces after the commas within the parentheses.
+     * **Notes:**
      *
-     * **Combining Codes:**
-     * Multiple codes can be combined in sequence. For example, `&N&C1Hello` would make "Hello" bold and red.
-     * The order of color and format codes can matter for the final appearance.
+     * - Do not include spaces after the commas within the parentheses for RGB codes.
+     * - Multiple codes can be combined, e.g., `&N&C1Bold Red Text&R`.
+     * - The `%prefix%R` code is automatically appended to the end of the output string
+     *   to ensure subsequent console output is not affected by the formatting.
+     * - Terminal support for colors and formatting may vary.
+     * ---
      *
      * **Examples:**
      * - `&N&C4Bold Blue Text&R`: Displays "Bold Blue Text" in bold and blue, then resets formatting.
-     * - `&B2Green Background&R`: Displays "Green Background" with a green background, then resets formatting.
+     * - `&B2Green Background&R`: Displays "Green Background" with a green background and default text color, then resets.
      * - `&C(255,165,0)&SOrange Underlined Text&R`: Displays "Orange Underlined Text" in orange and underlined, then resets.
      * - `&IInverted Colors&R`: Displays "Inverted Colors" with foreground and background colors swapped, then resets.
      * - `&N&C1Error: &R&C7File not found.` : Displays "Error:" in bold red and "File not found." in white, then resets.
-     *
-     * @returns The formatted text with ANSI escape codes.
      */
     public static formatText(text: string, prefix: string = '&'): string {
         const formatExp = new RegExp(this.formatString.replace('%prefix%', prefix), 'g');
         const rgbExp = new RegExp(this.rgbString.replace('%prefix%', prefix), 'g');
         return `${text
             .replace(formatExp, (result, format) => this.formats[format as ConsoleUI.formatKey])
-            .replace(rgbExp, (result, type, R, G, B) => (this.formats[type as ConsoleUI.formatKey]
+            .replace(rgbExp, (result, type, _fullRgb, R, G, B) => (this.formats[type as ConsoleUI.formatKey]
                 .replace('R', R)
                 .replace('G', G)
                 .replace('B', B)
