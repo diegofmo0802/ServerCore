@@ -160,19 +160,19 @@ export class Debug {
     }
     /**
      * Logs data with a '[WRN]' prefix using the default debug instance.
-     * @param Data - Data to log
+     * @param data - Data to log
      */
-    public static warn(...Data: any): void {
+    public static warn(...data: any): void {
         const debug = this.getInstance();
-        debug.warn(...Data);
+        debug.warn(...data);
     }
     /**
      * Logs data with an '[ERR]' prefix using the default debug instance.
-     * @param Data - Data to log
+     * @param data - Data to log
      */
-    public static error(...Data: any): void {
+    public static error(...data: any): void {
         const debug = this.getInstance();
-        debug.error(...Data);
+        debug.error(...data);
     }
 	/**
 	 * Clean a path.
