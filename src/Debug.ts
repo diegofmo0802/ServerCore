@@ -21,8 +21,8 @@ export class Debug {
     /**
      * Retrieves an existing debug instance by its ID or creates a new one if it doesn't exist.
      * @param id - The unique identifier for the debug instance. Defaults to `'_debug'`.
-	 * @param options - Debug instance options
-     * @returns The debug instance
+	 * @param options - Debug instance options.
+     * @returns The debug instance.
      */
     public static getInstance(id: string = '_debug', options: Debug.options = {}): Debug {
         const debug = Debug.debugs.get(id)
@@ -34,7 +34,7 @@ export class Debug {
     /**
      * Constructs a new Debug instance. This constructor is private and should not be called directly. Use `Debug.getInstance()` instead.
      * @param id - The unique identifier for the debug instance. Defaults to `'_default'`.
-	 * @param options - Debug instance options
+	 * @param options - Debug instance options.
      */
     private constructor(id: string = '_default', options: Debug.options = {}) {
         const { path = '.debug', show = true, save = true } = options;
@@ -61,7 +61,7 @@ export class Debug {
     }
 	/**
 	 * Retrieves or creates the write stream to the debug file associated with this instance.
-	 * @returns The stream to the debug file
+	 * @returns The stream to the debug file.
 	 */
 	private getStream(): WriteStream {
 		if (!this.stream)  {
@@ -160,7 +160,7 @@ export class Debug {
     }
     /**
      * Logs data with a '[WRN]' prefix using the default debug instance.
-     * @param data - Data to log
+     * @param data - Data to log.
      */
     public static warn(...data: any): void {
         const debug = this.getInstance();
@@ -168,7 +168,7 @@ export class Debug {
     }
     /**
      * Logs data with an '[ERR]' prefix using the default debug instance.
-     * @param data - Data to log
+     * @param data - Data to log.
      */
     public static error(...data: any): void {
         const debug = this.getInstance();
@@ -176,8 +176,8 @@ export class Debug {
     }
 	/**
 	 * Clean a path.
-	 * @param path - Path to clean
-	 * @returns Cleaned path
+	 * @param path - Path to clean.
+	 * @returns Cleaned path.
 	 */
 	private static cleanPath(path: string): string {
 		path = Utilities.Path.normalize(path);
@@ -187,10 +187,10 @@ export class Debug {
 	}
     /**
      * Get the path to the debug file.
-	 * @param id - Debug instance ID
-	 * @param folderPath - Path to the debug folder
-	 * @param date - Date of the debug instance
-     * @returns The path to the debug file
+	 * @param id - Debug instance ID.
+	 * @param folderPath - Path to the debug folder.
+	 * @param date - Date of the debug instance.
+     * @returns The path to the debug file.
      */
     private static getFilePath(id: string, folderPath: string, date: Debug.Date): string {
         const file = `[${id}] - ${date.hour}.${date.minute}.${date.second}.${date.millisecond}.DSaml`;
@@ -200,10 +200,10 @@ export class Debug {
     }
     /**
      * Generate a stream to the debug file.
-	 * @param id - Debug instance ID
-	 * @param filePath - Path to the debug file
-	 * @param date - Date of the debug instance
-     * @returns The stream to the debug file
+	 * @param id - Debug instance ID.
+	 * @param filePath - Path to the debug file.
+	 * @param date - Date of the debug instance.
+     * @returns The stream to the debug file.
      */
     private static generateStream(filePath: string): WriteStream {
         const folder = filePath.slice(0, filePath.lastIndexOf('/'));
@@ -213,15 +213,15 @@ export class Debug {
     }
 	/**
 	 * Decorate a timestamp with color codes.
-	 * @param timestamp - timestamp to decorate
-	 * @returns Decorated timestamp
+	 * @param timestamp - timestamp to decorate.
+	 * @returns Decorated timestamp.
 	 */
 	private static decorateTimestamp(timestamp: string): string {
 		return ConsoleUI.formatText(`&C(255,255,255)${timestamp}&R`);
 	}
     /**
      * Generate a datetime timestamp.
-     * @returns Formatted datetime timestamp
+     * @returns Formatted datetime timestamp.
      */
     private static getTimestamp(): string {
         const now = Debug.getDate();
@@ -230,7 +230,7 @@ export class Debug {
     }
     /**
      * Get the current date and time in formatted parts.
-     * @returns Object containing date parts and full formats
+     * @returns Object containing date parts and full formats.
      */
     private static getDate(): Debug.Date {
         const now   = new Date();

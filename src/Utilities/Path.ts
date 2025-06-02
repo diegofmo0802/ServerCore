@@ -6,8 +6,8 @@ export class Path {
     public static readonly moduleMain: string = PATH.join(this.moduleDir, 'build/ServerCore.js');
     /**
      * Normalizes a path by replacing all backslashes with the system-specific separator.
-     * @param path - The path to clean
-     * @returns The normalized path
+     * @param path - The path to clean.
+     * @returns The normalized path.
      */
     public static normalize(path: string): string {
         path = path.replace(/[\\/]/gi, PATH.sep);
@@ -15,8 +15,8 @@ export class Path {
     }
     /**
      * Converts a relative path to an absolute one, relative to the module root directory.
-     * @param path - The relative path
-     * @returns The absolute path
+     * @param path - The relative path.
+     * @returns The absolute path.
      */
     public static relative(path: string): string {
         path = this.normalize(path);

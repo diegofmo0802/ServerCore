@@ -26,7 +26,7 @@ export class Config implements Config.Main {
     public set showAll(value: boolean) { Debug.showAll = value; }
     /**
      * Get the default templates.
-     * @returns The default templates
+     * @returns The default templates.
      */
     public static defaultTemplates(): Config.Templates {
         return {

@@ -123,9 +123,9 @@ export class ConsoleUI {
     }
 
     /**
-     * Sends a message to the user through the console
-     * @param message - The message(s) you want to send to the user
-     * @param newLine - Whether there is a line break or not
+     * Sends a message to the user through the console.
+     * @param message - The message(s) you want to send to the user.
+     * @param newLine - Whether there is a line break or not.
      */
     public static send(message: string | string[], newLine?: boolean): void {
         if (typeof message === 'string') {
