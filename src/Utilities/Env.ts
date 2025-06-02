@@ -4,22 +4,26 @@ import PATH from "path";
 import Debug from "../Debug.js";
 
 export class Env {
+    /**
+     * Gets all current environment variables.
+     * @returns An object containing key-value pairs of environment variables.
+     */
     public static get variables(): Env.EnvList { return process.env; }
     /**
-     * Check if a file exists
-     * @param path - The path to the file
-     * @returns A promise that resolves to true if the file exists, false otherwise
+     * Checks if a file exists asynchronously.
+     * @param path - The path to the file.
+     * @returns A promise that resolves to `true` if the file exists, `false` otherwise.
      */
     public static async fileExists(path: string): Promise<boolean> {
         return FSPromises.access(path).then(() => true).catch(() => false);
     }
     /**
-     * Load the environment variables from the given path
-     * @param path - The path to the environment variables file
-     * @param options - Options to load the environment variables
-     * @returns The loaded environment variables as an object
-     * @throws Error if the environment variables file does not exist and cannot be created
-     * @throws Error if the environment variables file is not readable
+     * Load the environment variables from the given path.
+     * @param path - The path to the environment variables file.
+     * @param options - Options to load the environment variables.
+     * @returns A promise that resolves with the loaded environment variables as an object.
+     * @throws Error if the environment variables file does not exist and cannot be created.
+     * @throws Error if the environment variables file is not readable.
      */
     public static async load(path: string, options: Env.LoadOptions = {}): Promise<Env.EnvList> {
         Debug.log(`loading environment variables from &C6[${path}]`);
@@ -41,12 +45,12 @@ export class Env {
         return result;
     }
     /**
-     * Load the environment variables from the given path synchronously
-     * @param path - The path to the environment variables file
-     * @param options - Options to load the environment variables
-     * @returns The loaded environment variables as an object
-     * @throws Error if the environment variables file does not exist and cannot be created
-     * @throws Error if the environment variables file is not readable
+     * Load the environment variables from the given path synchronously.
+     * @param path - The path to the environment variables file.
+     * @param options - Options to load the environment variables.
+     * @returns The loaded environment variables as an object.
+     * @throws Error if the environment variables file does not exist and cannot be created.
+     * @throws Error if the environment variables file is not readable.
      */
     public static loadSync(path: string, options: Env.LoadOptions = {}): Env.EnvList {
         Debug.log(`loading environment variables from &C6[${path}]`);
@@ -68,10 +72,10 @@ export class Env {
         return result;
     }
     /**
-     * Extract the environment variables from the given content
-     * @param content - The content to extract the environment variables from
-     * @param defaultEnv - The default environment variables to use if none are found
-     * @returns The extracted environment variables as an object
+     * Extract the environment variables from the given content.
+     * @param content - The content to extract the environment variables from.
+     * @param defaultEnv - An optional object of default environment variables to include if not present in the content.
+     * @returns An object containing the extracted environment variables merged with defaults.
      */
     private static extractEnv(content: string, defaultEnv: Env.EnvList = {}): Env.EnvList {
         const lines = content.split('\n');
@@ -92,12 +96,12 @@ export class Env {
         return result;
     }
     /**
-     * Get the value of an environment variable
-     * @param key - The environment variable key
-     * @param options - Options to get the environment variable
-     * @param options.default - The default value to return if the environment variable is not set
-     * @param options.warning - Whether to show a warning if the environment variable is not set
-     * @returns The value of the environment variable or undefined if not set
+     * Get the value of an environment variable.
+     * @param key - The key of the environment variable to get.
+     * @param options - Options to get the environment variable.
+     * @param options.default - The default value to return if the environment variable is not set.
+     * @param options.warning - If `true`, a warning will be logged if the environment variable is not set.
+     * @returns The value of the environment variable or undefined if not set.
      */
     public static get(key: string, options: Env.getOptionsGranted): string;
     public static get(key: string, options: Env.getOptions): string | undefined
@@ -109,31 +113,31 @@ export class Env {
         return defaultVal;
     }
     /**
-     * Set an environment variable
-     * @param key - The environment variable key
-     * @param value - The value to set
+     * Set an environment variable.
+     * @param key - The key of the environment variable to set.
+     * @param value - The value to set for the environment variable.
      */
     public static set(key: string, value: string): void {
         process.env[key] = value;
     }
     /**
-     * Set multiple environment variables at once
-     * @param env - An object containing key-value pairs of environment variables
+     * Sets multiple environment variables from an object.
+     * @param env - An object containing key-value pairs of environment variables to set.
      */
     public static setMany(env: Env.EnvList): void {
         for (const key in env) process.env[key] = env[key] ?? '';
     }
     /**
-     * Delete an environment variable
-     * @param key - The environment variable key to delete
+     * Delete an environment variable.
+     * @param key - The key of the environment variable to delete.
      */
     public static delete(key: string): void {
         delete process.env[key];
     }
     /**
-     * Convert an EnvList to a .env-formatted string
-     * @param env - The environment variables object
-     * @returns A string in .env format
+     * Convert an EnvList to a .env-formatted string.
+     * @param env - The environment variables object.
+     * @returns A string in .env format.
      */
     public static toEnv(env: Env.EnvList): string {
         const filtered = Object.entries(env).filter(([key, value]) => typeof key === 'string' && typeof value === 'string');
