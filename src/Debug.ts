@@ -28,8 +28,13 @@ export class Debug {
     public static getInstance(id: string = '_debug', options: Debug.options = {}): Debug {
         const debug = Debug.debugs.get(id)
 		if (!debug) return new Debug(id, options);
-		debug.save = options.save ?? debug.save;
-		debug.show = options.show ?? debug.show;
+        else if (Object.keys(options).length > 0) {
+            const called_in = new Error().stack?.split('\n')[2].trim();
+            this.warn(`The options of the debug instance with ID &C6${id}&R were overwritten &C6${called_in}`);
+            debug.save = options.save ?? debug.save;
+            debug.show = options.show ?? debug.show;
+            if (options.path) this.warn(`The path of the debug instance with ID &C6${id}&R cant be overwritten before the initialization, the option will be ignored &C6${called_in}`);
+        }
 		return debug;
     }
     /**
