@@ -10,6 +10,7 @@ import Utilities from './Utilities/Utilities.js';
 
 export class Debug {
 	private static debugs: Debug.debugMap = new Map();
+    private static timestampFormat = '&C(255,255,255)[DD-MM-YYYY] [hh:mm:ss:ms]&R'
     public static showAll: boolean = false;
     private id: string;
     public show: boolean;
@@ -87,30 +88,32 @@ export class Debug {
      * Logs data with a '[LOG]' prefix to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public log(...data: any[]): void { this.customLog('&C2[LOG]', ...data); }
+    public log(...data: any[]): void { this.customLog(data, { prefix: '&C2[LOG]' }); }
     /**
      * Logs data with an '[INF]' prefix (for informational messages) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public info(...data: any[]): void { this.customLog('&C6[INF]', ...data); }
+    public info(...data: any[]): void { this.customLog(data, { prefix: '&C6[INF]' }); }
     /**
      * Logs data with a '[WRN]' prefix (for warnings) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public warn(...data: any[]): void { this.customLog('&C3[WRN]', ...data); }
+    public warn(...data: any[]): void { this.customLog(data, { prefix: '&C3[WRN]' }); }
     /**
      * Logs data with an '[ERR]' prefix (for errors) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public error(...data: any[]): void { this.customLog('&C1[ERR]', ...data); }
+    public error(...data: any[]): void { this.customLog(data, { prefix: '&C1[ERR]' }); }
     /**
      * Logs data with a custom prefix to the console (if enabled) and/or the debug file (if enabled).
      * @param data - Data to log
+     * @param options - Log options
      */
-    public customLog(prefix: string, ...data: any[]): void {
+    public customLog(data: any[], options: Debug.LogOptions): void {
+        const { prefix = ` &C2[LOG] [${this.id}&C2]`, show = this.show, save = this.save } = options;
         const timestamp = Debug.getTimestamp();
-        if (this._save) this.saveLog(timestamp, prefix, ...data);
-        if (this.show || Debug.showAll) this.showLog(timestamp, prefix, ...data);
+        if (save) this.saveLog(timestamp, prefix, ...data);
+        if (show || Debug.showAll) this.showLog(timestamp, prefix, ...data);
     }
 	/**
 	 * Displays the log entry on the console.
@@ -119,7 +122,6 @@ export class Debug {
 	 * @param data - The data to be displayed.
 	 */
 	private showLog(timestamp: string, prefix: string, ...data: any[]): void {
-        timestamp = Debug.decorateTimestamp(timestamp);
         timestamp = ConsoleUI.formatText(timestamp);
         prefix = ConsoleUI.formatText(prefix);
 		const toShow = data.map((Datum) => typeof Datum === 'string' ?
@@ -211,22 +213,33 @@ export class Debug {
         const stream = fs.createWriteStream(filePath, 'utf8');
         return stream;
     }
-	/**
-	 * Decorate a timestamp with color codes.
-	 * @param timestamp - timestamp to decorate.
-	 * @returns Decorated timestamp.
-	 */
-	private static decorateTimestamp(timestamp: string): string {
-		return ConsoleUI.formatText(`&C(255,255,255)${timestamp}&R`);
-	}
     /**
      * Generate a datetime timestamp.
+     * @param format - Timestamp format.
      * @returns Formatted datetime timestamp.
+     * @example `[DD-MM-YYYY] [hh:mm:ss:ms]`
+     * 
+     * | variable | value  |
+     * | -------- | ------ |
+     * | DD       | day    |
+     * | MM       | month  |
+     * | YYYY     | year   |
+     * | hh       | hour   |
+     * | mm       | minute |
+     * | ss       | second |
      */
-    private static getTimestamp(): string {
+    private static getTimestamp(format: string = this.timestampFormat, date: Debug.Date = this.getDate()): string {
         const now = Debug.getDate();
-        const prefix = `[${now.hour}:${now.minute}:${now.second}:${now.millisecond}]`;
-        return prefix;
+        // const timestamp = `[${now.hour}:${now.minute}:${now.second}:${now.millisecond}]`;
+        const timestamp = format
+            .replace(/DD/g, now.day)
+            .replace(/MM/g, now.month)
+            .replace(/YYYY/g, now.year)
+            .replace(/hh/g, now.hour)
+            .replace(/mm/g, now.minute)
+            .replace(/ss/g, now.second)
+            .replace(/ms/g, now.millisecond);
+        return timestamp;
     }
     /**
      * Get the current date and time in formatted parts.
@@ -256,6 +269,16 @@ export class Debug {
 
 export namespace Debug {
     export type debugMap = Map<string, Debug>;
+    export interface LogOptions {
+        /** The prefix to use for the log entry. */
+        prefix?: string;
+        /** The separator to use between the prefix and the data. */
+        separator?: string;
+        /** Whether to show the log entry on the console. */
+        show?: boolean;
+        /** Whether to save the log entry to the debug file. */
+        save?: boolean;
+    }
 	export interface options {
 		path?: string;
 		show?: boolean;
