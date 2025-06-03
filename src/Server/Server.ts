@@ -78,22 +78,22 @@ export class Server {
 	 */
 	public async stop(): Promise<void> {
 		try {
-			$logger.info('&C6╭─────────────────────────────');
-			$logger.info('&C6│ &C1Stopping server...');
+			$logger.info('&C(255,180,220)╭─────────────────────────────');
+			$logger.info('&C(255,180,220)│ &C1Stopping server...');
 			if (this.HttpServer) {
 				await this.stopHTTP();
-				$logger.info('&C6│   &C3✔ HTTP server stopped');
+				$logger.info('&C(255,180,220)│   &C3✔ HTTP server stopped');
 			}
 			if (this.HttpsServer) {
 				await this.stopHTTPS();
-				$logger.info('&C6│   &C3✔ HTTPS server stopped');
+				$logger.info('&C(255,180,220)│   &C3✔ HTTPS server stopped');
 			}
-			$logger.info('&C6│ &C2✔ All servers stopped successfully');
-			$logger.info('&C6╰─────────────────────────────');
+			$logger.info('&C(255,180,220)│ &C2✔ All servers stopped successfully');
+			$logger.info('&C(255,180,220)╰─────────────────────────────');
 		} catch(error) {
-			$logger.error('&C1✖ Error stopping server: &R&C6' + (error instanceof Error ? error.message : error));
+			$logger.error('&C(255,180,220)│ &C1✖ Error stopping server: &R&C6' + (error instanceof Error ? error.message : error));
 			
-			$logger.info('&C2╰─────────────────────────────');
+			$logger.info('&C(255,180,220)╰─────────────────────────────');
 		}
 	}
 	/**
