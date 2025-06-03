@@ -80,19 +80,21 @@ export class Server {
 		try {
 			$logger.info('&C(255,180,220)╭─────────────────────────────');
 			$logger.info('&C(255,180,220)│ &C1Stopping server...');
+			if (!this.HttpServer && !this.HttpsServer) throw Error('No server to stop');
 			if (this.HttpServer) {
 				await this.stopHTTP();
+				this.HttpServer = null;
 				$logger.info('&C(255,180,220)│   &C3✔ HTTP server stopped');
 			}
 			if (this.HttpsServer) {
 				await this.stopHTTPS();
+				this.HttpsServer = null;
 				$logger.info('&C(255,180,220)│   &C3✔ HTTPS server stopped');
 			}
 			$logger.info('&C(255,180,220)│ &C2✔ All servers stopped successfully');
 			$logger.info('&C(255,180,220)╰─────────────────────────────');
 		} catch(error) {
 			$logger.error('&C(255,180,220)│ &C1✖ Error stopping server: &R&C6' + (error instanceof Error ? error.message : error));
-			
 			$logger.info('&C(255,180,220)╰─────────────────────────────');
 		}
 	}
