@@ -25,7 +25,7 @@ export class Debug {
 	 * @param options - Debug instance options.
      * @returns The debug instance.
      */
-    public static getInstance(id: string = '_debug', options: Debug.options = {}): Debug {
+    public static getInstance(id: string = 'Debug', options: Debug.options = {}): Debug {
         const debug = Debug.debugs.get(id)
 		if (!debug) return new Debug(id, options);
         else if (Object.keys(options).length > 0) {
