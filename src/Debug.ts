@@ -84,8 +84,7 @@ export class Debug {
                 '', ''
 			].join('\n'));
 			this.stream = stream;
-            const file = Utilities.Path.relative(this.filePath);
-            this.log(`&C2&PStream created to the debug file: &C6&S${file}`);
+            this.log(`&C2&PStream created to the debug file: &C6&S${this.filePath}`);
 		}
 		return this.stream;
 	}
