@@ -6,7 +6,7 @@
 
 export class ConsoleUI {
     private static formatString = '%prefix%((?:(?:[BC])[0-7])|[NSPIR])';
-    private static rgbString = '%prefix%(?:([BC])\\((?:([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}),([0-2]?[0-9]{1,2}))\\))';
+    private static rgbString = '%prefix%(?:([BC])\\((?:([0-2]?[0-9]{1,2}), ?([0-2]?[0-9]{1,2}), ?([0-2]?[0-9]{1,2}))\\))';
     private static readonly formats = {
         // Var: Code    // Text color
         C0: '\x1B[30m', // Black
