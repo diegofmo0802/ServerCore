@@ -92,22 +92,22 @@ export class Debug {
      * Logs data with a '[LOG]' prefix to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public log(...data: any[]): void { this.customLog(data, { prefix: '&C2[LOG]' }); }
+    public log(...data: any[]): void { this.customLog(data, { prefix: `&C2[LOG] [${this.id}]` }); }
     /**
      * Logs data with an '[INF]' prefix (for informational messages) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public info(...data: any[]): void { this.customLog(data, { prefix: '&C6[INF]' }); }
+    public info(...data: any[]): void { this.customLog(data, { prefix: `&C6[INF] [${this.id}]` }); }
     /**
      * Logs data with a '[WRN]' prefix (for warnings) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public warn(...data: any[]): void { this.customLog(data, { prefix: '&C3[WRN]' }); }
+    public warn(...data: any[]): void { this.customLog(data, { prefix: `&C3[WRN] [${this.id}]` }); }
     /**
      * Logs data with an '[ERR]' prefix (for errors) to the console (if enabled) and/or the debug file (if enabled).
      * @param data - The data to be logged. Can be multiple arguments of any type.
      */
-    public error(...data: any[]): void { this.customLog(data, { prefix: '&C1[ERR]' }); }
+    public error(...data: any[]): void { this.customLog(data, { prefix: `&C1[ERR] [${this.id}]` }); }
     /**
      * Logs data with a custom prefix to the console (if enabled) and/or the debug file (if enabled).
      * @param data - Data to log
