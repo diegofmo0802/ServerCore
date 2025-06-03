@@ -53,7 +53,7 @@ export class Debug {
         this.rootPath = rootPath;
         this.filePath = filePath;
 		this.startDate = now;
-        this.stream =  null;
+        this.stream =  this.getStream();
         Debug.debugs.set(id, this);
     }
 	public get save(): boolean { return this._save; }
