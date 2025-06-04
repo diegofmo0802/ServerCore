@@ -4,9 +4,9 @@
  * @license Apache-2.0
  */
 
-import Request from './Request.js';
-import Response from './Response.js';
-import WebSocket from './WebSocket/WebSocket.js';
+import Request from '../Request.js';
+import Response from '../Response.js';
+import WebSocket from '../WebSocket/WebSocket.js';
 
 export class Rule<T extends keyof Rule.Type = keyof Rule.Type> {
     /** The type of the routing rule */

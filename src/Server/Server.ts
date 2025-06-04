@@ -7,7 +7,6 @@
 import HTTP from 'http';
 import FS from 'fs';
 import HTTPS from 'https';
-import { Duplex } from 'stream';
 
 import Utilities from '../Utilities/Utilities.js';
 import _LoggerManager from '../LoggerManager/LoggerManager.js';
@@ -17,7 +16,7 @@ import _Response from "./Response.js";
 import _Session from "./Session.js";
 import _Cookie from "./Cookie.js";
 import _WebSocket from "./WebSocket/WebSocket.js";
-import _Rule from './Rule.js';
+import _Router from "./Router/Router.js";
 
 const $logger = _LoggerManager.getInstance();
 
@@ -25,7 +24,7 @@ export class Server {
 	private protocol: Server.Protocol | null;
 	private HttpServer: HTTP.Server | null;
 	private HttpsServer: HTTP.Server | null;
-	private rules: Server.Rule[];
+	public router: Server.Router;
 	public config: Server.Config;
 	public logger: Server.LoggerManager;
 	/**
@@ -36,12 +35,12 @@ export class Server {
 	 */
 	public constructor(options?: Server.Config.options | Server.Config) {
 		this.config = options instanceof Server.Config ? options : new Server.Config(options);
-		this.rules = [];
+		this.router = new Server.Router(this.config);
 		this.HttpServer = null;
 		this.HttpsServer = null;
 		this.protocol = null;
 		this.logger = _LoggerManager.getInstance();
-		this.addFolder('/Saml:Global', Utilities.Path.normalize(`${Utilities.Path.moduleDir}/global`));
+		this.router.addFolder('/Saml:Global', Utilities.Path.normalize(`${Utilities.Path.moduleDir}/global`));
 	}
 	/**
 	 * Starts the server.
@@ -131,8 +130,8 @@ export class Server {
 	 */
 	private async initHTTP(port: number, host: string): Promise<HTTP.Server> {
 		const http = HTTP.createServer();
-		http.on('request', this.requestManager.bind(this));
-		http.on('upgrade', this.upgradeManager.bind(this));
+		http.on('request', this.router.requestManager.bind(this.router));
+		http.on('upgrade', this.router.upgradeManager.bind(this.router));
 		return new Promise((resolve) => http.listen(port, host, () => resolve(http)));
 	}
 	/**
@@ -145,58 +144,9 @@ export class Server {
 		const port = sslOptions.port ?? 443;
 		const cert = await Server.loadCertificates(sslOptions.pubKey, sslOptions.privKey);
 		const https = HTTPS.createServer(cert);
-		https.on('request', this.requestManager.bind(this));
-		https.on('upgrade', this.upgradeManager.bind(this));
+		https.on('request', this.router.requestManager.bind(this.router));
+		https.on('upgrade', this.router.upgradeManager.bind(this.router));
 		return new Promise((resolve) => https.listen(port, host, () => resolve(https)));
-	}
-	/**
-	 * Adds one or more routing rules to the server.
-	 * @param rules - The rule(s) to be added.
-	 */
-	public addRules(...rules: Server.Rule[]): Server {
-		this.rules = this.rules.concat(rules);
-		return this;
-	}
-	/**
-	 * Adds an action routing rule.
-	 * @param method - The HTTP method to respond to.
-	 * @param urlRule - The URL path for the action.
-	 * @param action - The action to be executed.
-	 * @param auth - The optional authorization check function.
-	 */
-	public addAction(method: Server.Request.Method, urlRule: string, action: Server.Rule.ActionExec, auth?: Server.Rule.AuthExec): Server {
-		this.addRules(new Server.Rule('Action', method, urlRule, action, auth));
-		return this;
-	}
-	/**
-	 * Adds a file routing rule.
-	 * @param urlRule - The URL path to listen on.
-	 * @param source - The path to the file to be served.
-	 * @param auth - The optional authorization check function.
-	 */
-	public addFile(urlRule: string, source: string, auth?: Server.Rule.AuthExec): Server{
-		this.addRules(new Server.Rule('File', 'GET', urlRule, source, auth));
-		return this;
-	}
-	/**
-	 * Adds a folder routing rule.
-	 * @param urlRule - The URL path to listen on.
-	 * @param source - The directory path to be served.
-	 * @param auth - The optional authorization check function.
-	 */
-	public addFolder(urlRule: string, source: string, auth?: Server.Rule.AuthExec): Server {
-		this.addRules(new Server.Rule('Folder', 'GET', urlRule, source, auth));
-		return this;
-	}
-	/**
-	 * Adds a WebSocket routing rule.
-	 * @param urlRule - The URL path to listen on.
-	 * @param action - The action to be executed on connection.
-	 * @param auth - The optional authorization check function.
-	 */
-	public addWebSocket(urlRule: string, action: Server.Rule.WebSocketExec, auth?: Server.Rule.AuthExec): Server {
-		this.addRules(new Server.Rule('WebSocket', 'ALL', urlRule, action, auth));
-		return this;
 	}
 	/**
 	 * Defines default `.HSaml` templates for the server.
@@ -206,84 +156,6 @@ export class Server {
 	public setTemplate(name: keyof Server.Config.Templates, path: string): Server {
 		this.config.templates[name] = path;
 		return this;
-	}
-	/**
-	 * Routes incoming HTTP requests to be processed.
-	 * @param request - The received HTTP request.
-	 * @param response - The server response handler.
-	 * @throws If no routing rule matches the request.
-	 */
-	private routeRequest(request: Server.Request, response: Server.Response): void {
-		let routed = false;
-		for (const rule of this.rules) {
-			if (rule.test(request)) {
-				if (rule.testAuth(request)) {
-					try { rule.exec(request, response); }
-					catch(error) {
-						$logger.request.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
-						$logger.request.error('&C1Route:', request.method, request.url);
-						response.sendError(500, 'Internal Server Error');
-					}
-				} else response.sendError(403, `You don't have permission to access: ${request.method} -> ${request.url}`);
-				routed = true;
-				break;
-			}
-		}
-		if (!(routed)) response.sendError(400, `No router for: ${request.method} -> ${request.url}`);
-	}
-	/**
-	 * Routes WebSocket connection requests.
-	 * @param request - The received HTTP request.
-	 * @param webSocket - The WebSocket connection with the client.
-	 * @throws If no WebSocket routing rule matches.
-	 */
-	private routeWebSocket(request: Server.Request, webSocket: Server.WebSocket): void {
-		let routed = false;
-		for (const rule of this.rules) {
-			if (rule.test(request, true)) {			
-				if (rule.testAuth(request)) {
-					const AcceptKey = (request.headers['sec-websocket-key'] ?? '').trim();
-					webSocket.acceptConnection(AcceptKey, request.cookies);
-					try { rule.exec(request, webSocket); }
-					catch(error) {
-						$logger.webSocket.error('&C1Error executing rule:&R&C6', (error instanceof Error ? error.message : error));
-						$logger.webSocket.error('&C1Route:', request.method, request.url);
-						webSocket.send('HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\n\r\n');
-						webSocket.end();
-					}
-				} else {
-					webSocket.send('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
-					webSocket.end();
-				}
-				routed = true;
-				break;
-			}
-		}
-		if (!(routed)) webSocket.send(`HTTP/1.1 400 Bad request\r\nNo router for: ${request.method} -> ${request.url}\r\n\r\n`);
-	}
-	/**
-	 * Triggered when the server receives an HTTP request.
-	 * @param HttpRequest - The incoming HTTP request.
-	 * @param HttpResponse - The server response stream.
-	 */
-	private requestManager(HttpRequest: HTTP.IncomingMessage, HttpResponse: HTTP.ServerResponse): void {
-		const request = new Server.Request(HttpRequest);
-		const response = new Server.Response(request, HttpResponse, this.config.templates);
-		const sessionID = request.cookies.get('Session');
-		$logger.request.log(request.ip, request.method, request.url, sessionID);
-		this.routeRequest(request, response);
-	};
-	/**
-	 * Will be executed when the server receives an upgrade request.
-	 * @param HttpRequest The request received by the server.
-	 * @param Socket The socket to respond with (WebSocket upgrade).
-	 */
-	private upgradeManager(HttpRequest: HTTP.IncomingMessage, Socket: Duplex): void {
-		const request = new Server.Request(HttpRequest);
-		const webSocket = new Server.WebSocket(Socket);
-		const sessionID = request.cookies.get('Session');
-		$logger.webSocket.log(request.ip, request.method, request.url, sessionID);
-		this.routeWebSocket(request, webSocket);
 	}
 	/**
 	 * Loads the SSL key and certificate and returns their content as strings.
@@ -311,7 +183,7 @@ export namespace Server {
     export import Response = _Response
     export import Session = _Session
     export import WebSocket = _WebSocket
-    export import Rule = _Rule;
+    export import Router = _Router;
 	export import LoggerManager = _LoggerManager;
     export interface Certificates {
         cert: Buffer | string,
@@ -323,7 +195,6 @@ export namespace Server {
 		port?: number
     };
     export type Protocol = 'HTTP' | 'HTTPS' | 'HTTP/S';
-	export type Rules = Array<Rule>;
 }
 
 export default Server;
