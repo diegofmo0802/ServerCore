@@ -1,3 +1,9 @@
+/**
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
+ * @description Adds a logger manager to have an instance of the ServerCore loggers.
+ * @license Apache-2.0
+ */
+
 import Debug from "../Debug.js";
 import _Logger from "./Logger.js";
 
