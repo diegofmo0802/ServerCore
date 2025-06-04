@@ -1,5 +1,6 @@
 import Server from './Server.js';
 import ConsoleUI from '../ConsoleUI.js';
+import Utilities from '../Utilities/Utilities.js';
 import Logger from '../LoggerManager/Logger.js';
 
 export class DebugUI {
@@ -78,6 +79,7 @@ export class DebugUI {
         this.addCommand('sv-stop', this.server.stop.bind(this.server), { description: '&C6Stops the server', usage: 'stop' });
         this.addCommand('sv-restart', this.server.restart.bind(this.server), { description: '&C6Restarts the server', usage: 'restart' });
         this.addCommand('sv-rules', this.showRules.bind(this), { description: '&C6Shows the server rules', usage: 'rules' });
+        this.addCommand('sv-config', this.showConfig.bind(this), { description: '&C6Shows the server configuration', usage: 'config' });
         this.addCommand('exit-debug', this.stopReadIn.bind(this), { description: '&C6Exits the debug UI', usage: 'exit-debug' });
         this.addCommand('exit', () => process.exit(), { description: '&C6Exits the process', usage: 'exit' });;
     }
@@ -101,6 +103,37 @@ export class DebugUI {
             this.out.info(`&C(255,180,220)│     - &C(255,255,255)Usage: &C6${command.usage ?? ''}`);
             this.out.info(`&C(255,180,220)│     - &C(255,255,255)${command.description ?? ''}`);
         }
+        this.out.info('&C(255,180,220)╰─────────────────────────────────────────────');
+    }
+    /** Prints the server configuration to the console. */
+    private showConfig() {
+        const { config } = this.server;
+        this.out.info('&C(255,180,220)╭─────────────────────────────────────────────');
+        this.out.info('&C(255,180,220)│ &C2 Server Configuration');
+        this.out.info('&C(255,180,220)├─────────────────────────────────────────────');
+        this.out.info(`&C(255,180,220)│ &C3Port: &C6${config.port}`);
+        this.out.info(`&C(255,180,220)│ &C3Host: &C6${config.host}`);
+        if (config.ssl) {
+            this.out.info(`&C(255,180,220)│ &C3ssl options`);
+            this.out.info(`&C(255,180,220)│   - &C3enabled: &C6${config.ssl.port ?? 443}`);
+            this.out.info(`&C(255,180,220)│   - &C3cert: &C6${config.ssl.pubKey}`);
+            this.out.info(`&C(255,180,220)│   - &C3key: &C6${config.ssl.privKey}`);
+        }
+        this.out.info(`&C(255,180,220)│ &C3server templates`);
+        for (const name in config.templates) {
+            const path = config.templates[name];
+            this.out.info(`&C(255,180,220)│   - &C3${name}: &C6${path}`);
+        }
+        this.out.info(`&C(255,180,220)│ &C3Debug options`);
+        this.out.info(`&C(255,180,220)│   - &C3 showAll: &C6${config.showAll}`);
+        this.out.info(`&C(255,180,220)│   - &C3 show server logs: &C6${config.logger.server.show}`);
+        this.out.info(`&C(255,180,220)│   - &C3 save server logs: &C6${config.logger.server.save}`);
+        this.out.info(`&C(255,180,220)│   - &C3 show requests logs: &C6${config.logger.request.show}`);
+        this.out.info(`&C(255,180,220)│   - &C3 save requests logs: &C6${config.logger.request.save}`);
+        this.out.info(`&C(255,180,220)│   - &C3 show responses logs: &C6${config.logger.response.show}`);
+        this.out.info(`&C(255,180,220)│   - &C3 save responses logs: &C6${config.logger.response.save}`);
+        this.out.info(`&C(255,180,220)│   - &C3 show websockets logs: &C6${config.logger.webSocket.show}`);
+        this.out.info(`&C(255,180,220)│   - &C3 save websockets logs: &C6${config.logger.webSocket.save}`);
         this.out.info('&C(255,180,220)╰─────────────────────────────────────────────');
     }
 }
