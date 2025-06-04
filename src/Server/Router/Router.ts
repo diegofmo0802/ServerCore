@@ -1,3 +1,9 @@
+/**
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
+ * @description Manages the routing of the requests and WebSocket connections.
+ * @license Apache-2.0
+*/
+
 import HTTP from 'http';
 import { Duplex } from 'stream';
 
