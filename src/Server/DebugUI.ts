@@ -1,6 +1,11 @@
+/**
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
+ * @description Utility to help with debugging tasks and server development.
+ * @license Apache-2.0
+ */
+
 import Server from './Server.js';
 import ConsoleUI from '../ConsoleUI.js';
-import Utilities from '../Utilities/Utilities.js';
 import Logger from '../LoggerManager/Logger.js';
 
 export class DebugUI {
