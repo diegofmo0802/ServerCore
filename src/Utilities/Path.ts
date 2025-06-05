@@ -23,6 +23,15 @@ export class Path {
         path = PATH.join(this.moduleDir, path);
         return PATH.normalize(path);
     }
+    /**
+     * Gets the directory name of a path.
+     * @param path - The path to get the directory name from.
+     * @returns The directory name.
+     */
+    public static dirname(path: string): string {
+        path = this.normalize(path);
+        return PATH.dirname(path);
+    }
 }
 export namespace Path {}
 export default Path;
