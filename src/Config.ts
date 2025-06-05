@@ -14,16 +14,25 @@ export class Config implements Config.Main {
     public port: number;
     public logger: LoggerManager;
     public ssl: Config.SSLOptions | null;
-    public static instance: Config;
     public constructor(options: Config.options = {}) {
         this.host = options.host ?? 'localhost';
         this.port = options.port ?? 80;
         this.ssl = options.ssl ?? null;
-        this.logger = options.logger ?? LoggerManager.getInstance();
+        this.logger = LoggerManager.getInstance();
         this.templates = options.templates ?? Config.defaultTemplates();
     }
     public get showAll(): boolean { return Debug.showAll; }
     public set showAll(value: boolean) { Debug.showAll = value; }
+    /**
+     * Converts the config to a JSON string.
+     * @returns The JSON string.
+     */
+    public toJson(): string {
+        const { host, port, ssl, templates } = this;
+        const config: Config.Main = { host, port, ssl, templates };
+        const content = JSON.stringify(config, null, 4);
+        return content;
+    }
     /**
      * Get the default templates.
      * @returns The default templates.
@@ -51,7 +60,6 @@ export namespace Config {
         host: string;
         port: number;
         ssl: SSLOptions | null;
-        logger: LoggerManager;
         templates: Templates;
     }
     export type options = Partial<Main>;
