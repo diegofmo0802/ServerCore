@@ -24,10 +24,16 @@ export class Env {
         const setEnv = options.setEnv ?? true;
 
         if (!await Utilities.fileExists(path)) {
-            await FSP.mkdir(PATH.dirname(path), { recursive: true });
-            const env = this.toEnv(defaultEnv);
-            await FSP.writeFile(path, env, 'utf-8');
-            Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
+            try {
+                Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
+                await FSP.mkdir(PATH.dirname(path), { recursive: true });
+                const env = this.toEnv(defaultEnv);
+                await FSP.writeFile(path, env, 'utf-8');
+                Debug.log(`environment variables file &C6[${path}]&R &C2was created successfully`);
+            } catch (error) {
+                Debug.log(`environment variables file &C6[${path}]&R &C1could not be created`);
+                throw error;
+            }
         }
 
         const env = await FSP.readFile(path, 'utf-8');
