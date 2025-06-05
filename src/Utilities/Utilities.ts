@@ -3,10 +3,21 @@
  * @description add useful functions to the server core. 
  * @license Apache-2.0
  */
+
+import { promises as FSP } from "fs";
+
 import _Path from './Path.js';
 import _Env from './Env.js';
 
 export class Utilities {
+    /**
+     * Checks if a file exists asynchronously.
+     * @param path - The path to the file.
+     * @returns A promise that resolves to `true` if the file exists, `false` otherwise.
+     */
+    public static async fileExists(path: string): Promise<boolean> {
+        return FSP.access(path).then(() => true).catch(() => false);
+    }
     /**
      * Compares two objects recursively for deep equality.
      * @param obj1 - The first object to compare.

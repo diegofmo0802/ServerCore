@@ -1,7 +1,8 @@
-import FS, { promises as FSPromises } from "fs";
+import FS, { promises as FSP } from "fs";
 import PATH from "path";
 
 import Debug from "../Debug.js";
+import Utilities from "./Utilities.js";
 
 export class Env {
     /**
@@ -9,14 +10,6 @@ export class Env {
      * @returns An object containing key-value pairs of environment variables.
      */
     public static get data(): Env.EnvList { return process.env; }
-    /**
-     * Checks if a file exists asynchronously.
-     * @param path - The path to the file.
-     * @returns A promise that resolves to `true` if the file exists, `false` otherwise.
-     */
-    public static async fileExists(path: string): Promise<boolean> {
-        return FSPromises.access(path).then(() => true).catch(() => false);
-    }
     /**
      * Load the environment variables from the given path.
      * @param path - The path to the environment variables file.
@@ -30,14 +23,14 @@ export class Env {
         const defaultEnv = options.defaultEnv ?? {};
         const setEnv = options.setEnv ?? true;
 
-        if (!await this.fileExists(path)) {
-            await FSPromises.mkdir(PATH.dirname(path), { recursive: true });
+        if (!await Utilities.fileExists(path)) {
+            await FSP.mkdir(PATH.dirname(path), { recursive: true });
             const env = this.toEnv(defaultEnv);
-            await FSPromises.writeFile(path, env, 'utf-8');
+            await FSP.writeFile(path, env, 'utf-8');
             Debug.log(`environment variables file &C6[${path}]&R does not exist, creating it`);
         }
 
-        const env = await FSPromises.readFile(path, 'utf-8');
+        const env = await FSP.readFile(path, 'utf-8');
         const result = this.extractEnv(env, defaultEnv);
         if (setEnv) this.setMany(result);
 
