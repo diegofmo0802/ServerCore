@@ -1,3 +1,9 @@
+/**
+ * @author diegofmo0802 <diegofmo0802@mysaml.com>
+ * @description add the config validator to use in the config loader.
+ * @license Apache-2.0
+ */
+
 import Config from "./Config.js";
 import Logger from "../LoggerManager/Logger.js";
 
