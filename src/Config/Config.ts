@@ -74,7 +74,7 @@ export namespace Config {
     export type options = Partial<Main>;
 }
 export namespace Config {
-    export const Loader = _ConfigLoader;
-    export const Validator = _ConfigValidator;
+    export import Loader = _ConfigLoader;
+    export import Validator = _ConfigValidator;
 }
 export default Config;
