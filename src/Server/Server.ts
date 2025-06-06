@@ -11,7 +11,7 @@ import HTTPS from 'https';
 import Utilities from '../Utilities/Utilities.js';
 import _LoggerManager from '../LoggerManager/LoggerManager.js';
 import _DebugUI from './DebugUI.js';
-import _Config from '../Config.js';
+import _Config from '../Config/Config.js';
 import _Request from "./Request.js";
 import _Response from "./Response.js";
 import _Session from "./Session.js";

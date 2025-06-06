@@ -4,20 +4,29 @@
  * @license Apache-2.0
  */
 
-import Debug from "./Debug.js";
-import LoggerManager from "./LoggerManager/LoggerManager.js";
-import Utilities from "./Utilities/Utilities.js";
+import Debug from "../Debug.js";
+import LoggerManager from "../LoggerManager/LoggerManager.js";
+import Utilities from "../Utilities/Utilities.js";
+import _ConfigLoader from "./ConfigLoader.js";
+import _ConfigValidator from "./ConfigValidator.js";
+
 
 export class Config implements Config.Main {
+    public static readonly DEFAULT: Config.Main = {
+        host: 'localhost',
+        port: 80,
+        ssl: null,
+        templates: Config.defaultTemplates()
+    };
     public templates: Config.Templates;
     public host: string;
     public port: number;
     public logger: LoggerManager;
     public ssl: Config.SSLOptions | null;
     public constructor(options: Config.options = {}) {
-        this.host = options.host ?? 'localhost';
-        this.port = options.port ?? 80;
-        this.ssl = options.ssl ?? null;
+        this.host = options.host ?? Config.DEFAULT.host;
+        this.port = options.port ?? Config.DEFAULT.port;
+        this.ssl = options.ssl ?? Config.DEFAULT.ssl;
         this.logger = LoggerManager.getInstance();
         this.templates = options.templates ?? Config.defaultTemplates();
     }
@@ -64,5 +73,8 @@ export namespace Config {
     }
     export type options = Partial<Main>;
 }
-
+export namespace Config {
+    export const Loader = _ConfigLoader;
+    export const Validator = _ConfigValidator;
+}
 export default Config;

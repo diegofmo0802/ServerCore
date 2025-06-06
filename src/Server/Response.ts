@@ -11,7 +11,7 @@ import PATH from 'path';
 import Request from './Request.js';
 import Utilities from '../Utilities/Utilities.js';
 import Template from '../Template.js';
-import Config from '../Config.js';
+import Config from '../Config/Config.js';
 
 export class Response {
 	/** Contains the request received by the server. */

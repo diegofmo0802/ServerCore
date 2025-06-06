@@ -6,7 +6,7 @@
  */
 
 // Imports the main utilities of the ServerCore module.
-import Config from "./Config.js";
+import Config from "./Config/Config.js";
 import Debug from "./Debug.js";
 import Logger from "./LoggerManager/Logger.js";
 import Template from "./Template.js";

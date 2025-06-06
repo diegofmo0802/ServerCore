@@ -12,7 +12,7 @@ import Request from '../Request.js';
 import Response from '../Response.js';
 import WebSocket from '../WebSocket/WebSocket.js';
 import LoggerManager from '../../LoggerManager/LoggerManager.js';
-import Config from '../../Config';
+import Config from '../../Config/Config.js';
 
 const $logger = LoggerManager.getInstance();
 
