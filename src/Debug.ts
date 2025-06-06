@@ -128,11 +128,23 @@ export class Debug {
 	private showLog(timestamp: string, prefix: string, ...data: any[]): void {
         timestamp = ConsoleUI.formatText(timestamp);
         prefix = ConsoleUI.formatText(prefix);
-		const toShow = data.map((Datum) => typeof Datum === 'string' ?
-			ConsoleUI.formatText(Datum) : Datum
-		);
+		const toShow = data.map((Datum) => {
+            if (typeof Datum === 'string') {
+                if (!Datum.includes('\n')) return ConsoleUI.formatText(Datum);
+                else return this.formatMultiline(timestamp, prefix, Datum);
+            } else if (Datum instanceof Error) return this.formatMultiline(timestamp, prefix, Datum.stack ?? Datum.message);
+            else Datum;
+        });
 		console.log(`${timestamp} ${prefix} ->`, ...toShow);
 	}
+    private formatMultiline(timestamp: string, prefix: string, data: string): string {
+        timestamp = ConsoleUI.cleanFormat(timestamp);
+        prefix = ConsoleUI.cleanFormat(prefix);
+        const lines = data.split('\n');
+        const first = lines.shift();
+        const result = lines.map((line) => `${timestamp} ${prefix} -> ${line}`);
+        return ConsoleUI.formatText([first, ...result].join('\n'));
+    }
 	/**
 	 * Saves the log entry to the debug file.
      * @param timestamp - The timestamp of the log entry.
