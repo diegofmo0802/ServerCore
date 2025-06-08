@@ -1,372 +1,318 @@
-# Importante
+# 🚀 ServerCore
+
+This project began as a **personal journey** to deeply understand how web servers work in **Node.js**.
+Throughout its development, I’ve gained **tons of new skills and insights** that I’m excited to share.
+
+🛠️ **Continuous Improvement:**
+I constantly refactor the code whenever I spot areas that can be polished or optimized.
+
+🌟 **Real-World Usage:**
+I actively use this module in my own web projects, which means I’m always finding new ideas, enhancements, and opportunities to fix bugs based on feedback.
+
+💡 **Vision:**
+My goal is to make **ServerCore** a tool that helps developers build **APIs**, **PWAs**, **websites**, and—thanks to the [WebApp module](https://github.com/diegofmo0802/WebApp)—**SPAs** with ease and confidence.
+
+Stay tuned for more updates and features! 🚀
+That’s all for now, [diegofmo0802](https://diegofmo0802.github.io) out.
+
+---
+
+# Installation
+
+You can use **npm** to install ServerCore:
+
+* **Stable version**
+
+  ```console
+  mpm install saml.servercore
+  ```
+* **Development version**
+
+  ```console
+  mpm install saml.servercore@dev
+  ```
 
 > [!IMPORTANT]
-> La futura versión **3.7.0** será omitida hasta la versión **4.0.0**.
-> La razón de esta decisión fue que hubo cambios que afectan la compatibilidad
-> entre las versiones **3.6.5** y **3.7.0**:
+> You need to set `"type": "module"` in your `package.json` to use **ServerCore**.
+> This requirement will be removed in a future version, but for now please configure it like this:
 >
-> Se está planteando que las funcionalidades **beta.mail** y **beta.jwt** se muevan a módulos separados.
-> Esta decisión dependerá de qué tan grandes se vuelvan dichas funcionalidades. Por el momento, y para la futura versión **4.0.0**,
-> seguirán estando en el lugar habitual, aunque con ciertos cambios que afectan la compatibilidad con las funciones beta
-> incorporadas en la versión **3.6.5**.
->
-> Recuerda que puedes acceder a la versión de desarrollo descargando la rama **dev** del repositorio o por medio de npm:
-> ```bash
-> npm i mysaml.servercore@Dev
+> ```json
+> {
+>   "name": "my-project",
+>   "main": "index.js",
+>   "type": "module"
+> }
 > ```
->
-> Como último punto, se planea cambiar el nombre del módulo en npm. Se darán detalles cuando se decida cuál será, y se agregará como dependencia a la última versión de **ServerCore** que sea desplegada en npm.
 
+---
 
-# ServerCore
+# Documentation
 
-Hola! soy [diegofmo0802](https://diegofmo0802.github.io).<br/>
-Como comente  anteriormente en mi perfil, ServerCore permitirá:
+## Static Pages
 
-- [x] Crear servidores HTTP y HTTPS.
-- [ ] **En proceso** Sistema de plantillas.
-- [x] Gestionar conexiones WebSocket.
-- [ ] Gestionar negociaciones de WebRTC.
-- [ ] Gestionar notificaciones WebPush.
-
-Es posible que algunos de los puntos anteriores se subdividan en proyectos diferentes<br/>
-o que se cree un gestor de paquetes para implementar las funcionalidades dentro del mismo<br/>
-
-## Sobre el proyecto
-
-Actualmente tengo en local una copia del proyecto con varias de las funcionalidades<br/>
-este comenzó como un proyecto personal y con fines de práctica de pensamiento lógico<br/>
-por lo tanto no tiene las mejores prácticas ni la mejor documentación, sin embargo<br/>
-publicaré el código de esta manera e iré modificando para corregir esto.
-
-```console
-mpm install saml.servercore
-```
-
-**Futuras correcciones**
-
-- [x] Documentar clases y funciones para intellisense.
-- [x] Cambiar los nombres de variables, funciones, clases y descripciones a inglés.
-- [ ] **en proceso** Crear documentación para enseñar a usar el módulo.
-- [ ] **en proceso** Buscar y corregir malas practicas.
-
-Esto es todo por el momento, [diegofmo0802](https://diegofmo0802.github.io) se retira.
-
-# Documentación 
-
-Primero debemos instalar el modulo usando
-
-```console
-mpm install saml.servercore
-```
-
-También es necesario que en tu package.json este el proyecto como type: module
-```json
-{
-  "name": "my-project",
-  "main": "index.js",
-  "type": "module"
-}
-```
-
-Una ves tengas ServerCore en tu proyecto y lo hayas configurado como modulo debes importarlo<br/>
--->
-- Si en tu package.json tienes la propiedad `"type": "module"`:
-  ```js
-  import ServerCore from 'saml.servercore';
-  ```
-- Si no tienes esta propiedad usa:
-  ```js
-  //Actualmente no esta soportado, en futuras versiones se ampliara su compatibilidad
-  ```
-
-## Servidor HTTP
-
-Para crear un servidor HTTP puedes hacerlo de diferentes maneras:
-
-> [!NOTE]
-> Debes haber importado el modulo primero.
-
-- Solo pasando el puerto
-
-  ```js
-  const Server = new ServerCore(80);
-  ```
-
-- Pasando Puerto y Host
-
-  ```js
-  const Server = new ServerCore(80, 'MiDominio.com');
-  ```
-
-## Servidor HTTPS
-
-> [!NOTE]
-> - Debes tener un certificado ssl (la clave publica y privada).
-> - Si no quieres especificar un host usa `null`.
-> - Actualmente se inicia el servidor HTTP y HTTPS a la vez en este caso
->   esto se corregirá y se pondrá como característica opcional en futuras versiones.
+You can use **ServerCore** to serve static pages:
 
 ```js
-const server = new ServerCore(80, null, {
-  pubKey: 'Cert/MiDominio.pem',    //El archivo con la clave publica       (Obligatorio)
-  privKey: 'Cert/MiDominio.key',   //El archivo con la  clave privada      (Obligatorio)
-  port: 443                        //El puerto donde se abrirá el servidor (Opcional)
-});
+// Importing ServerCore
+import ServerCore from 'saml.servercore';
+
+// Creating the server
+const server = new ServerCore();
+
+// Adding rules
+server.router.addFolder('/source', 'source');
+server.router.addFile('/', 'source/index.html');
+
+// Starting the server
+server.start();
 ```
 
-## Agregar enrutador
+---
 
-En **`ServerCore`** existen 4 clases de enrutador:
+## APIs and Websites
 
-|Tipo                   |Descripción                                          |
-|----------------------:|:----------------------------------------------------|
-|[Folder](#carpeta)     |Comparte una carpeta y sus sub-carpetas              |
-|[File](#archivo)       |Comparte un único archivo                            |
-|[Action](#acción)      |Te permite trabajar completamente con las solicitudes|
-|[WebSocket](#websocket)|Permite manejar conexiones WebSocket en esa ruta     |
+You can use **actions** to execute code and send responses to the client:
 
-Los Métodos aceptados actualmente son:
+```js
+import ServerCore from 'saml.servercore';
 
-|Método|Descripción                                 |
-|-----:|:-------------------------------------------|
-|GET   |El método de petición `GET`.                |
-|POST  |El método de petición `POST`.               |
-|PUT   |El método de petición `PUT`.                |
-|DELETE|El método de petición `DELETE`.             |
-|ALL   |Todos los métodos anteriormente mencionados.|
+const server = new ServerCore();
 
-Como funciona la RuleUrl:<br/>
-
-Actualmente la RuleUrl acepta 2 características
- - Comodín * toma todas las sub rutas incluyendo hasta antes de *
-   - para /test/* tomaría /test y todo lo demás como /test/algo-mas/x
-   - para /test2/*/Algo tomaría /Test2/(cualquier-cosa)/Algo
-     es como el comodín $ solo que no guardara en una variable
- - Toma parámetros de la url usando $ seguido del nombre de la variable
-   y se puede acceder a ellas desde `Request.RuleParams`
-   **Ejemplo**:
-   ```js
-   server.addAction('ALL', '/User/$UserID/Post/$PostID', (request, response) => {
-    response.sendJson({
-      url: request.url,
-      ruleParams: request.ruleParams
-    });
-    /* Esto devolverá lo siguiente si la ruta fuera /User/111111/Post/222222
-      {
-         "Url": "/User/111111/Post/222222"
-         "RuleParams": {
-             "UserID": "111111",
-             "PostID": "222222"
-         }
-      }
-    */
+// Action with a static response
+server.router.addAction('GET', '/api/test', (request, response) => {
+  response.sendJson({
+    message: 'Hello World',
+    route: `[${request.method}] -> ${request.url}`
   });
-   ```
-**AuthExec**
-Es una función que recibe como parámetro la petición del http
-esta debe retornar un valor booleano, true para decir que la petición esta autenticada y false para decir que no lo esta.
-**Ejemplo**:
+});
+
+// Route params and query params
+// Example route param: `/api/params/$id`
+// Example request: `http://localhost/api/params/123`
+server.router.addAction('GET', '/api/params/$id', (request, response) => {
+  response.sendJson({
+    message: 'Hello World',
+    route: `[${request.method}] -> ${request.url}`,
+    params: request.ruleParams,
+    query: request.searchParams
+  });
+});
+
+// Serving files
+server.router.addAction('GET', '/api/file', (request, response) => {
+  response.sendFile('source/index.html');
+});
+
+// Sending simple text
+server.router.addAction('GET', '/api/string', (request, response) => {
+  response.send('Hello World');
+});
+
+// Starting the server
+server.start();
+```
+
+---
+
+## SPAs
+
+You can serve a single file for multiple URLs, including recursive routes:
+
 ```js
-// si la petición se hace con el QueryParam Auth y es igual a AuthYes se confirmara la autenticidad de la petición
-server.addFile('/FileWA', 'changes.md', (Request) => {
-    return Request.queryParams.has('Auth') && Request.queryParams.get('Auth') == 'AuthYes'
+import ServerCore from 'saml.servercore';
+
+const server = new ServerCore();
+
+server.router.addFile('/', 'main.html');
+server.router.addFile('/app/*', 'main.html');
+server.router.addFolder('/public', 'public');
+
+/*
+You can also add other features like actions, files, folders, etc.
+Use addWebSocket for real-time connections.
+*/
+
+server.start();
+```
+
+---
+
+## Server Configuration
+
+You can configure the server using the `server.config` object:
+
+```js
+import ServerCore from 'saml.servercore';
+const server = new ServerCore();
+
+server.config.port = 3000;
+server.config.host = 'localhost';
+server.config.https = {
+  key: 'path/to/key.pem',
+  cert: 'path/to/cert.pem'
+};
+server.config.templates.error = 'error.html';
+server.config.templates.folder = 'folder.html';
+```
+
+You can also create the server with a configuration object passed to the constructor:
+
+* **Using options:**
+
+```js
+const server = new ServerCore({
+  port: 3000,
+  host: 'localhost',
+  ssl: null
 });
 ```
 
+* **Using the Config instance:**
 
-### Carpeta
+```js
+const config = new ServerCore.Config();
+config.port = 3000;
+config.host = 'localhost';
+config.ssl = null;
 
-Comparte una carpeta y todo su contenido tanto archivos como sub-carpetas
+const server = new ServerCore(config);
+```
+
+---
+
+## URL Rules
+
+URL rules are strings used to define routes handled by the router.
+
+The main separator is `/` which indicates a new sub-route:
+
+* **`*`**: A wildcard that captures all sub-routes.
+* **`$<name>`**: A dynamic parameter you can access via `request.ruleParams`.
+* **`<string>`**: A literal segment that must match exactly.
+
+**Examples**:
+
+* `/api/*` — Matches `/api/users`, `/api/posts/comments`, etc.
+* `/user/$id` — Matches `/user/123`, capturing `123` as `id`.
+* `/blog/$category/$postId` — Matches `/blog/tech/42`, capturing `tech` as `category` and `42` as `postId`.
+
+---
+
+## Rules
+
+In **ServerCore**, there are four types of routers:
+
+| Type                    | Description                                            |
+| ----------------------- | ------------------------------------------------------ |
+| [Folder](#folder)       | Serves a folder and its sub-folders                    |
+| [File](#file)           | Serves a single file                                   |
+| [Action](#action)       | Lets you handle requests programmatically              |
+| [WebSocket](#websocket) | Allows managing WebSocket connections on a given route |
+
+### Folder
+
+Serves a folder and its sub-folders:
 
 > [!WARNING]
-> - ⚠️No compartas la raíz de tu proyecto, ya que esto daría acceso a **TODO** su contenido.
->   - Datos privados como las llaves privadas de tus certificados.
->   - Contraseñas a bases de datos que estén en los archivos js del lado del servidor.
->   - Tokens de seguridad
->   y en general cualquier otro dato
-> - Esto tomara la ruta que le asignes de forma completa
->   **Ejemplo**: si le asignas la ruta `/src` tomaría todas las sub-rutas como `/src/estilos` 
-
-Para añadir este tipo de regla usa:
+> Do not share the root of your project, as this would expose **ALL** its contents:
+>
+> * Private certificate keys
+> * Database passwords in server-side `.js` files
+> * Security tokens
+> * And any other sensitive data
+>
+> Also:
+>
+> * The entire assigned path will be exposed.
+>
+>   * **Example:** assigning `/src` would include all sub-routes like `/src/styles`.
 
 ```js
-// Usando AddFile
-/*
-  Esta función acepta 3 parámetros:
-  UrlRule, Source, AuthExec.
-    AuthExec es opcional.
-*/
-server.addFolder('/MyFolder', 'Test');
-
-
-// Usando el constructor de la clase Rule:
-// De esta manera tienes mayor control sobre la creación de la regla.
-server.addRules(
-    /*
-      este constructor acepta 5 parámetros para crearse correctamente:
-      Tipo, Método, UrlRule, Content, AuthExec.
-      AuthExec es opcional.
-    */
-    new ServerCore.Rule('Folder', 'GET', '/MyFolder/', 'Test/', () => true),
-  );
-
+server.router.addFolder('/my-folder', 'path/to/folder');
+server.router.addFolder('/my-folder-2', '/path/to/folder/absolute');
 ```
 
-### Archivo
+### File
 
-Comparte un archivo especifico
+Serves a single file:
 
 ```js
-// Usando AddFolder
-/*
-  Esta función acepta 3 parámetros:
-  UrlRule, Source, AuthExec.
-    AuthExec es opcional.
-*/
-server.addFile('/MyFile', 'changes.md');
-
-
-// Usando el constructor de la clase Rule:
-// De esta manera tienes mayor control sobre la creación de la regla.
-server.addRules(
-  /*
-    este constructor acepta 5 parámetros para crearse correctamente:
-    Tipo, Método, UrlRule, Content, AuthExec.
-    AuthExec es opcional.
-  */
-  new ServerCore.Rule('File', 'GET', '/MyFile/*', 'changes.md', () => true),
-);
+server.router.addFile('/my-file', 'path/to/file');
+server.router.addFile('/my-file-2', '/path/to/file/absolute');
 ```
 
-### Acción
+### Action
 
-Te permite tener total control sobre esas peticiones:
+Lets you handle requests programmatically:
 
 ```js
-// Usando AddAction
-/*
-  Esta función acepta 4 parámetros:
-  Método, UrlRule, Action, AuthExec.
-    AuthExec es opcional.
-*/
-server.addAction('GET', '/', (request, response) => {
-    if (request.cookies.has('User_ID')) {
-      response.send("El User_ID que estas usando es:" + request.cookies.get('User_ID'));
-    } else {
-      response.sendFile('./ErrorUsuario.html');
-    }
-  }
-);
-
-
-// Usando el constructor de la clase Rule:
-// En este caso no hay diferencia a usar AddAction e incluso deberás especificar el tipo.
-Server.AddRules(
-  /*
-    este constructor acepta 5 parámetros para crearse correctamente:
-    Tipo, Método, UrlRule, Content, AuthExec.
-    AuthExec es opcional.
-  */
-  new ServerCore.Rule('Action', 'GET', '/', (request, response) => {
-    if (request.cookies.has('User_ID')) {
-      response.send("El User_ID que estas usando es:" + request.cookies.get('User_ID'));
-    } else {
-      response.sendFile('./ErrorUsuario.html');
-    }
-  })
-);
+server.router.addAction('GET', '/my-action', (request, response) => {
+  response.sendJson({
+    message: 'Hello World',
+    route: `[${request.method}] -> ${request.url}`
+  });
+});
 ```
 
 ### WebSocket
 
-Esto te permite gestionar una conexión WebSocket completa:
-> [!NOTE]
-> Las url de los web sockets van por medio distinto al de las peticiones de File, Folder y Action por ende
-> no tendrán conflictos si son similares o iguales a ellas
+Allows managing WebSocket connections on a given route:
 
+> [!NOTE]
+> WebSocket URLs use a separate namespace from Files, Folders, and Actions,
+> so they won’t conflict even if they share the same route patterns.
 
 ```js
-// Usando AddWebSocket
-/*
-  Esta función acepta 3 parámetros:
-  UrlRule, Action, AuthExec.
-    AuthExec es opcional.
-*/
-const Conexiones = new Set();
+const connections = new Set();
+
 server.addWebSocket('/Test/WS-Chat', (request, socket) => {
-  console.log('[WS] CM: Conexión nueva')
-  Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
-  Conexiones.add(socket);
-  socket.on('finish', () => Conexiones.delete(socket));
-  socket.on('error', (error) => console.log('[WS-Error]:', error));
+  console.log('[WS] New connection');
+  connections.forEach(user => user.Send('A user has connected.'));
+  connections.add(socket);
+
+  socket.on('finish', () => connections.delete(socket));
+  socket.on('error', error => console.log('[WS-Error]:', error));
+
   socket.on('message', (data, info) => {
-    //console.log(Info.OPCode);
-    if (info.opCode == 1) {
-      console.log('[WS] MSS:', data.toString());
-      Conexiones.forEach((Usuario) => {
-        if (Usuario !== socket) Usuario.Send(data.toString());
+    if (info.opCode === 1) {
+      console.log('[WS] Message:', data.toString());
+      connections.forEach(user => {
+        if (user !== socket) user.Send(data.toString());
       });
-    } else if (info.opCode == 8) {
-      Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
+    } else if (info.opCode === 8) {
+      connections.forEach(user => user.Send('A user has disconnected.'));
     }
   });
 });
-
-
-// Usando el constructor de la clase Rule:
-// En este caso no hay diferencia a usar AddWebSocket e incluso deberás especificar el tipo y el método.
-const Conexiones = new Set();
-Server.AddRules(
-  /*
-    este constructor acepta 5 parámetros para crearse correctamente:
-    Tipo, Método, UrlRule, Content, AuthExec.
-    AuthExec es opcional.
-    A pesar de recibir el método este no se tomara en cuenta para las conexiones web socket.
-  */
-  new ServerCore.Rule('WebSocket', 'GET', '/Test/WS-Chat', (request, socket) => {
-    console.log('[WS] CM: Conexión nueva')
-    Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se conecto"));
-    Conexiones.add(socket);
-    socket.on('finish', () => Conexiones.delete(socket));
-    socket.on('error', (error) => console.log('[WS-Error]:', error));
-    socket.on('message', (data, info) => {
-      //console.log(Info.OPCode);
-      if (info.opCode == 1) {
-        console.log('[WS] MSS:', data.toString());
-        Conexiones.forEach((Usuario) => {
-          if (Usuario !== socket) Usuario.Send(data.toString());
-        });
-      } else if (info.opCode == 8) {
-        Conexiones.forEach((Usuario) => Usuario.Send("Un usuario se desconecto"));
-      }
-    });
-  })
-);
 ```
 
-# Version Dev
+---
 
-## En desarrollo
+# Development Version
 
-En el momento están en desarrollo:
-- [JsonWT]: El uso de Json Web Tokens.
-- [Mail]: El envió de E-Mails.
-- [Server]: El sistema de autenticación dinámico para las reglas de enrutamiento.
+## Currently in Development
 
-## Instalación
+The following features are under active development:
 
-Para instalar la version en desarrollo:
+* **\[JsonWT]**: JSON Web Token (JWT) support.
+* **\[Mail]**: Email sending functionality.
+* **\[Server]**: Dynamic authentication system for routing.
+
+## Installation
+
+To install the development version:
+
 ```console
-mpm install saml.servercore@Dev
+mpm install saml.servercore@dev
 ```
-> [!WARNING]
-> - Esta version podría contener errores.
-> - Contiene la version mas reciente del proyecto.
 
-Para acceder a las funciones en desarrollo sin añadir mencionadas en changes.md
+> [!WARNING]
+> This version may contain bugs.
+> It includes the latest features that may not yet be fully tested.
+
+To access development features not yet listed in `changes.md`:
+
 ```js
-import { Beta } from 'saml.servercore'
-const Mail = Beta.Mail;
-const JsonWT = Beta.JsonWT;
+import { Beta } from 'saml.servercore';
+const { Mail, JwtManager } = Beta;
 ```
